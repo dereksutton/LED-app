@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import logo from '../assets/LED-logo.png';
+import backgroundImage from '../assets/paintedhome2.jpg';
 
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const sectionStyle = {
-        backgroundImage: "url('/src/assets/paintedhome2.jpg')",
+        backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -15,7 +17,7 @@ const Hero = () => {
     };
 
     return (
-        <section style={sectionStyle} className="text-white">
+        <section style={sectionStyle} className="text-white overflow-hidden">
             <div style={{
                 position: 'absolute',
                 top: 0,
@@ -25,10 +27,10 @@ const Hero = () => {
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 zIndex: 1
             }}></div>
-            <div style={{ position: 'relative', zIndex: 2, height: '100%' }}>
-                <div className="flex justify-between items-center md:p-0">
+            <div style={{ position: 'relative', zIndex: 2, height: '100%' }} className="w-full">
+                <div className="flex justify-between items-center md:p-0 w-full">
                     <motion.img
-                        src="/src/assets/LED-logo.png"
+                        src={logo}
                         alt="LED Custom Painting Logo"
                         className="h-44 sm:h-44 md:h-48 pl-2 md:pl-10"
                         initial={{ x: '-100vw' }}
@@ -61,7 +63,7 @@ const Hero = () => {
                     </motion.div>
                 </div>
                 {isMenuOpen && (
-                    <nav className="md:hidden">
+                    <nav className="md:hidden w-full">
                         <ul className="flex flex-col items-center space-y-3 text-lg poppins-regular bg-slate-900 bg-opacity-75 py-2">
                             <li><a href="#services" className="hover:text-gray-300">Services</a></li>
                             <li><a href="#testimonials" className="hover:text-gray-300">Testimonials</a></li>
@@ -70,7 +72,7 @@ const Hero = () => {
                     </nav>
                 )}
                 <motion.div
-                    className="flex flex-col items-center justify-center h-full pb-64 sm:pb-48 md:pb-64 px-4 md:px-0 text-center"
+                    className="flex flex-col items-center justify-center h-full pb-64 sm:pb-48 md:pb-64 px-4 md:px-0 text-center w-full"
                     initial={{ y: '100vh' }}
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
@@ -78,7 +80,7 @@ const Hero = () => {
                     <h1 className="brand-gold text-4xl sm:text-4xl md:text-5xl poppins-semibold mt-0 sm:mt-0 md:mt-36 mb-2">
                         Transform Your Space With Precision Painting
                     </h1>
-                    <p className="text-xl sm:text-xl md:text-xl poppins-regular mb-4 sm:mb-5 md:mb-6">
+                    <p className="text-xl sm:text-xl md:text-xl poppins-regular mb-4 sm:mb-5 md:mb-6 pb-6">
                         Quality You Can See, Service You Can Trust.
                     </p>
                     <button
