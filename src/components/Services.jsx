@@ -54,8 +54,8 @@ const Services = () => {
                             {services.map((service, index) => (
                                 <div key={index} className="bg-white rounded-lg shadow-lg p-4 w-72 lg:w-72 text-center">
                                     <div className="text-5xl mb-4">{service.icon}</div>
-                                    <h3 className="text-2xl font-semibold mb-2">{service.title}</h3>
-                                    <p className="text-gray-700">{service.description}</p>
+                                    <h3 className="text-xl text-slate-700 poppins-bold mb-2">{service.title}</h3>
+                                    <p className="text-md poppins-regular text-slate-400">{service.description}</p>
                                 </div>
                             ))}
                         </div>

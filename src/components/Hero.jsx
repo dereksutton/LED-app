@@ -44,9 +44,9 @@ const Hero = () => {
                             animate={{ x: 0 }}
                             transition={{ type: 'spring', stiffness: 30 }}
                         >
-                            <li><a href="#services" className="hover:text-gray-300 hover:no-underline">Services</a></li>
-                            <li><a href="#testimonials" className="hover:text-gray-300 hover:no-underline">Testimonials</a></li>
-                            <li><a href="#contact" className="hover:text-gray-300 hover:no-underline">Contact</a></li>
+                            <li><a href="#services" className="hover:text-gray-300 text-xl hover:no-underline">Services</a></li>
+                            <li><a href="#testimonials" className="hover:text-gray-300 text-xl hover:no-underline">Testimonials</a></li>
+                            <li><a href="#contact" className="hover:text-gray-300 text-xl hover:no-underline">Contact</a></li>
                         </motion.ul>
                     </nav>
                     <motion.div

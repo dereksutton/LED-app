@@ -22,7 +22,7 @@ const Testimonials = () => {
     return (
         <section id="testimonials" className="bg-white py-16 text-center">
             <div className="container mx-auto px-4">
-                <h2 className="text-4xl font-bold mb-8">What Our Clients Say</h2>
+                <h2 className="poppins-bold text-slate-700 text-5xl lg:text-5xl">What Our Clients Say</h2>
                 <div className="flex flex-wrap justify-center gap-8">
                     {testimonials.map((testimonial, index) => (
                         <div key={index} className="bg-gray-100 rounded-lg shadow-lg p-6 w-72 text-center">
