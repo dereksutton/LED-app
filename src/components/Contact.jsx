@@ -48,7 +48,7 @@ const Contact = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="message" className="block text-left text-slate-700 mb-2 font-semibold">Tell Us What You Need</label>
+                        <label htmlFor="message" className="block text-left text-slate-700 mb-2 font-semibold">Tell Us About Your Project</label>
                         <textarea
                             id="message"
                             name="message"
