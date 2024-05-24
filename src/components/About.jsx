@@ -2,10 +2,10 @@ import React from 'react';
 
 const About = () => {
     return (
-        <>
-           <h1 className="poppins-bold text-slate-700 text-5xl lg:text-5xl">About Us</h1>
+        <section id="about" className="mx-auto w-4/5 lg:w-1/3 mb-8">
+           <h1 className="poppins-bold text-slate-700 text-4xl lg:text-5xl">Our Story</h1>
            <div className="flex justify-center items-center">
-                <p className="w-7/12 lg:w:1/3 poppins-regular text-slate-400">Here at <span className="poppins-bold text-slate-700">LED</span>, we believe the experience you have is equally as important as the final results. 
+                <p className="lg:w:1/3 poppins-regular text-slate-400">Here at <span className="poppins-bold text-slate-700">LED</span>, we believe the experience you have is equally as important as the final results. 
                     We pride ourselves in taking the <span className="poppins-bold text-slate-700">"PAIN"</span> out of Painting!
                     <br/>
                     <br/>
@@ -17,7 +17,7 @@ const About = () => {
                     you around your schedule & budget to get your project done <span className="poppins-bold text-slate-700">efficiently</span> & <span className="poppins-bold text-slate-700">properly.</span>
                 </p>
             </div>
-        </>
+        </section>
     );
 }
 
