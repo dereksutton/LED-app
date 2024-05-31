@@ -38,7 +38,7 @@ const Services = () => {
         <section id="services" className="bg-gray-100 pb-8 text-center">
             <div className="mx-auto">
                 <div className="flex flex-col lg:flex-row justify-center lg:items-center gap-8">
-                    <div className="flex justify-center w-full lg:w-2/3 mb-0 lg:mb-0">
+                    <div className="flex justify-center w-screen lg:w-2/3 mb-0 lg:mb-0">
                         <dotlottie-player 
                             src="https://lottie.host/2250bca4-7b80-483f-930e-5b2384312c4b/g852b9giyz.json" 
                             background="transparent" 
@@ -49,7 +49,7 @@ const Services = () => {
                         </dotlottie-player>
                     </div>
                     <div className="flex flex-wrap w-full lg:w-full items-center">
-                        <h2 className="poppins-bold text-5xl lg:text-5xl text-slate-700 pt-6 mb-4 w-full">Our Services</h2>
+                        <h2 className="poppins-bold text-4xl lg:text-5xl text-slate-700 pt-0 lg:pt-6 mb-6 lg:mb-4 w-full">Our Services</h2>
                         <div className="flex flex-wrap justify-center gap-6">
                             {services.map((service, index) => (
                                 <div key={index} className="bg-white rounded-lg shadow-lg p-4 w-72 lg:w-80 text-center">

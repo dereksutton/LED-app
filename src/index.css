@@ -54,6 +54,10 @@ a:hover, a:focus {
   text-decoration: underline;
 }
 
+.bg-brand-gold {
+  background-color: var(--brand-gold);
+}
+
 /* Buttons */
 button {
   background-color: transparent;

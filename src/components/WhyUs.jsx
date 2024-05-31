@@ -3,14 +3,14 @@ import ledWhyUs from '../assets/LED-WhyUs.png';
 
 const WhyUs = () => {
   return (
-    <section id="whyus" className="bg-slate-700">
+    <section id="whyus" className="bg-white">
       <div className="w-screen mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-center">
           <div className="lg:w-1/2 w-full lg:pr-24 mb-8 lg:mb-0 flex flex-col items-center justify-center">
-            <h1 className="poppins-bold brand-gold text-4xl lg:text-5xl text-center mt-4 mb-6">
+            <h1 className="poppins-bold text-slate-700 text-4xl lg:text-5xl text-center mt-4 mb-6">
               Why Work With Us?
             </h1>
-            <p className="w-4/5 text-white text-lg leading-relaxed text-center">
+            <p className="w-4/5 text-slate-400 text-lg leading-relaxed text-center">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac
               venenatis erat. Donec et lacus vitae elit dignissim aliquet. Fusce
               dapibus quam in ullamcorper suscipit. Integer non libero at lorem

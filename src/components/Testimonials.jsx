@@ -36,8 +36,8 @@ const Testimonials = () => {
     return (
         <section id="testimonials" className="bg-white py-16 text-center">
             <div className="container mx-auto px-4">
-                <h2 className="poppins-bold text-slate-700 text-5xl lg:text-5xl mb-8">What Our Clients Say</h2>
-                <InfiniteCards items={testimonials} speed="slow" /> {/* Example with slow speed */}
+                <h2 className="poppins-bold text-slate-700 text-4xl lg:text-5xl mb-8">What Our Clients Say</h2>
+                <InfiniteCards items={testimonials} speed="normal" /> {/* Example with slow speed */}
             </div>
         </section>
     );

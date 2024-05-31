@@ -18,28 +18,28 @@ const Hero = () => {
     };
 
     return (
-        <section style={sectionStyle} className="brand-gold overflow-hidden">
+        <section style={sectionStyle} className="text-white overflow-hidden">
             <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-10"></div>
             <div className="relative z-20 h-full w-full">
-                <div className="flex justify-between items-center md:p-0 w-full">
+                <div className="flex justify-between items-center lg:p-0 w-full">
                     <motion.img
                         src={logo}
                         alt="LED Custom Painting Logo"
-                        className="h-44 sm:h-44 md:h-48 pl-2 md:pl-10"
+                        className="h-64 pl-0 lg:pl-8"
                         initial={{ x: '-100vw' }}
                         animate={{ x: 0 }}
                         transition={{ type: 'spring', stiffness: 30 }}
                     />
-                    <nav className="hidden md:flex">
+                    <nav className="hidden lg:flex">
                         <motion.ul
-                            className="flex items-center space-x-20 pr-4 md:pr-10 text-lg poppins-regular"
+                            className="flex items-center space-x-20 pr-6 lg:pr-12 text-lg poppins-regular"
                             initial={{ x: '100vw' }}
                             animate={{ x: 0 }}
                             transition={{ type: 'spring', stiffness: 30 }}
                         >
-                            <li><a href="#services" className="hover:text-white text-xl hover:no-underline">Services</a></li>
+                            <li><a href="#services" className="hover:text-yellow-400 text-xl hover:no-underline">Services</a></li>
                             <Menu as="li" className="relative">
-                                <Menu.Button className="flex items-center hover:text-white text-xl focus:outline-none custom-focus-ring">
+                                <Menu.Button className="flex items-center hover:text-yellow-400 text-xl focus:outline-none custom-focus-ring">
                                     About Us
                                     <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -97,12 +97,12 @@ const Hero = () => {
                                     </Menu.Items>
                                 </Transition>
                             </Menu>
-                            <li><a href="#quote" className="hover:text-white text-xl hover:no-underline">Quote Request</a></li>
-                            <li><a href="#testimonials" className="hover:text-white text-xl hover:no-underline">Testimonials</a></li>
+                            <li><a href="#testimonials" className="hover:text-yellow-400 text-xl hover:no-underline">Testimonials</a></li>
+                            <li><a href="#quote" className="hover:text-yellow-400 text-xl hover:no-underline">Quote Request</a></li>
                         </motion.ul>
                     </nav>
                     <motion.div
-                        className="md:hidden pr-4 md:pr-10"
+                        className="lg:hidden pr-4 lg:pr-10"
                         initial={{ x: '100vw' }}
                         animate={{ x: 0 }}
                         transition={{ type: 'spring', stiffness: 30 }}
@@ -115,29 +115,30 @@ const Hero = () => {
                     </motion.div>
                 </div>
                 {isMenuOpen && (
-                    <nav className="md:hidden w-full">
-                        <ul className="flex flex-col items-center space-y-3 text-lg poppins-regular bg-slate-900 bg-opacity-75 py-2">
-                            <li><a href="#services" className="hover:text-gray-300">Services</a></li>
-                            <li><a href="#testimonials" className="hover:text-gray-300">Testimonials</a></li>
-                            <li><a href="#contact" className="hover:text-yellow-500">Contact</a></li>
+                    <nav className="lg:hidden w-full">
+                        <ul className="flex flex-col items-center space-y-3 text-lg poppins-regular bg-slate-900 bg-opacity-75 brand-gold py-2">
+                            <li><a href="#services" className="hover:text-white hover:no-underline">Services</a></li>
+                            <li><a href="#about" className="hover:text-white hover:no-underline">About Us</a></li>
+                            <li><a href="#testimonials" className="hover:text-white hover:no-underline">Testimonials</a></li>
+                            <li><a href="#quote" className="hover:text-white hover:no-underline">Quote Request</a></li>
                         </ul>
                     </nav>
                 )}
                 <motion.div
-                    className="flex flex-col items-center justify-center h-full pb-64 sm:pb-48 md:pb-64 px-4 md:px-0 text-center w-full"
+                    className="flex flex-col items-center justify-center h-full pb-64 sm:pb-48 lg:pb-64 px-4 lg:px-0 text-center w-full"
                     initial={{ y: '100vh' }}
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-4xl sm:text-4xl md:text-5xl poppins-semibold mt-0 sm:mt-0 md:mt-36 mb-2">
+                    <h1 className="brand-gold text-4xl sm:text-4xl lg:text-5xl poppins-semibold mt-0 sm:mt-0 lg:mt-36 mb-2">
                         Transform Your Space With Precision Painting
                     </h1>
-                    <p className="text-white text-xl sm:text-xl md:text-xl poppins-regular mb-4 sm:mb-5 md:mb-6 pb-6">
+                    <p className="text-white text-xl sm:text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 pb-6">
                         Quality You Can See, Service You Can Trust.
                     </p>
                     <a
-                        href="#quote" className="inline-flex h-12 sm:h-12 md:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-700
-                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-4 sm:px-5 md:px-6 poppins-bold text-slate-700 text-3xl sm:text-3xl md:text-3xl
+                        href="#quote" className="inline-flex h-12 sm:h-12 lg:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-4 sm:px-5 lg:px-6 poppins-bold text-slate-700 text-3xl sm:text-3xl lg:text-3xl
                         transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                         focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
                         shadow-lg hover:shadow-2xl hover:no-underline hover:text-bluenpm -700"
