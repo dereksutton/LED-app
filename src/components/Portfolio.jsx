@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import InfiniteCards from './InfiniteCards'; // Ensure the path is correct
+import InfiniteCards from './InfiniteCards';
 import ImageModal from './ImageModal';
 
 // Import images from the src/assets folder
@@ -51,30 +51,30 @@ const portfolioImages = [
 ];
 
 const Portfolio = () => {
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-  
-    const handleImageClick = (imageUrl) => {
-      setSelectedImage(imageUrl);
-      setIsModalOpen(true);
-    };
-  
-    const handleCloseModal = () => {
-      setIsModalOpen(false);
-      setSelectedImage(null);
-    };
-  
-    return (
-      <section id="portfolio" className="bg-slate-200 py-16 text-center">
-        <div className="container mx-auto px-2">
-          <h1 className="poppins-bold text-slate-700 text-4xl lg:text-5xl mb-8">Our Recent Work</h1>
-          <InfiniteCards items={portfolioImages} direction="right" speed="slow" onImageClick={handleImageClick} />
-        </div>
-        <ImageModal imageSrc={selectedImage} isOpen={isModalOpen} onClose={handleCloseModal} />
-      </section>
-    );
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleImageClick = (imageUrl) => {
+    console.log('Image clicked:', imageUrl); // Debug log
+    setSelectedImage(imageUrl);
+    setIsModalOpen(true);
   };
-  
-  export default Portfolio;
 
+  const handleCloseModal = () => {
+    console.log('Modal closed'); // Debug log
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
 
+  return (
+    <section id="portfolio" className="bg-slate-200 py-16 text-center">
+      <div className="container mx-auto px-2">
+        <h1 className="text-4xl lg:text-5xl poppins-bold text-slate-700 mb-8">Our Recent Work</h1>
+        <InfiniteCards items={portfolioImages} onImageClick={handleImageClick} speed="slow" direction="left" contentType="image" />
+      </div>
+      <ImageModal imageSrc={selectedImage} isOpen={isModalOpen} onClose={handleCloseModal} />
+    </section>
+  );
+};
+
+export default Portfolio;

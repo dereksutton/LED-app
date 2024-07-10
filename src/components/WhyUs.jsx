@@ -10,14 +10,15 @@ const WhyUs = () => {
             <h1 className="poppins-bold text-slate-700 text-4xl lg:text-5xl text-center mt-4 mb-6">
               Why Work With Us?
             </h1>
-            <p className="w-4/5 text-slate-400 text-lg leading-relaxed text-center">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac
-              venenatis erat. Donec et lacus vitae elit dignissim aliquet. Fusce
-              dapibus quam in ullamcorper suscipit. Integer non libero at lorem
-              bibendum ultricies. Praesent finibus, lorem in commodo malesuada,
-              ligula risus tristique sapien, eu suscipit nisi ante a erat.
-              Aliquam erat volutpat.
-            </p>
+            <ul className="w-3/5 text-slate-400 text-lg leading-relaxed text-start custom-list">
+              <li className="pb-4"><span className="poppins-bold text-slate-500">The Best House Guest:</span> We treat your home with utmost respect, ensuring a pleasant and stress-free painting process.</li>
+              <li className="pb-4"><span className="poppins-bold text-slate-500">Attention to Detail:</span> Our meticulous approach guarantees flawless results that exceed expectations.</li>
+              <li className="pb-4"><span className="poppins-bold text-slate-500">Clear Communication:</span> We prioritize understanding your vision and addressing any concerns throughout the project.</li>
+              <li className="pb-4"><span className="poppins-bold text-slate-500">Extra Mile Service:</span> From careful masking to thorough clean-up, we go above and beyond to protect your property.</li>
+              <li className="pb-4"><span className="poppins-bold text-slate-500">Joy Through Color:</span> We don't just paint walls; we bring life and happiness to your living spaces.</li>
+              <li className="pb-4"><span className="poppins-bold text-slate-500">Local Expertise:</span> As the top house and commercial painters in the area, we understand your community's unique needs.</li>
+              <li><span className="poppins-bold text-slate-500">Customer Satisfaction:</span> Our ultimate goal is your complete delight with both our work and service.</li>
+            </ul>
           </div>
           <div className="lg:w-1/2 w-screen">
             <img

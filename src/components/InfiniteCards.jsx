@@ -4,10 +4,11 @@ import { cn } from "../utils/cn";
 const InfiniteCards = ({
   items,
   direction = "left",
-  speed = "normal", // Default to 'normal' speed
+  speed = "normal",
   pauseOnHover = true,
   className,
   onImageClick,
+  contentType = "image" // Add a new prop to differentiate between image and text content
 }) => {
   const containerRef = React.useRef(null);
   const scrollerRef = React.useRef(null);
@@ -53,7 +54,7 @@ const InfiniteCards = ({
           duration = "20s";
           break;
         case "slow":
-          duration = "80s";
+          duration = "100s";
           break;
         default:
           duration = "40s";
@@ -81,36 +82,27 @@ const InfiniteCards = ({
         {items.map((item, idx) => (
           <li
             key={idx}
-            className="w-[300px] h-[200px] relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 overflow-hidden"
+            onClick={() => {
+              if (contentType === "image") {
+                console.log('Image clicked'); // Debug log
+                if (onImageClick) {
+                  onImageClick(item.imageUrl);
+                }
+              }
+            }}
+            className="w-[300px] h-[200px] relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 overflow-hidden cursor-pointer"
             style={{
               background: "linear-gradient(180deg, var(--slate-800), var(--slate-900))",
             }}
-            onClick={() => onImageClick(item.imageUrl)}
           >
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={`Portfolio ${idx + 1}`}
-                className="w-full h-full object-cover rounded-2xl cursor-pointer"
-              />
+            {contentType === "image" ? (
+              <img src={item.imageUrl} alt={`Portfolio ${idx + 1}`} className="w-full h-full object-cover rounded-2xl" />
             ) : (
-              <blockquote>
-                <div
-                  aria-hidden="true"
-                  className="user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%_+_4px)] w-[calc(100%_+_4px)]"
-                ></div>
-                <span className="relative z-20 text-sm leading-[1.6] text-gray-100 font-normal">
-                  {item.quote}
-                </span>
-                <div className="relative z-20 mt-6 flex flex-row items-center">
-                  <span className="flex flex-col gap-1">
-                    <span className="text-sm leading-[1.6] text-gray-400 font-normal">
-                      {item.name}
-                    </span>
-                    <span className="text-sm leading-[1.6] text-gray-400 font-normal">
-                      {item.title}
-                    </span>
-                  </span>
+              <blockquote className="p-4 text-white">
+                <p className="text-lg italic mb-4">&ldquo;{item.quote}&rdquo;</p>
+                <div className="flex justify-end">
+                  <span className="font-bold">{item.name}</span>
+                  <span className="ml-2 text-sm text-gray-400">{item.title}</span>
                 </div>
               </blockquote>
             )}
@@ -122,4 +114,3 @@ const InfiniteCards = ({
 };
 
 export default InfiniteCards;
-

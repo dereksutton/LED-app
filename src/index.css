@@ -68,6 +68,11 @@ button {
   transition: background-color 0.3s, color 0.3s;
 }
 
+.custom-list {
+  list-style-type: disc;
+  list-style-position: inside;
+}
+
 .brand-gold {
   color: var(--brand-gold);
 }
