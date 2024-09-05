@@ -2,31 +2,36 @@ import React from 'react';
 import ledWhyUs from '../assets/LED-WhyUs.png';
 
 const WhyUs = () => {
+  const reasons = [
+    { title: "The Best House Guest", description: "We treat your home with utmost respect, ensuring a pleasant and stress-free painting process.", icon: "🏠" },
+    { title: "Attention to Detail", description: "Our meticulous approach guarantees flawless results that exceed expectations.", icon: "🔍" },
+    { title: "Clear Communication", description: "We prioritize understanding your vision and addressing any concerns throughout the project.", icon: "💬" },
+    { title: "Extra Mile Service", description: "From careful masking to thorough clean-up, we go above and beyond to protect your property.", icon: "🏃" },
+    { title: "Local Expertise", description: "As the top house and commercial painters in the area, we understand your community's unique needs.", icon: "🏘️" },
+    { title: "Customer Satisfaction", description: "Our ultimate goal is your complete delight with both our work and service.", icon: "😊" }
+  ];
+
   return (
     <section id="whyus" className="bg-white">
-      <div className="w-screen mx-auto">
-        <div className="flex flex-col lg:flex-row items-center justify-center">
-          <div className="lg:w-1/2 w-full lg:pr-24 mb-8 lg:mb-0 flex flex-col items-center justify-center">
-            <h1 className="poppins-bold text-slate-700 text-4xl lg:text-5xl text-center mt-4 mb-6">
-              Why Work With Us?
-            </h1>
-            <ul className="w-3/5 text-slate-400 text-lg leading-relaxed text-start custom-list">
-              <li className="pb-4"><span className="poppins-bold text-slate-500">The Best House Guest:</span> We treat your home with utmost respect, ensuring a pleasant and stress-free painting process.</li>
-              <li className="pb-4"><span className="poppins-bold text-slate-500">Attention to Detail:</span> Our meticulous approach guarantees flawless results that exceed expectations.</li>
-              <li className="pb-4"><span className="poppins-bold text-slate-500">Clear Communication:</span> We prioritize understanding your vision and addressing any concerns throughout the project.</li>
-              <li className="pb-4"><span className="poppins-bold text-slate-500">Extra Mile Service:</span> From careful masking to thorough clean-up, we go above and beyond to protect your property.</li>
-              <li className="pb-4"><span className="poppins-bold text-slate-500">Joy Through Color:</span> We don't just paint walls; we bring life and happiness to your living spaces.</li>
-              <li className="pb-4"><span className="poppins-bold text-slate-500">Local Expertise:</span> As the top house and commercial painters in the area, we understand your community's unique needs.</li>
-              <li><span className="poppins-bold text-slate-500">Customer Satisfaction:</span> Our ultimate goal is your complete delight with both our work and service.</li>
-            </ul>
+      <div className="flex flex-col lg:flex-row">
+        <div className="w-full lg:w-1/2 p-8 flex flex-col items-center justify-center">
+          <h2 className="poppins-bold text-4xl lg:text-5xl text-slate-700 mb-8 text-center">Why Work With Us?</h2>
+          <div className="flex flex-wrap justify-center gap-6 max-w-2xl">
+            {reasons.map((reason, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-lg p-4 w-full sm:w-64 text-center">
+                <div className="text-4xl mb-4">{reason.icon}</div>
+                <h3 className="text-xl text-slate-700 poppins-bold mb-2">{reason.title}</h3>
+                <p className="text-sm poppins-regular text-slate-400">{reason.description}</p>
+              </div>
+            ))}
           </div>
-          <div className="lg:w-1/2 w-screen">
-            <img
-              src={ledWhyUs}
-              alt="Why Work With Us"
-              className="w-full h-auto lg:h-full lg:object-cover"
-            />
-          </div>
+        </div>
+        <div className="w-full lg:w-1/2 relative min-h-[400px] md:min-h-[600px] lg:min-h-0 lg:h-auto">
+          <img
+            src={ledWhyUs}
+            alt="Why Work With Us"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
         </div>
       </div>
     </section>
