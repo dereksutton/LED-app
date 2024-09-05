@@ -3,34 +3,34 @@ import React from 'react';
 const Services = () => {
     const services = [
         {
-            title: 'Residential Painting',
-            description: 'Interior and exterior painting for homes.',
-            icon: '🏠',
-        },
-        {
-            title: 'Commercial Painting',
-            description: 'Painting services for offices and commercial spaces.',
-            icon: '🏢',
-        },
-        {
-            title: 'Custom Finishes',
-            description: 'Unique finishes to give your walls a special look.',
+            title: 'Interior Painting',
+            description: 'Transform your indoor spaces with expert painting.',
             icon: '🎨',
         },
         {
-            title: 'Cabinet Refinishing',
-            description: 'We redo the finish on your cabinets.',
-            icon: '🖌️'
+            title: 'Exterior Painting',
+            description: `Enhance your home's curb appeal with fresh paint.`,
+            icon: '🏠',
+        },
+        {
+            title: 'Pressure Washing',
+            description: 'Restore surfaces to their original beauty.',
+            icon: '💦',
         },
         {
             title: 'Cabinet Refinishing',
-            description: 'We redo the finish on your cabinets.',
-            icon: '🖌️'
+            description: 'Give your cabinets a fresh, updated look.',
+            icon: '🚪',
         },
         {
-            title: 'Cabinet Refinishing',
-            description: 'We redo the finish on your cabinets.',
-            icon: '🖌️'
+            title: 'Popcorn Ceiling Removal',
+            description: 'Modernize your ceilings for a sleek appearance.',
+            icon: '🔨',
+        },
+        {
+            title: 'Knockdown Ceiling Texture',
+            description: 'Add subtle texture for a modern ceiling finish.',
+            icon: '🖌️',
         },
     ];
 
