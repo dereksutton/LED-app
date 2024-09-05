@@ -18,7 +18,7 @@ const WhyUs = () => {
           <h2 className="poppins-bold text-4xl lg:text-5xl text-slate-700 mb-8 text-center">Why Work With Us?</h2>
           <div className="flex flex-wrap justify-center gap-6 max-w-2xl">
             {reasons.map((reason, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-lg p-4 w-full sm:w-64 text-center">
+              <div key={index} className="bg-white rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">
                 <div className="text-4xl mb-4">{reason.icon}</div>
                 <h3 className="text-xl text-slate-700 poppins-bold mb-2">{reason.title}</h3>
                 <p className="text-sm poppins-regular text-slate-400">{reason.description}</p>

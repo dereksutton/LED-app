@@ -17,6 +17,18 @@ const Hero = () => {
         position: 'relative',
     };
 
+    const menuButtonStyle = {
+        outline: 'none',
+        boxShadow: 'none',
+        border: 'none',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+    };
+
+    const hamburgerButtonStyle = {
+        ...menuButtonStyle,
+        backgroundColor: 'transparent',
+    };
+
     return (
         <section style={sectionStyle} className="text-white overflow-hidden">
             <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-10"></div>
@@ -39,63 +51,71 @@ const Hero = () => {
                         >
                             <li><a href="#services" className="hover:text-yellow-400 text-xl hover:no-underline">Services</a></li>
                             <Menu as="li" className="relative">
-                                <Menu.Button className="flex items-center hover:text-yellow-400 text-xl focus:outline-none custom-focus-ring">
-                                    About Us
-                                    <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                    </svg>
-                                </Menu.Button>
-                                <Transition
-                                    enter="transition ease-out duration-100"
-                                    enterFrom="transform opacity-0 scale-95"
-                                    enterTo="transform opacity-100 scale-100"
-                                    leave="transition ease-in duration-75"
-                                    leaveFrom="transform opacity-100 scale-100"
-                                    leaveTo="transform opacity-0 scale-95"
-                                >
-                                    <Menu.Items className="absolute right-0 mt-2 w-48 bg-slate-700 rounded-md shadow-lg py-2 ring-0 ring-yellow-400 focus:outline-none">
-                                        <Menu.Item>
-                                            {({ active }) => (
-                                                <a
-                                                    href="#about"
-                                                    className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
-                                                >
-                                                    Our Story
-                                                </a>
-                                            )}
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            {({ active }) => (
-                                                <a
-                                                    href="#whyus"
-                                                    className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
-                                                >
-                                                    Why Us?
-                                                </a>
-                                            )}
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            {({ active }) => (
-                                                <a
-                                                    href="#portfolio"
-                                                    className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
-                                                >
-                                                    Our Recent Work
-                                                </a>
-                                            )}
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                            {({ active }) => (
-                                                <a
-                                                    href="#guarantee"
-                                                    className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
-                                                >
-                                                    Our Guarantee
-                                                </a>
-                                            )}
-                                        </Menu.Item>
-                                    </Menu.Items>
-                                </Transition>
+                                {({ open }) => (
+                                    <>
+                                        <Menu.Button 
+                                            className="flex items-center hover:text-yellow-400 text-xl focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button" 
+                                            style={menuButtonStyle}
+                                        >
+                                            About Us
+                                            <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </Menu.Button>
+                                        <Transition
+                                            show={open}
+                                            enter="transition ease-out duration-100"
+                                            enterFrom="transform opacity-0 scale-95"
+                                            enterTo="transform opacity-100 scale-100"
+                                            leave="transition ease-in duration-75"
+                                            leaveFrom="transform opacity-100 scale-100"
+                                            leaveTo="transform opacity-0 scale-95"
+                                        >
+                                            <Menu.Items static className="absolute right-0 mt-2 w-48 bg-slate-700 rounded-md shadow-lg py-2 focus:outline-none">
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#about"
+                                                            className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
+                                                        >
+                                                            Our Story
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#whyus"
+                                                            className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
+                                                        >
+                                                            Why Us?
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#portfolio"
+                                                            className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
+                                                        >
+                                                            Our Recent Work
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                                <Menu.Item>
+                                                    {({ active }) => (
+                                                        <a
+                                                            href="#guarantee"
+                                                            className={`${active ? 'bg-yellow-400 text-slate-700' : 'text-yellow-400'} block px-4 py-2 hover:no-underline`}
+                                                        >
+                                                            Our Guarantee
+                                                        </a>
+                                                    )}
+                                                </Menu.Item>
+                                            </Menu.Items>
+                                        </Transition>
+                                    </>
+                                )}
                             </Menu>
                             <li><a href="#testimonials" className="hover:text-yellow-400 text-xl hover:no-underline">Testimonials</a></li>
                             <li><a href="#quote" className="hover:text-yellow-400 text-xl hover:no-underline">Quote Request</a></li>
@@ -107,8 +127,12 @@ const Hero = () => {
                         animate={{ x: 0 }}
                         transition={{ type: 'spring', stiffness: 30 }}
                     >
-                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none focus:ring-0">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <button 
+                            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                            className="text-white focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button"
+                            style={hamburgerButtonStyle}
+                        >
+                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}></path>
                             </svg>
                         </button>
