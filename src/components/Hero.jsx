@@ -30,9 +30,9 @@ const Hero = () => {
     };
 
     return (
-        <section style={sectionStyle} className="text-white overflow-hidden">
+        <section style={sectionStyle} className="text-white overflow-y-auto">
             <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-10"></div>
-            <div className="relative z-20 h-full w-full">
+            <div className="relative z-20 flex flex-col min-h-screen">
                 <div className="flex justify-between items-center lg:p-0 w-full">
                     <motion.img
                         src={logo}
@@ -154,18 +154,18 @@ const Hero = () => {
                     </nav>
                 )}
                 <motion.div
-                    className="flex flex-col items-center justify-center h-full pb-44 sm:pb-48 lg:pb-64 px-4 lg:px-0 text-center w-full"
+                    className="flex flex-col items-center justify-center pb-44 sm:pb-48 lg:pb-32 flex-grow px-4 lg:px-0 text-center w-full"
                     initial={{ y: '100vh' }}
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-4xl sm:text-4xl lg:text-5xl poppins-semibold mt-0 sm:mt-0 lg:mt-36 mb-2">
+                    <h1 className="brand-gold text-4xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
                         Transform Your Space With Precision Painting
                     </h1>
-                    <p className="text-white text-xl sm:text-xl lg:text-3xl poppins-regular mb-4 sm:mb-5 lg:mb-6 pb-4">
+                    <p className="text-white text-2xl sm:text-xl lg:text-3xl poppins-regular mb-4 sm:mb-5">
                         Quality You Can See, Service You Can Trust.
                     </p>
-                    <p className="text-white text-xl sm:text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
+                    <p className="text-white text-lg sm:text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
                         <span className="block mb-2 mt-4">
                             ⭐⭐⭐⭐⭐
                         </span>
