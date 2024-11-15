@@ -37,7 +37,7 @@ const Hero = () => {
                     <motion.img
                         src={logo}
                         alt="LED Custom Painting Logo"
-                        className="h-84 pl-0 lg:pl-8"
+                        className="h-80 pl-0 lg:pl-8"
                         initial={{ x: '-100vw' }}
                         animate={{ x: 0 }}
                         transition={{ type: 'spring', stiffness: 30 }}
