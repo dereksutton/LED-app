@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "../utils/cn";
 
 const InfiniteCards = ({
@@ -7,108 +7,70 @@ const InfiniteCards = ({
   speed = "normal",
   pauseOnHover = true,
   className,
-  onImageClick,
-  contentType = "image" // Add a new prop to differentiate between image and text content
+  contentType = "text"
 }) => {
-  const containerRef = React.useRef(null);
-  const scrollerRef = React.useRef(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    addAnimation();
+    setIsReady(true);
   }, []);
 
-  const [start, setStart] = useState(false);
+  // Double the items for seamless loop
+  const scrollItems = [...items, ...items, ...items]; // Triple the items for longer scroll
 
-  const addAnimation = () => {
-    if (containerRef.current && scrollerRef.current) {
-      const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
-        const duplicatedItem = item.cloneNode(true);
-        if (scrollerRef.current) {
-          scrollerRef.current.appendChild(duplicatedItem);
-        }
-      });
-
-      setDirection();
-      setSpeed();
-      setStart(true);
-    }
-  };
-
-  const setDirection = () => {
-    if (containerRef.current) {
-      if (direction === "left") {
-        containerRef.current.style.setProperty("--animation-direction", "forwards");
-      } else {
-        containerRef.current.style.setProperty("--animation-direction", "reverse");
-      }
-    }
-  };
-
-  const setSpeed = () => {
-    if (containerRef.current) {
-      let duration;
-      switch (speed) {
-        case "fast":
-          duration = "20s";
-          break;
-        case "slow":
-          duration = "100s";
-          break;
-        default:
-          duration = "40s";
-      }
-      containerRef.current.style.setProperty("--animation-duration", duration);
+  const getDuration = () => {
+    switch (speed) {
+      case "fast":
+        return "20s";
+      case "slow":
+        return "60s";
+      default:
+        return "40s";
     }
   };
 
   return (
-    <div
-      ref={containerRef}
-      className={cn(
-        "scroller relative z-20 max-w-7xl mx-auto overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_40%,white_60%,transparent)]",
-        className
-      )}
-    >
-      <ul
-        ref={scrollerRef}
+    <div className={cn(
+      "relative z-20 w-full overflow-hidden",
+      className
+    )}>
+      <div
         className={cn(
-          "flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap items-center",
-          start && "animate-scroll",
+          "flex gap-6 w-max",
+          isReady && "animate-scroll-infinite",
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
+        style={{
+          animationDirection: direction === "left" ? "normal" : "reverse",
+          animationDuration: getDuration(),
+        }}
       >
-        {items.map((item, idx) => (
-          <li
+        {scrollItems.map((item, idx) => (
+          <div
             key={idx}
-            onClick={() => {
-              if (contentType === "image") {
-                console.log('Image clicked'); // Debug log
-                if (onImageClick) {
-                  onImageClick(item.imageUrl);
-                }
-              }
-            }}
-            className="w-[300px] h-[200px] relative rounded-2xl border border-b-0 flex-shrink-0 border-slate-700 overflow-hidden cursor-pointer"
-            style={{
-              background: "linear-gradient(180deg, var(--slate-800), var(--slate-900))",
-            }}
-          >
-            {contentType === "image" ? (
-              <img src={item.imageUrl} alt={`Portfolio ${idx + 1}`} className="w-full h-full object-cover rounded-2xl" />
-            ) : (
-              <blockquote className="p-4 text-white">
-                <p className="text-lg italic mb-4">&ldquo;{item.quote}&rdquo;</p>
-                <div className="flex justify-end">
-                  <span className="font-bold">{item.name}</span>
-                  <span className="ml-2 text-sm text-gray-400">{item.title}</span>
-                </div>
-              </blockquote>
+            className={cn(
+              "w-[350px] flex-shrink-0 rounded-2xl border border-slate-700",
+              "bg-gradient-to-b from-slate-800 to-slate-900 shadow-xl"
             )}
-          </li>
+          >
+            <blockquote className="p-6 h-full flex flex-col">
+              <p className="text-lg italic text-white mb-4">
+                "{item.quote}"
+              </p>
+              <footer className="mt-auto">
+                <div className="flex flex-col items-end">
+                  <cite className="font-semibold text-white not-italic">
+                    {item.name}
+                  </cite>
+                  <span className="text-sm text-slate-400">
+                    {item.title}
+                  </span>
+                </div>
+              </footer>
+            </blockquote>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

@@ -15,6 +15,7 @@ module.exports = {
       animation: {
         shimmer: "shimmer 2s linear infinite",
         scroll: "scroll 30s linear infinite",
+        'scroll-infinite': 'scroll-x 40s linear infinite', // Added new animation
       },
       keyframes: {
         shimmer: {
@@ -28,6 +29,10 @@ module.exports = {
         scroll: {
           '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(-100%)' },
+        },
+        'scroll-x': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-33.33%)' }  // Because we tripled the items
         },
       },
     },
