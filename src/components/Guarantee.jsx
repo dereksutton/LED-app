@@ -21,9 +21,9 @@ const Guarantee = () => {
     ];
 
     return (
-        <section id="guarantee" className="bg-slate-700 py-20 px-4 md:px-8">
+        <section id="guarantee" className="bg-slate-700 py-12 px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
-                <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl text-center mb-16">Our Guarantee</h2>
+                <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl text-center mb-8">Our Guarantee</h2>
                 
                 <div className="flex flex-col lg:flex-row justify-center items-center lg:items-stretch gap-8">
                     <div className="flex flex-col lg:flex-row gap-8 justify-center items-center lg:items-stretch">
@@ -33,7 +33,7 @@ const Guarantee = () => {
                                     {point.icon}
                                 </div>
                                 <h3 className="text-slate-700 poppins-semibold text-xl mb-3">{point.title}</h3>
-                                <p className="text-white poppins-regular text-sm">{point.description}</p>
+                                <p className="text-white poppins-regular text-lg">{point.description}</p>
                             </div>
                         ))}
                     </div>

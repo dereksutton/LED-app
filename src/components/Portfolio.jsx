@@ -1,78 +1,39 @@
-import React, { useState } from 'react';
-import InfiniteCards from './InfiniteCards';
-import ImageModal from './ImageModal';
-
-// Import images from the src/assets folder
-import image1 from '../assets/LED-WorkImg-1.jpg';
-import image2 from '../assets/LED-WorkImg-2.jpg';
-import image3 from '../assets/LED-WorkImg-3.jpg';
-import image4 from '../assets/LED-WorkImg-4.jpg';
-import image5 from '../assets/LED-WorkImg-5.jpg';
-import image6 from '../assets/LED-WorkImg-6.jpg';
-import image7 from '../assets/LED-WorkImg-7.jpg';
-import image8 from '../assets/LED-WorkImg-8.jpg';
-import image9 from '../assets/LED-WorkImg-9.jpg';
-import image10 from '../assets/LED-WorkImg-10.jpg';
-import image11 from '../assets/LED-WorkImg-11.jpg';
-import image12 from '../assets/LED-WorkImg-12.jpg';
-import image13 from '../assets/LED-WorkImg-13.jpg';
-import image14 from '../assets/LED-WorkImg-14.jpg';
-import image15 from '../assets/LED-WorkImg-15.jpg';
-import image16 from '../assets/LED-WorkImg-16.jpg';
-import image17 from '../assets/LED-WorkImg-17.jpg';
-import image18 from '../assets/LED-WorkImg-18.jpg';
-import image19 from '../assets/LED-WorkImg-19.jpg';
-import image20 from '../assets/LED-WorkImg-20.jpg';
-import image21 from '../assets/LED-WorkImg-21.jpg';
-
-const portfolioImages = [
-  { imageUrl: image1 },
-  { imageUrl: image2 },
-  { imageUrl: image3 },
-  { imageUrl: image4 },
-  { imageUrl: image5 },
-  { imageUrl: image6 },
-  { imageUrl: image7 },
-  { imageUrl: image8 },
-  { imageUrl: image9 },
-  { imageUrl: image10 },
-  { imageUrl: image11 },
-  { imageUrl: image12 },
-  { imageUrl: image13 },
-  { imageUrl: image14 },
-  { imageUrl: image15 },
-  { imageUrl: image16 },
-  { imageUrl: image17 },
-  { imageUrl: image18 },
-  { imageUrl: image19 },
-  { imageUrl: image20 },
-  { imageUrl: image21 },
-  // Add more images as needed
-];
+// Portfolio.jsx
+import React from 'react';
+import BeforeAfterSlider from './BeforeAfterSlider';
+import before1 from '../assets/before1.jpg';
+import after1 from '../assets/after1.jpg';
+import before2 from '../assets/before2.jpg';
+import after2 from '../assets/after2.jpg';
+import before3 from '../assets/before3.jpg';
+import after3 from '../assets/after3.jpg';
+import before4 from '../assets/before4.jpg';
+import after4 from '../assets/after4.jpg';
+import before5 from '../assets/before5.jpg';
+import after5 from '../assets/after5.jpg';
+import before6 from '../assets/before6.jpg';
+import after6 from '../assets/after6.jpg';
 
 const Portfolio = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleImageClick = (imageUrl) => {
-    console.log('Image clicked:', imageUrl); // Debug log
-    setSelectedImage(imageUrl);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    console.log('Modal closed'); // Debug log
-    setIsModalOpen(false);
-    setSelectedImage(null);
-  };
+  const imagePairs = [
+    { before: before1, after: after1 },
+    { before: before2, after: after2 },
+    { before: before3, after: after3 },
+    { before: before4, after: after4 },
+    { before: before5, after: after5 },
+    { before: before6, after: after6 }
+  ];
 
   return (
-    <section id="portfolio" className="bg-slate-200 py-16 text-center">
-      <div className="container mx-auto px-2">
-        <h1 className="text-4xl lg:text-5xl poppins-bold text-slate-700 mb-8">Our Recent Work</h1>
-        <InfiniteCards items={portfolioImages} onImageClick={handleImageClick} speed="slow" direction="left" contentType="image" />
+    <section id="portfolio" className="bg-slate-200 pt-8 py-12">
+      <div className="container mx-auto">
+        <h1 className="text-4xl lg:text-5xl font-bold text-slate-700 text-center poppins-bold">
+          Check Out Our Recent Work
+        </h1>
+        <p className="mb-12 text-slate-500 text-xl poppins-semibold">Click the button on the images below to view each project's tranformation!</p>
+        <BeforeAfterSlider imagePairs={imagePairs} />
       </div>
-      <ImageModal imageSrc={selectedImage} isOpen={isModalOpen} onClose={handleCloseModal} />
     </section>
   );
 };

@@ -19,9 +19,9 @@ const WhyUs = () => {
           <div className="flex flex-wrap justify-center gap-6 max-w-2xl">
             {reasons.map((reason, index) => (
               <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">
-                <div className="text-4xl mb-4">{reason.icon}</div>
-                <h3 className="text-xl text-slate-700 poppins-semibold mb-2">{reason.title}</h3>
-                <p className="text-sm poppins-regular text-white">{reason.description}</p>
+                <div className="text-5xl mb-4">{reason.icon}</div>
+                <h3 className="text-2xl text-slate-700 poppins-semibold mb-2">{reason.title}</h3>
+                <p className="text-lg poppins-regular text-white">{reason.description}</p>
               </div>
             ))}
           </div>

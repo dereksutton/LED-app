@@ -68,6 +68,22 @@ button {
   transition: background-color 0.3s, color 0.3s;
 }
 
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
 .custom-list {
   list-style-type: disc;
   list-style-position: inside;

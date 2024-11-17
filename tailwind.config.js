@@ -14,7 +14,7 @@ module.exports = {
     extend: {
       animation: {
         shimmer: "shimmer 2s linear infinite",
-        scroll: "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+        scroll: "scroll 30s linear infinite",
       },
       keyframes: {
         shimmer: {
@@ -26,9 +26,8 @@ module.exports = {
           },
         },
         scroll: {
-          to: {
-            transform: "translate(calc(-50% - 0.5rem))",
-          },
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' },
         },
       },
     },
@@ -46,4 +45,3 @@ function addVariablesForColors({ addBase, theme }) {
     ":root": newVars,
   });
 }
-
