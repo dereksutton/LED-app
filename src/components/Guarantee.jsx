@@ -21,14 +21,16 @@ const Guarantee = () => {
     ];
 
     return (
-        <section id="guarantee" className="bg-slate-700 py-12 px-4 md:px-8">
+        <section id="guarantee" className="bg-slate-700 py-10 px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
-                <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl text-center mb-8">Our Guarantee</h2>
+                <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl text-center">Our Guarantee</h2>
                 
-                <div className="flex flex-col lg:flex-row justify-center items-center lg:items-stretch gap-8">
-                    <div className="flex flex-col lg:flex-row gap-8 justify-center items-center lg:items-stretch">
+                {/* Main container with adjusted spacing */}
+                <div className="flex flex-col lg:flex-row items-center">
+                    {/* Cards Container - reduced width on desktop */}
+                    <div className="flex flex-col lg:flex-row gap-8 justify-center items-center lg:items-stretch lg:w-11/12">
                         {guaranteePoints.map((point, index) => (
-                            <div key={index} className="bg-slate-400 rounded-xl p-6 shadow-lg flex flex-col items-center text-center w-80">
+                            <div key={index} className="bg-slate-400 rounded-xl p-6 shadow-lg flex flex-col items-center text-center w-80 lg:w-2/3">
                                 <div className="mb-4">
                                     {point.icon}
                                 </div>
@@ -38,12 +40,19 @@ const Guarantee = () => {
                         ))}
                     </div>
                     
-                    <div className="lg:w-1/3 flex justify-center items-center">
+                    {/* Lottie Container - significantly larger on desktop */}
+                    <div className="w-full lg:w-2/5 h-[250px] lg:h-[400px] flex justify-center items-center mt-6">
                         <dotlottie-player 
                             src="https://lottie.host/270a8cfb-e098-4d3c-990f-5b197bb0b585/XlgEY5DXZY.json" 
                             background="transparent" 
                             speed="1" 
-                            style={{ width: '100%', maxWidth: '600px' }} 
+                            style={{ 
+                                width: '100%',
+                                height: '100%',
+                                minWidth: '250px',
+                                minHeight: '250px',
+                            }}
+                            className="lg:scale-125"
                             loop 
                             autoplay
                         ></dotlottie-player>

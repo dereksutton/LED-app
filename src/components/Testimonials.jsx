@@ -5,28 +5,33 @@ const Testimonials = () => {
   const testimonials = [
     {
       quote: 'Outstanding service and quality work! Highly recommended.',
+      rating: '⭐⭐⭐⭐⭐',
       name: 'John Doe',
-      title: 'New York, NY',
+      title: 'Google Review',
     },
     {
       quote: 'The team was professional and the results were fantastic.',
+      rating: '⭐⭐⭐⭐⭐',
       name: 'Jane Smith',
-      title: 'Los Angeles, CA',
+      title: 'Google Review',
     },
     {
       quote: 'Great experience from start to finish. Will hire again!',
+      rating: '⭐⭐⭐⭐⭐',
       name: 'Peter Johnson',
-      title: 'Chicago, IL',
+      title: 'Google Review',
     },
     {
       quote: 'Exceptional quality and customer service. Very happy!',
+      rating: '⭐⭐⭐⭐⭐',
       name: 'Alice Brown',
-      title: 'Houston, TX',
+      title: 'Google Review',
     },
     {
       quote: 'Top-notch work and friendly team. Strongly recommend!',
+      rating: '⭐⭐⭐⭐⭐',
       name: 'Michael Davis',
-      title: 'Phoenix, AZ',
+      title: 'Google Review',
     },
   ];
 

@@ -59,6 +59,9 @@ const InfiniteCards = ({
               </p>
               <footer className="mt-auto">
                 <div className="flex flex-col items-end">
+                  <span>
+                    {item.rating}
+                  </span>
                   <cite className="font-semibold text-white not-italic">
                     {item.name}
                   </cite>

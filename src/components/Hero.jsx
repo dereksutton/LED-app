@@ -43,23 +43,23 @@ const Hero = () => {
                         transition={{ type: 'spring', stiffness: 30 }}
                     />
                     <nav className="hidden lg:flex flex-col items-end">
-                        <div className="text-yellow-500 poppins-semibold mb-2 pr-12"> {/* Phone number container */}
+                        <div className="text-yellow-500 poppins-semibold mb-3 pr-16">
                             <a href="tel:+19043850426" className="hover:text-white text-xl no-underline transition-colors duration-300">
                                 📞 (904) 385-0426
                             </a>
                         </div>
                         <motion.ul
-                            className="flex items-center space-x-10 pr-6 text-lg poppins-regular"
+                            className="flex items-center space-x-10 pr-6 poppins-semibold"
                             initial={{ x: '100vw' }}
                             animate={{ x: 0 }}
                             transition={{ type: 'spring', stiffness: 30 }}
                         >
-                            <li><a href="#services" className="hover:text-yellow-400 text-xl hover:no-underline">Services</a></li>
+                            <li><a href="#services" className="hover:text-yellow-400 text-2xl hover:no-underline">Services</a></li>
                             <Menu as="li" className="relative">
                                 {({ open }) => (
                                     <>
                                         <Menu.Button 
-                                            className="flex items-center hover:text-yellow-400 text-xl focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button" 
+                                            className="flex items-center hover:text-yellow-400 text-2xl focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button" 
                                             style={menuButtonStyle}
                                         >
                                             About Us
@@ -76,7 +76,7 @@ const Hero = () => {
                                             leaveFrom="transform opacity-100 scale-100"
                                             leaveTo="transform opacity-0 scale-95"
                                         >
-                                            <Menu.Items static className="absolute right-0 mt-2 w-48 bg-slate-700 rounded-md shadow-lg py-2 focus:outline-none">
+                                            <Menu.Items static className="absolute right-0 w-48 bg-slate-700 rounded-md shadow-lg py-1 focus:outline-none">
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <a
@@ -122,8 +122,8 @@ const Hero = () => {
                                     </>
                                 )}
                             </Menu>
-                            <li><a href="#testimonials" className="hover:text-yellow-400 text-xl hover:no-underline">Testimonials</a></li>
-                            <li><a href="#quote" className="bg-yellow-500 p-3 mr-10 rounded-md poppins-semibold text-slate-700 text-xl hover:no-underline hover:bg-yellow-300 hover:text-slate-700">Quote Request</a></li>
+                            <li><a href="#testimonials" className="hover:text-yellow-400 text-2xl hover:no-underline">Testimonials</a></li>
+                            <li><a href="#quote" className="bg-yellow-500 p-3 mr-10 rounded-md poppins-bold text-slate-700 text-2xl hover:no-underline hover:bg-yellow-300 hover:text-slate-700">Quote Request</a></li>
                         </motion.ul>
                     </nav>
                     <motion.div
@@ -167,7 +167,14 @@ const Hero = () => {
                     </p>
                     <p className="text-white text-lg sm:text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
                         <span className="block mb-2 mt-4">
-                            ⭐⭐⭐⭐⭐
+                        <dotlottie-player 
+                            src="https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie" 
+                            background="transparent" 
+                            speed="1" 
+                            style={{ width: '100%', maxWidth: '600px' }} 
+                            loop 
+                            autoplay
+                        ></dotlottie-player>
                         </span>
                             Proudly Maintaining a 5-Star Rating on Google
                     </p>
