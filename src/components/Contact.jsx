@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import emailjs from 'emailjs-com';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -7,35 +6,53 @@ const Contact = () => {
         email: '',
         message: '',
     });
+    const [status, setStatus] = useState({
+        type: '',
+        message: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        setStatus({ type: '', message: '' });
 
-        const serviceID = 'service_ejza0lp'; // Your EmailJS service ID
-        const templateID = 'template_95zj3ls'; // Your EmailJS template ID
-        const userID = 'l0Wxgq4RwYuDMgXZJ'; // Your EmailJS Public Key
-
-        const emailParams = {
-            from_name: formData.name,
-            from_email: formData.email, // User's email
-            to_email: 'dsutton@visioneerprints.com', // Your verified email address
-            reply_to: formData.email, // Set the reply-to field to user's email
-            message: formData.message,
-        };
-
-        emailjs.send(serviceID, templateID, emailParams, userID)
-            .then((result) => {
-                alert('Thank you for your message!');
-                setFormData({ name: '', email: '', message: '' });
-            }, (error) => {
-                console.error('Failed to send email. Error: ', error);
-                alert('An error occurred. Please try again.');
+        try {
+            const response = await fetch('http://localhost:5000/send-quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
             });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setStatus({
+                    type: 'success',
+                    message: 'Thank you for your message! We\'ll get back to you soon.'
+                });
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                setStatus({
+                    type: 'error',
+                    message: data.message || 'Something went wrong. Please try again.'
+                });
+            }
+        } catch (error) {
+            setStatus({
+                type: 'error',
+                message: 'Failed to send message. Please try again later.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -43,6 +60,15 @@ const Contact = () => {
             <div className="container mx-auto px-4">
                 <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl">Quote Request Form</h2>
                 <p className="poppins-regular text-lg lg:text-xl text-white pb-6">No hassle. No hidden fees.</p>
+                
+                {status.message && (
+                    <div className={`max-w-lg mx-auto mb-6 p-4 rounded-lg ${
+                        status.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                        {status.message}
+                    </div>
+                )}
+                
                 <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-slate-400 rounded-lg shadow-lg p-8 space-y-6">
                     <div className="form-group">
                         <label htmlFor="name" className="block text-left text-slate-700 mb-2 font-semibold">Name</label>
@@ -54,6 +80,7 @@ const Contact = () => {
                             onChange={handleChange}
                             required
                             className="w-full p-3 border border-gray-300 rounded-lg"
+                            disabled={isSubmitting}
                         />
                     </div>
                     <div className="form-group">
@@ -66,6 +93,7 @@ const Contact = () => {
                             onChange={handleChange}
                             required
                             className="w-full p-3 border border-gray-300 rounded-lg"
+                            disabled={isSubmitting}
                         />
                     </div>
                     <div className="form-group">
@@ -78,13 +106,19 @@ const Contact = () => {
                             rows="5"
                             required
                             className="w-full p-3 border border-gray-300 rounded-lg"
+                            disabled={isSubmitting}
                         />
                     </div>
-                    <button type="submit" className="inline-flex h-12 sm:h-12 md:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-4 sm:px-5 md:px-6 poppins-bold text-slate-700 text-3xl sm:text-3xl md:text-3xl
-                        transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
-                        focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
-                        shadow-lg hover:shadow-2xl">Send Message</button>
+                    <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className={`inline-flex h-12 sm:h-12 md:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                            bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-4 sm:px-5 md:px-6 poppins-bold text-slate-700 text-3xl sm:text-3xl md:text-3xl
+                            transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
+                            focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
+                            shadow-lg hover:shadow-2xl ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        {isSubmitting ? 'Sending...' : 'Send Message'}
+                    </button>
                 </form>
             </div>
         </section>
