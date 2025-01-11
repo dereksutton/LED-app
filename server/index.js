@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: 'http://localhost:5173',
     methods: ['POST'],
     credentials: true
 }));
@@ -69,12 +69,11 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     const mailOptions = {
         from: `"${name}" <${process.env.EMAIL_USER}>`,
         replyTo: email,
-        to: 'dsutton@visioneerprints.com', // Updated to match your email
+        to: 'dereksutton86@gmail.com',
         subject: `Quote Request from ${name}`,
         text: `Quote Request from ${name}
-        
-Email: ${email}
-Message: ${message}`,
+        Email: ${email}
+        Message: ${message}`,
         html: htmlContent
     };
 
@@ -93,7 +92,7 @@ Message: ${message}`,
                 <p>Here's a copy of your submission:</p>
                 <hr>
                 ${htmlContent}
-                <p>Best regards,<br>Visioneer Prints</p>
+                <p>Best regards,<br>LED Custom Painting & More</p>
             `
         };
         
