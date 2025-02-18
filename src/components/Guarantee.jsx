@@ -30,18 +30,18 @@ const Guarantee = () => {
                     {/* Cards Container - reduced width on desktop */}
                     <div className="flex flex-col lg:flex-row gap-8 justify-center items-center lg:items-stretch lg:w-11/12">
                         {guaranteePoints.map((point, index) => (
-                            <div key={index} className="bg-slate-400 rounded-xl p-6 shadow-lg flex flex-col items-center text-center w-80 lg:w-2/3">
+                            <div key={index} className="bg-slate-400 rounded-xl p-4 shadow-lg flex flex-col items-center text-center w-80 lg:w-2/3">
                                 <div className="mb-4">
                                     {point.icon}
                                 </div>
-                                <h3 className="text-slate-700 poppins-semibold text-xl mb-3">{point.title}</h3>
-                                <p className="text-white poppins-regular text-lg">{point.description}</p>
+                                <h3 className="text-slate-700 poppins-semibold text-2xl mb-3">{point.title}</h3>
+                                <p className="text-white poppins-regular text-xl">{point.description}</p>
                             </div>
                         ))}
                     </div>
                     
                     {/* Lottie Container - significantly larger on desktop */}
-                    <div className="w-full lg:w-2/5 h-[250px] lg:h-[400px] flex justify-center items-center mt-6">
+                    <div className="w-full lg:w-1/2 h-[250px] lg:h-[400px] flex justify-center items-center mt-16 mb-6">
                         <dotlottie-player 
                             src="https://lottie.host/270a8cfb-e098-4d3c-990f-5b197bb0b585/XlgEY5DXZY.json" 
                             background="transparent" 
@@ -49,10 +49,10 @@ const Guarantee = () => {
                             style={{ 
                                 width: '100%',
                                 height: '100%',
-                                minWidth: '250px',
-                                minHeight: '250px',
+                                minWidth: '350px',
+                                minHeight: '350px',
                             }}
-                            className="lg:scale-125"
+                            className="lg:scale-150"
                             loop 
                             autoplay
                         ></dotlottie-player>

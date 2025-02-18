@@ -1,14 +1,25 @@
 import React from 'react';
+import FacebookIcon from '../assets/facebook_icon.png';
+import InstagramIcon from '../assets/instagram_icon.png';
 
 const Footer = () => {
     return (
         <footer className="bg-slate-500 text-white py-4">
             <div className="container mx-auto text-center px-4">
-                <p className="poppins-regular brand-gold">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
-                <ul className="flex justify-center space-x-4 mt-4">
-                    <li><a href="https://www.facebook.com/" className="hover:text-gray-400">Facebook</a></li>
-                    <li><a href="https://www.instagram.com/" className="hover:text-gray-400">Instagram</a></li>
-                </ul>
+                <p className="poppins-semibold brand-gold text-2xl">Follow Us On Social Media!</p>
+                    <ul className="flex justify-center space-x-4 mt-4">
+                        <li>
+                            <a href="https://www.facebook.com/ledcustompainting?mibextid=kFxxJD" className="hover:text-gray-400">
+                                <img src={FacebookIcon} alt="Facebook Icon" className="w-8 h-8 inline-block" />
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.instagram.com/led_custom_painting?igsh=MXMxczJ2NXp3anAxdA==" className="hover:text-gray-400">
+                            <img src={InstagramIcon} alt="Instagram Icon" className="w-8 h-8 inline-block" />
+                            </a>
+                        </li>
+                    </ul>
+                <p className="poppins-regular brand-gold mt-6">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
             </div>
         </footer>
     );

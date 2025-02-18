@@ -16,12 +16,12 @@ const WhyUs = () => {
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-1/2 p-8 flex flex-col items-center justify-center">
           <h2 className="poppins-bold text-4xl lg:text-5xl text-slate-700 mb-8 text-center">Why Work With Us?</h2>
-          <div className="flex flex-wrap justify-center gap-6 max-w-2xl">
+          <div className="flex flex-wrap justify-center gap-6 max-w-2xl mb-6">
             {reasons.map((reason, index) => (
               <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">
                 <div className="text-5xl mb-4">{reason.icon}</div>
                 <h3 className="text-2xl text-slate-700 poppins-semibold mb-2">{reason.title}</h3>
-                <p className="text-lg poppins-regular text-white">{reason.description}</p>
+                <p className="text-xl poppins-regular text-white">{reason.description}</p>
               </div>
             ))}
           </div>

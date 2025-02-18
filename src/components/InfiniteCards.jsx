@@ -41,7 +41,7 @@ const InfiniteCards = ({
           pauseOnHover && "hover:[animation-play-state:paused]"
         )}
         style={{
-          animationDirection: direction === "left" ? "normal" : "reverse",
+          animationDirection: direction === "left" ? "slow" : "reverse",
           animationDuration: getDuration(),
         }}
       >
@@ -54,7 +54,7 @@ const InfiniteCards = ({
             )}
           >
             <blockquote className="p-6 h-full flex flex-col">
-              <p className="text-lg italic text-white mb-4">
+              <p className="text-lg text-left italic text-white mb-4">
                 "{item.quote}"
               </p>
               <footer className="mt-auto">

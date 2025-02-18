@@ -59,7 +59,7 @@ const Contact = () => {
         <section id="quote" className="bg-slate-700 py-16 text-center">
             <div className="container mx-auto px-4">
                 <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl">Quote Request Form</h2>
-                <p className="poppins-regular text-lg lg:text-xl text-white pb-6">No hassle. No hidden fees.</p>
+                <p className="poppins-regular text-2xl lg:text-3xl text-white pb-8">No hassle. No hidden fees.</p>
                 
                 {status.message && (
                     <div className={`max-w-lg mx-auto mb-6 p-4 rounded-lg ${
@@ -71,7 +71,7 @@ const Contact = () => {
                 
                 <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-slate-400 rounded-lg shadow-lg p-8 space-y-6">
                     <div className="form-group">
-                        <label htmlFor="name" className="block text-left text-slate-700 mb-2 font-semibold">Name</label>
+                        <label htmlFor="name" className="block text-left text-slate-700 mb-2 text-xl poppins-semibold">Name</label>
                         <input
                             type="text"
                             id="name"
@@ -84,7 +84,7 @@ const Contact = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="email" className="block text-left text-slate-700 mb-2 font-semibold">Email</label>
+                        <label htmlFor="email" className="block text-left text-slate-700 mb-2 text-xl poppins-semibold">Email</label>
                         <input
                             type="email"
                             id="email"
@@ -97,7 +97,7 @@ const Contact = () => {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="message" className="block text-left text-slate-700 mb-2 font-semibold">Tell Us About Your Project</label>
+                        <label htmlFor="message" className="block text-left text-slate-700 mb-2 text-xl poppins-semibold">Tell Us About Your Project</label>
                         <textarea
                             id="message"
                             name="message"
@@ -120,6 +120,13 @@ const Contact = () => {
                         {isSubmitting ? 'Sending...' : 'Send Message'}
                     </button>
                 </form>
+                <p className="poppins-regular text-2xl lg:text-3xl text-white p-6">Or call us at 
+                    <span className="brand-gold">
+                        <a href="tel:+19043850426" className="hover:text-white text-2xl lg:text-3xl poppins-semibold ml-4 no-underline transition-colors duration-300">
+                                📞 (904) 385-0426
+                        </a>
+                    </span>
+                </p>
             </div>
         </section>
     );

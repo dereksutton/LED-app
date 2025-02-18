@@ -154,18 +154,18 @@ const Hero = () => {
                     </nav>
                 )}
                 <motion.div
-                    className="flex flex-col items-center justify-center pb-44 sm:pb-48 lg:pb-32 flex-grow px-4 lg:px-0 text-center w-full"
+                    className="flex flex-col items-center justify-center pb-28 sm:pb-48 lg:pb-28 pt-16 flex-grow px-4 lg:px-0 text-center w-full"
                     initial={{ y: '100vh' }}
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-4xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
+                    <h1 className="brand-gold text-5xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
                         Transform Your Space With Precision Painting
                     </h1>
-                    <p className="text-white text-2xl sm:text-xl lg:text-3xl poppins-regular mb-4 sm:mb-5">
+                    <p className="text-white text-3xl lg:text-3xl poppins-regular mb-4 sm:mb-5">
                         Quality You Can See, Service You Can Trust.
                     </p>
-                    <p className="text-white text-lg sm:text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
+                    <p className="text-white text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
                         <span className="block mb-2 mt-4">
                         <dotlottie-player 
                             src="https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie" 

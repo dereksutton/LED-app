@@ -48,14 +48,14 @@ const Services = () => {
                             autoplay>
                         </dotlottie-player>
                     </div>
-                    <div className="flex flex-wrap w-full lg:w-full items-center">
+                    <div className="flex flex-wrap w-full lg:w-full items-center mb-6">
                         <h2 className="poppins-bold text-4xl lg:text-5xl text-slate-700 pt-0 lg:pt-6 mb-6 lg:mb-4 w-full">Our Services</h2>
                         <div className="flex flex-wrap justify-center gap-6">
                             {services.map((service, index) => (
                                 <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 text-center">
                                     <div className="text-5xl mb-4">{service.icon}</div>
-                                    <h3 className="text-xl text-slate-700 poppins-bold mb-2">{service.title}</h3>
-                                    <p className="text-lg poppins-regular text-white">{service.description}</p>
+                                    <h3 className="text-2xl text-slate-700 poppins-semibold mb-2">{service.title}</h3>
+                                    <p className="text-xl poppins-regular text-white">{service.description}</p>
                                 </div>
                             ))}
                         </div>

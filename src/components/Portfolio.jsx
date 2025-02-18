@@ -26,9 +26,9 @@ const Portfolio = () => {
   ];
 
   return (
-    <section id="portfolio" className="bg-slate-200 pt-8 py-12">
+    <section id="portfolio" className="bg-slate-200 pt-8 py-12 pb-16">
       <div className="container mx-auto">
-        <h1 className="text-4xl lg:text-5xl font-bold text-slate-700 text-center poppins-bold">
+        <h1 className="text-4xl lg:text-5xl text-slate-700 text-center poppins-bold">
           Check Out Our Recent Work
         </h1>
         <p className="mb-12 text-slate-500 text-xl poppins-semibold">Click the button on the images below to view each project's tranformation!</p>
