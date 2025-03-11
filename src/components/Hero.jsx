@@ -44,8 +44,8 @@ const Hero = () => {
                     />
                     <nav className="hidden lg:flex flex-col items-end">
                         <div className="text-yellow-500 poppins-semibold mb-3 pr-16">
-                            <a href="tel:+19043850426" className="hover:text-white text-xl no-underline transition-colors duration-300">
-                                📞 (904) 385-0426
+                            <a href="tel:+19043850426" className="hover:text-yellow-400 text-white text-2xl no-underline transition-colors duration-300">
+                                <span className="hover:no-underline">📞</span> (904) 385-0426
                             </a>
                         </div>
                         <motion.ul
@@ -159,7 +159,7 @@ const Hero = () => {
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-5xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
+                    <h1 className="brand-gold text-5xl lg:text-6xl poppins-semibold mt-0 sm:mt-0">
                         Transform Your Space With Precision Painting
                     </h1>
                     <p className="text-white text-3xl lg:text-3xl poppins-regular mb-4 sm:mb-5">

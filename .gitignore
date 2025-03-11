@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 server/.env
+server/oauth-tools
+
 
 # Editor directories and files
 .vscode/*

@@ -21,11 +21,11 @@ const InfiniteCards = ({
   const getDuration = () => {
     switch (speed) {
       case "fast":
-        return "20s";
+        return "25s";
       case "slow":
         return "60s";
       default:
-        return "40s";
+        return "45s";
     }
   };
 

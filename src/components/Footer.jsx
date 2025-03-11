@@ -10,12 +10,12 @@ const Footer = () => {
                     <ul className="flex justify-center space-x-4 mt-4">
                         <li>
                             <a href="https://www.facebook.com/ledcustompainting?mibextid=kFxxJD" className="hover:text-gray-400">
-                                <img src={FacebookIcon} alt="Facebook Icon" className="w-8 h-8 inline-block" />
+                                <img src={FacebookIcon} alt="Facebook Icon" className="w-10 h-10 inline-block" />
                             </a>
                         </li>
                         <li>
                             <a href="https://www.instagram.com/led_custom_painting?igsh=MXMxczJ2NXp3anAxdA==" className="hover:text-gray-400">
-                            <img src={InstagramIcon} alt="Instagram Icon" className="w-8 h-8 inline-block" />
+                            <img src={InstagramIcon} alt="Instagram Icon" className="w-10 h-10 inline-block" />
                             </a>
                         </li>
                     </ul>

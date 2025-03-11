@@ -97,6 +97,19 @@ const Contact = () => {
                         />
                     </div>
                     <div className="form-group">
+                        <label htmlFor="email" className="block text-left text-slate-700 mb-2 text-xl poppins-semibold">Phone</label>
+                        <input
+                            type="number"
+                            id="phone"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                            className="w-full p-3 border border-gray-300 rounded-lg"
+                            disabled={isSubmitting}
+                        />
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="message" className="block text-left text-slate-700 mb-2 text-xl poppins-semibold">Tell Us About Your Project</label>
                         <textarea
                             id="message"
