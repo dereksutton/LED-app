@@ -4,6 +4,7 @@ const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+	phone: '',
         message: '',
     });
     const [status, setStatus] = useState({
@@ -23,7 +24,7 @@ const Contact = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await fetch('http://localhost:5000/send-quote', {
+            const response = await fetch('/send-quote', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

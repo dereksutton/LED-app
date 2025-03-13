@@ -7,17 +7,20 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
 
+console.log('Starting server with process.env.PORT =', process.env.PORT);
+process.env.PORT = '3001';
+
 // Connect to MongoDB
 connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 3001;
 
 // ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://147.182.175.175', 'https://147.182.175.175'],
     methods: ['POST', 'GET'], // Added GET for potential future admin dashboard
     credentials: true
 }));
@@ -60,66 +63,84 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
 
     try {
         // 1. Save to MongoDB
+        console.log('Attempting to save to MongoDB...');
         const newQuoteRequest = new QuoteRequest({
             name,
             email,
             phone,
             message
         });
-        
+
         await newQuoteRequest.save();
         console.log('Quote request saved to database with ID:', newQuoteRequest._id);
-        
-        // 2. Send Email
-        const accessToken = await oauth2Client.getAccessToken();
-        console.log('Access token obtained');
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: {
-                type: "OAuth2",
-                user: process.env.EMAIL_USER,
-                clientId: process.env.CLIENT_ID,
-                clientSecret: process.env.CLIENT_SECRET,
-                refreshToken: process.env.REFRESH_TOKEN,
-                accessToken: accessToken.token,
-                expires: 3599
-            }
-        });
+        // 2. Try to send email, but don't fail the request if it doesn't work
+        try {
+            console.log('Attempting to get access token...');
+            const accessToken = await oauth2Client.getAccessToken();
+            console.log('Access token obtained');
 
-        const mailOptions = {
-            from: `"LED Quote Request" <${process.env.EMAIL_USER}>`,
-            replyTo: email,
-            to: 'ledcustompainting@gmail.com',
-            subject: `Quote Request from ${name}`,
-            text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
-            html: `
-                <h2>New Quote Request</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Phone:</strong> ${phone}</p>
-                <p><strong>Database ID:</strong> ${newQuoteRequest._id}</p>
-                <p><strong>Message:</strong></p>
-                <p>${message.replace(/\n/g, '<br>')}</p>
-                <hr>
-                <p><small>This email was sent from your website's quote request form.</small></p>
-            `,
-        };
+            console.log('Setting up transporter...');
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    type: "OAuth2",
+                    user: process.env.EMAIL_USER,
+                    clientId: process.env.CLIENT_ID,
+                    clientSecret: process.env.CLIENT_SECRET,
+                    refreshToken: process.env.REFRESH_TOKEN,
+                    accessToken: accessToken.token,
+                    expires: 3599
+                },
+                // Add timeout settings
+                connectionTimeout: 10000, // 10 seconds
+                greetingTimeout: 10000
+            });
 
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-        
-        res.status(200).json({ 
-            success: true, 
-            message: 'Quote request sent!',
+            const mailOptions = {
+                from: `"LED Quote Request" <${process.env.EMAIL_USER}>`,
+                replyTo: email,
+                to: 'ledcustompainting@gmail.com',
+                subject: `Quote Request from ${name}`,
+                text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
+                html: `
+                    <h2>New Quote Request</h2>
+                    <p><strong>Name:</strong> ${name}</p>
+                    <p><strong>Email:</strong> ${email}</p>
+                    <p><strong>Phone:</strong> ${phone}</p>
+                    <p><strong>Database ID:</strong> ${newQuoteRequest._id}</p>
+                    <p><strong>Message:</strong></p>
+                    <p>${message.replace(/\n/g, '<br>')}</p>
+                    <hr>
+                    <p><small>This email was sent from your website's quote request form.</small></p>
+                `,
+            };
+
+            console.log('Sending email...');
+            await transporter.sendMail(mailOptions);
+            console.log('Email sent successfully');
+        } catch (emailError) {
+            console.error('Email sending failed, but continuing:', emailError.message);
+            // Continue with the request even if email fails
+        }
+
+        // 3. Respond to the client
+        res.status(200).json({
+            success: true,
+            message: 'Quote request saved!',
             quoteId: newQuoteRequest._id
         });
 
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to process your request.' });
+        console.error('Error detail:', error.message);
+        console.error('Error stack:', error.stack);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process your request.',
+            error: error.message
+        });
     }
 });
 
@@ -140,4 +161,15 @@ app.get('/health', (req, res) => {
 });
 
 // ✅ Start Server
-app.listen(PORT, () => console.log(`Server running on Port ${PORT}`));
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on Port ${PORT} and accepting connections from all interfaces`);
+});
+
+server.on('error', (err) => {
+  console.error('Server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Try a different port.`);
+  } else {
+    console.error('Unexpected server error:', err);
+  }
+});
