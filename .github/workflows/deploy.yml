@@ -1,0 +1,26 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  push:
+    branches:
+      - master  # or main, whichever branch you use for deployment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.16
+        with:
+          host: ${{ secrets.DO_HOST }}           # Add this secret with your Droplet's IP
+          username: root                         # Change this if you use a different user
+          key: ${{ secrets.DO_SSH_KEY }}           # Your private key secret
+          script: |
+            cd /var/www/led-app
+            git pull origin master
+            npm install
+            pm2 restart all   # Or whichever command restarts your application
