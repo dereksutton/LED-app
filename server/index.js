@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-const { google } = require('googleapis');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
@@ -21,19 +20,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: ['http://localhost:5173', 'http://147.182.175.175', 'https://147.182.175.175'],
-    methods: ['POST', 'GET'], // Added GET for potential future admin dashboard
+    methods: ['POST', 'GET'],
     credentials: true
 }));
-
-// ✅ Google OAuth 2.0 Setup
-const oauth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URI
-);
-oauth2Client.setCredentials({
-    refresh_token: process.env.REFRESH_TOKEN,
-});
 
 // ✅ Rate limiting to prevent spam
 const limiter = rateLimit({
@@ -41,7 +30,7 @@ const limiter = rateLimit({
     max: 5, // Limit each IP to 5 requests per window
 });
 
-// ✅ Input validation
+// ✅ Input validation middleware
 const validateQuoteRequest = (req, res, next) => {
     const { name, email, phone, message } = req.body;
 
@@ -57,7 +46,7 @@ const validateQuoteRequest = (req, res, next) => {
     next();
 };
 
-// ✅ Handle Quote Request Submission
+// ✅ Handle Quote Request Submission using SendGrid
 app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     const { name, email, phone, message } = req.body;
 
@@ -70,38 +59,27 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
             phone,
             message
         });
-
         await newQuoteRequest.save();
         console.log('Quote request saved to database with ID:', newQuoteRequest._id);
 
-        // 2. Try to send email, but don't fail the request if it doesn't work
+        // 2. Send email using SendGrid
         try {
-            console.log('Attempting to get access token...');
-            const accessToken = await oauth2Client.getAccessToken();
-            console.log('Access token obtained');
-
-            console.log('Setting up transporter...');
+            console.log('Setting up SendGrid transporter...');
             const transporter = nodemailer.createTransport({
-                host: 'smtp.gmail.com',
-                port: 465,
-                secure: true,
+                host: 'smtp.sendgrid.net',
+                port: 587,
+                secure: false, // Use STARTTLS
                 auth: {
-                    type: "OAuth2",
-                    user: process.env.EMAIL_USER,
-                    clientId: process.env.CLIENT_ID,
-                    clientSecret: process.env.CLIENT_SECRET,
-                    refreshToken: process.env.REFRESH_TOKEN,
-                    accessToken: accessToken.token,
-                    expires: 3599
+                    user: 'apikey', // This value is literal for SendGrid
+                    pass: process.env.SENDGRID_API_KEY
                 },
-                // Add timeout settings
                 connectionTimeout: 10000, // 10 seconds
                 greetingTimeout: 10000
             });
 
             const mailOptions = {
                 from: `"LED Quote Request" <${process.env.EMAIL_USER}>`,
-                replyTo: email,
+                replyTo: process.env.EMAIL_USER,
                 to: 'ledcustompainting@gmail.com',
                 subject: `Quote Request from ${name}`,
                 text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
@@ -118,12 +96,12 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
                 `,
             };
 
-            console.log('Sending email...');
+            console.log('Sending email via SendGrid...');
             await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully');
+            console.log('Email sent successfully via SendGrid.');
         } catch (emailError) {
-            console.error('Email sending failed, but continuing:', emailError);
-            // Continue with the request even if email fails
+            console.error('Email sending failed via SendGrid, but continuing:', emailError);
+            // Optionally, return an error response if you want to fail the submission.
         }
 
         // 3. Respond to the client
@@ -144,7 +122,7 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     }
 });
 
-// ✅ Get all quote requests (protected route - would need auth in production)
+// ✅ Get all quote requests (protected route - requires authentication in production)
 app.get('/quote-requests', async (req, res) => {
     try {
         const quoteRequests = await QuoteRequest.find().sort({ createdAt: -1 });
@@ -162,14 +140,14 @@ app.get('/health', (req, res) => {
 
 // ✅ Start Server
 const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on Port ${PORT} and accepting connections from all interfaces`);
+    console.log(`Server running on Port ${PORT} and accepting connections from all interfaces`);
 });
 
 server.on('error', (err) => {
-  console.error('Server error:', err);
-  if (err.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Try a different port.`);
-  } else {
-    console.error('Unexpected server error:', err);
-  }
+    console.error('Server error:', err);
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Try a different port.`);
+    } else {
+        console.error('Unexpected server error:', err);
+    }
 });
