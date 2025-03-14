@@ -3,7 +3,7 @@ name: Deploy to DigitalOcean Droplet
 on:
   push:
     branches:
-      - master  # or main, whichever branch you use for deployment
+      - master
 
 jobs:
   deploy:
@@ -16,14 +16,14 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.DO_HOST }}           # Add this secret with your Droplet's IP
-          username: root                         # Change this if you use a different user
-          key: ${{ secrets.DO_SSH_KEY }}           # Your private key secret
+          host: ${{ secrets.DO_HOST }}
+          username: root
+          key: ${{ secrets.DO_SSH_KEY }}
           ssh_config: |
             Host *
                 StrictHostKeyChecking no
           script: |
-            cd /var/www/led-app
+            cd /var/www/led-app/LED-app
             git pull origin master
             npm install
             pm2 restart all   # Or whichever command restarts your application
