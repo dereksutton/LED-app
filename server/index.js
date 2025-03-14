@@ -122,7 +122,7 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
             await transporter.sendMail(mailOptions);
             console.log('Email sent successfully');
         } catch (emailError) {
-            console.error('Email sending failed, but continuing:', emailError.message);
+            console.error('Email sending failed, but continuing:', emailError);
             // Continue with the request even if email fails
         }
 
