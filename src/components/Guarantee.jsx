@@ -23,7 +23,7 @@ const Guarantee = () => {
     return (
         <section id="guarantee" className="bg-slate-700 py-10 px-4 md:px-8">
             <div className="max-w-7xl mx-auto">
-                <h2 className="poppins-bold brand-gold text-5xl lg:text-4xl text-center">Our Guarantee</h2>
+                <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl text-center">Our Guarantee</h2>
                 
                 {/* Main container with adjusted spacing */}
                 <div className="flex flex-col lg:flex-row items-center">

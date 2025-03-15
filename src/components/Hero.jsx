@@ -28,7 +28,7 @@ const Hero = () => {
                     <motion.img
                         src={logo}
                         alt="LED Custom Painting Logo"
-                        className="h-80 pl-0 lg:pl-8"
+                        className="h-80 pl-0 lg:pl-5"
                         initial={{ x: '-100vw' }}
                         animate={{ x: 0 }}
                         transition={{ type: 'spring', stiffness: 30 }}
@@ -161,14 +161,14 @@ const Hero = () => {
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-5xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
+                    <h1 className="brand-gold text-5xl lg:text-8xl poppins-semibold mt-0 sm:mt-0">
                         Transform Your Space With Precision Painting
                     </h1>
-                    <p className="text-white text-3xl lg:text-3xl poppins-regular mb-4 sm:mb-5">
+                    <p className="text-white text-4xl lg:text-5xl poppins-regular mb-4 sm:mb-5">
                         Quality You Can See, Service You Can Trust.
                     </p>
-                    <p className="text-white text-xl lg:text-2xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
-                        <span className="block mb-2 mt-4">
+                    <p className="text-white text-2xl lg:text-3xl poppins-regular mb-4 sm:mb-5 lg:mb-6 text-center">
+                        <span className="block mb-2 lg:ml-10">
                         <dotlottie-player 
                             src="https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie" 
                             background="transparent" 
@@ -181,8 +181,8 @@ const Hero = () => {
                             Proudly Maintaining a 5-Star Rating on Google
                     </p>
                     <a
-                        href="#quote" className="inline-flex h-12 sm:h-12 lg:h-14 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-12 sm:px-12 lg:px-12 poppins-bold text-slate-700 text-3xl sm:text-3xl lg:text-5xl
+                        href="#quote" className="inline-flex h-16 sm:h-12 lg:h-20 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-12 sm:px-12 lg:px-12 poppins-bold text-slate-700 text-4xl lg:text-6xl
                         transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                         focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
                         shadow-lg hover:shadow-2xl hover:no-underline hover:text-slate-700 mt-1"

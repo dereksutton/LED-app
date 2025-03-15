@@ -59,8 +59,8 @@ const Contact = () => {
     return (
         <section id="quote" className="bg-slate-700 py-16 text-center">
             <div className="container mx-auto px-4">
-                <h2 className="poppins-bold brand-gold text-5xl lg:text-4xl">Quote Request Form</h2>
-                <p className="poppins-regular text-2xl lg:text-3xl text-white pb-8">No hassle. No hidden fees.</p>
+                <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl">Quote Request Form</h2>
+                <p className="poppins-regular text-2xl lg:text-4xl text-white pb-8">No hassle. No hidden fees.</p>
                 
                 {status.message && (
                     <div className={`max-w-lg mx-auto mb-6 p-4 rounded-lg ${
@@ -126,8 +126,8 @@ const Contact = () => {
                     <button 
                         type="submit" 
                         disabled={isSubmitting}
-                        className={`inline-flex h-12 sm:h-12 md:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                            bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-4 sm:px-5 md:px-6 poppins-bold text-slate-700 text-3xl sm:text-3xl md:text-3xl
+                        className={`inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                            bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] p-10 lg:px-8 poppins-bold text-slate-700 text-4xl lg:text-5xl
                             transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                             focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
                             shadow-lg hover:shadow-2xl ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
@@ -135,12 +135,12 @@ const Contact = () => {
                     </button>
                 </form>
                 <span>
-                    <p className="poppins-regular text-2xl lg:text-3xl text-white p-6">
+                    <p className="poppins-regular text-2xl lg:text-3xl text-white p-4">
                         Or call us today at:
                     </p>
                 </span>
                 <span className="brand-gold">
-                    <a href="tel:+19043850426" className="hover:text-white text-3xl lg:text-4xl poppins-semibold no-underline transition-colors duration-300">
+                    <a href="tel:+19043850426" className="hover:text-white text-4xl lg:text-5xl poppins-bold no-underline transition-colors duration-300">
                         📞 (904) 385-0426
                     </a>
                 </span>
