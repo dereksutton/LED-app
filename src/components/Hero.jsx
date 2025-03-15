@@ -119,7 +119,7 @@ const Hero = () => {
                                 )}
                             </Menu>
                             <li><a href="#testimonials" className="hover:text-yellow-400 text-2xl hover:no-underline">Testimonials</a></li>
-                            <li><a href="#quote" className="bg-yellow-500 p-3 mr-10 rounded-md poppins-bold text-slate-700 text-2xl hover:no-underline hover:bg-yellow-300 hover:text-slate-700">Quote Request</a></li>
+                            <li><a href="#quote" className="bg-yellow-400 p-3 mr-10 rounded-md poppins-bold text-slate-700 text-2xl hover:no-underline hover:bg-yellow-300 hover:text-slate-700">Quote Request</a></li>
                         </motion.ul>
                     </nav>
                     <motion.div
