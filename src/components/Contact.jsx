@@ -128,7 +128,7 @@ const Contact = () => {
                         disabled={isSubmitting}
                         className={`inline-flex h-20 sm:h-22 lg:h-24 animate-shimmer items-center justify-center rounded-md border border-yellow-400
                             bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] 
-                            px-8 sm:px-10 md:px-12 lg:px-16 py-4 sm:py-5 poppins-bold text-slate-700 text-3xl sm:text-4xl lg:text-5xl
+                            px-8 sm:px-10 md:px-12 lg:px-16 py-4 sm:py-5 poppins-bold text-slate-700 text-3xl sm:text-4xl lg:text-4xl
                             w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg
                             transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                             focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
