@@ -59,7 +59,7 @@ const Contact = () => {
     return (
         <section id="quote" className="bg-slate-700 py-16 text-center">
             <div className="container mx-auto px-4">
-                <h2 className="poppins-bold brand-gold text-4xl lg:text-5xl">Quote Request Form</h2>
+                <h2 className="poppins-bold brand-gold text-5xl lg:text-6xl">Quote Request Form</h2>
                 <p className="poppins-regular text-2xl lg:text-3xl text-white pb-8">No hassle. No hidden fees.</p>
                 
                 {status.message && (
@@ -140,7 +140,7 @@ const Contact = () => {
                     </p>
                 </span>
                 <span className="brand-gold">
-                    <a href="tel:+19043850426" className="hover:text-white text-2xl lg:text-3xl poppins-semibold no-underline transition-colors duration-300">
+                    <a href="tel:+19043850426" className="hover:text-white text-3xl lg:text-4xl poppins-semibold no-underline transition-colors duration-300">
                         📞 (904) 385-0426
                     </a>
                 </span>
