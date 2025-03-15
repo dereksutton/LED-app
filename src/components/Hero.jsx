@@ -30,8 +30,10 @@ const Hero = () => {
     };
 
     return (
-        <section style={sectionStyle} className="text-white overflow-y-auto">
-            <div className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-10"></div>
+        <section style={sectionStyle} className="text-white relative">
+            {/* Fixed overlay - changed from absolute to fixed and made it cover the full viewport */}
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-10"></div>
+            
             <div className="relative z-20 flex flex-col min-h-screen">
                 <div className="flex justify-between items-center lg:p-0 w-full">
                     <motion.img
