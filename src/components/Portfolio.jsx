@@ -31,7 +31,7 @@ const Portfolio = () => {
         <h1 className="text-5xl lg:text-7xl text-slate-700 text-center poppins-bold">
           Check Out Our Recent Work
         </h1>
-        <p className="m-3 p-2 pb-6 text-slate-500 text-2xl poppins-semibold">Click the button on the images below to view each project's tranformation!</p>
+        <p className="m-3 p-2 pb-6 text-slate-500 text-xl poppins-semibold">Click the button on the images below to view each project's tranformation!</p>
         <BeforeAfterSlider imagePairs={imagePairs} />
       </div>
     </section>
