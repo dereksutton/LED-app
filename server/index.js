@@ -71,7 +71,10 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
             console.log('Preparing email with SendGrid API...');
             const msg = {
                 to: 'ledcustompainting@gmail.com',
-                from: process.env.EMAIL_USER, // Must be verified in SendGrid
+                from: {
+                    email: process.env.EMAIL_USER,
+                    name: 'LED Quote Request'
+                },
                 replyTo: email, // Use the customer's email as reply-to
                 subject: `Quote Request from ${name}`,
                 text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
