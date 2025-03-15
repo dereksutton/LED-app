@@ -102,9 +102,9 @@ const Testimonials = () => {
   ];
 
   return (
-    <section id="testimonials" className="bg-white p-4 overflow-hidden">
+    <section id="testimonials" className="bg-white p-4 pb-16 overflow-hidden">
       <div className="container mx-auto">
-        <h2 className="poppins-bold text-slate-700 text-5xl lg:text-7xl mb-10 text-center px-4">
+        <h2 className="poppins-bold text-slate-700 text-5xl lg:text-7xl pb-8 text-center px-4">
           What Our Clients Say
         </h2>
         <div className="mt-8">
