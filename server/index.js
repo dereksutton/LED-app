@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail'); // Changed to SendGrid's mail package
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
@@ -8,6 +8,10 @@ const QuoteRequest = require('./models/QuoteRequest');
 
 console.log('Starting server with process.env.PORT =', process.env.PORT);
 process.env.PORT = '3001';
+
+// Set SendGrid API Key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+console.log('SendGrid API Key configured');
 
 // Connect to MongoDB
 connectDB();
@@ -46,7 +50,7 @@ const validateQuoteRequest = (req, res, next) => {
     next();
 };
 
-// ✅ Handle Quote Request Submission using SendGrid
+// ✅ Handle Quote Request Submission using SendGrid API
 app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     const { name, email, phone, message } = req.body;
 
@@ -62,25 +66,13 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
         await newQuoteRequest.save();
         console.log('Quote request saved to database with ID:', newQuoteRequest._id);
 
-        // 2. Send email using SendGrid
+        // 2. Send email using SendGrid API
         try {
-            console.log('Setting up SendGrid transporter...');
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.sendgrid.net',
-                port: 587,
-                secure: false, // Use STARTTLS
-                auth: {
-                    user: 'apikey', // This value is literal for SendGrid
-                    pass: process.env.SENDGRID_API_KEY
-                },
-                connectionTimeout: 10000, // 10 seconds
-                greetingTimeout: 10000
-            });
-
-            const mailOptions = {
-                from: `"LED Quote Request" <${process.env.EMAIL_USER}>`,
-                replyTo: process.env.EMAIL_USER,
+            console.log('Preparing email with SendGrid API...');
+            const msg = {
                 to: 'ledcustompainting@gmail.com',
+                from: process.env.EMAIL_USER, // Must be verified in SendGrid
+                replyTo: email, // Use the customer's email as reply-to
                 subject: `Quote Request from ${name}`,
                 text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
                 html: `
@@ -96,12 +88,24 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
                 `,
             };
 
-            console.log('Sending email via SendGrid...');
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent successfully via SendGrid.');
+            console.log('Sending email via SendGrid API...');
+            await sgMail.send(msg);
+            console.log('Email sent successfully via SendGrid API.');
         } catch (emailError) {
-            console.error('Email sending failed via SendGrid, but continuing:', emailError);
-            // Optionally, return an error response if you want to fail the submission.
+            console.error('Email sending failed via SendGrid API:', emailError);
+            
+            // More detailed error logging for SendGrid API errors
+            if (emailError.response) {
+                console.error('SendGrid API error details:');
+                console.error(emailError.response.body);
+            }
+            
+            // You may want to update this to return an error to the client
+            // return res.status(500).json({
+            //     success: false,
+            //     message: 'Email sending failed, but your request was saved.',
+            //     error: emailError.message
+            // });
         }
 
         // 3. Respond to the client
