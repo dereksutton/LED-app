@@ -7,32 +7,21 @@ import backgroundImage from '../assets/paintedhome2.jpg';
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const sectionStyle = {
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        width: '100%',
-        minHeight: '100vh',
-        position: 'relative',
-    };
-
-    const menuButtonStyle = {
-        outline: 'none',
-        boxShadow: 'none',
-        border: 'none',
-        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
-    };
-
-    const hamburgerButtonStyle = {
-        ...menuButtonStyle,
-        backgroundColor: 'transparent',
-    };
-
+    // Use a combined approach with relative positioning for the section
+    // and absolute positioning for the overlay within that section
     return (
-        <section style={sectionStyle} className="text-white relative">
-            {/* Fixed overlay - changed from absolute to fixed and made it cover the full viewport */}
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-10"></div>
+        <section 
+            className="text-white relative min-h-screen overflow-hidden"
+            style={{
+                backgroundImage: `url(${backgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'scroll', // This is important - don't use fixed
+            }}
+        >
+            {/* Overlay that's confined to just this section */}
+            <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
             
             <div className="relative z-20 flex flex-col min-h-screen">
                 <div className="flex justify-between items-center lg:p-0 w-full">
@@ -62,7 +51,12 @@ const Hero = () => {
                                     <>
                                         <Menu.Button 
                                             className="flex items-center hover:text-yellow-400 text-2xl focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button" 
-                                            style={menuButtonStyle}
+                                            style={{
+                                                outline: 'none',
+                                                boxShadow: 'none',
+                                                border: 'none',
+                                                WebkitTapHighlightColor: 'rgba(0,0,0,0)'
+                                            }}
                                         >
                                             About Us
                                             <svg className="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -137,7 +131,13 @@ const Hero = () => {
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)} 
                             className="text-white focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button"
-                            style={hamburgerButtonStyle}
+                            style={{
+                                backgroundColor: 'transparent',
+                                outline: 'none',
+                                boxShadow: 'none',
+                                border: 'none',
+                                WebkitTapHighlightColor: 'rgba(0,0,0,0)'
+                            }}
                         >
                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}></path>
