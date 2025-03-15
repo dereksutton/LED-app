@@ -57,7 +57,7 @@ const Contact = () => {
     };
 
     return (
-        <section id="quote" className="bg-slate-700 py-16 text-center">
+        <section id="quote" className="bg-slate-700 p-4 text-center">
             <div className="container mx-auto px-4">
                 <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl">Quote Request Form</h2>
                 <p className="poppins-regular text-2xl lg:text-4xl text-white pb-8">No hassle. No hidden fees.</p>

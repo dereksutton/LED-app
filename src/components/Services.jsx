@@ -35,7 +35,7 @@ const Services = () => {
     ];
 
     return (
-        <section id="services" className="bg-white pt-4 pb-8 text-center">
+        <section id="services" className="bg-white pb-4 text-center">
             <div className="mx-auto">
                 <div className="flex flex-col lg:flex-row justify-center lg:items-center gap-8">
                     <div className="flex justify-center w-screen lg:w-2/3 mb-0 lg:mb-0">

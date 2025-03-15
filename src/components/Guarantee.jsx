@@ -21,9 +21,9 @@ const Guarantee = () => {
     ];
 
     return (
-        <section id="guarantee" className="bg-slate-700 py-10 px-4 md:px-8">
+        <section id="guarantee" className="bg-slate-700 p-4 md:px-8">
             <div className="max-w-7xl mx-auto">
-                <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl text-center">Our Guarantee</h2>
+                <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl text-center mb-6">Our Guarantee</h2>
                 
                 {/* Main container with adjusted spacing */}
                 <div className="flex flex-col lg:flex-row items-center">
@@ -41,7 +41,7 @@ const Guarantee = () => {
                     </div>
                     
                     {/* Lottie Container - significantly larger on desktop */}
-                    <div className="w-full lg:w-1/2 h-[250px] lg:h-[400px] flex justify-center items-center mt-16 mb-6">
+                    <div className="w-full lg:w-1/2 h-[250px] lg:h-[400px] flex justify-center items-center mt-20 mb-8">
                         <dotlottie-player 
                             src="https://lottie.host/270a8cfb-e098-4d3c-990f-5b197bb0b585/XlgEY5DXZY.json" 
                             background="transparent" 
