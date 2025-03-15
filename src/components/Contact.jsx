@@ -136,12 +136,12 @@ const Contact = () => {
                 </form>
                 <span>
                     <p className="poppins-regular text-2xl lg:text-3xl text-white p-6">
-                        Or call us at
+                        Or call us today at:
                     </p>
                 </span>
                 <span className="brand-gold">
                     <a href="tel:+19043850426" className="hover:text-white text-2xl lg:text-3xl poppins-semibold ml-4 no-underline transition-colors duration-300">
-                        📞 (904) 385-0426
+                        (904) 385-0426
                     </a>
                 </span>
             </div>
