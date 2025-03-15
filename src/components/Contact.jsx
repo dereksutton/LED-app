@@ -140,8 +140,8 @@ const Contact = () => {
                     </p>
                 </span>
                 <span className="brand-gold">
-                    <a href="tel:+19043850426" className="hover:text-white text-2xl lg:text-3xl poppins-semibold ml-4 no-underline transition-colors duration-300">
-                        (904) 385-0426
+                    <a href="tel:+19043850426" className="hover:text-white text-2xl lg:text-3xl poppins-semibold no-underline transition-colors duration-300">
+                        📞 (904) 385-0426
                     </a>
                 </span>
             </div>
