@@ -19,7 +19,7 @@ const Footer = () => {
                             </a>
                         </li>
                     </ul>
-                <p className="poppins-regular brand-gold text-2xl mt-10">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
+                <p className="poppins-regular brand-gold text-md mt-16">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
             </div>
         </footer>
     );
