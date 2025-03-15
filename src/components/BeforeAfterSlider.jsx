@@ -40,8 +40,8 @@ const BeforeAfterCard = ({ beforeImg, afterImg }) => {
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 transform-style-3d">
           <button
             onClick={() => setIsFlipped(!isFlipped)}
-            className="inline-flex h-12 sm:h-12 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] poppins-bold text-slate-700 text-xl
+            className="inline-flex h-12 lg:h-14 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] poppins-bold text-slate-700 text-2xl
                         transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                         shadow-lg hover:shadow-2xl hover:no-underline hover:text-slate-700 active:scale-95 hover:-translate-y-0.5
                         backdrop-blur-sm bg-opacity-90"
