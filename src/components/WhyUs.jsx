@@ -15,7 +15,7 @@ const WhyUs = () => {
     <section id="whyus" className="bg-white">
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-1/2 p-8 flex flex-col items-center justify-center">
-          <h2 className="poppins-bold text-5xl lg:text-6xl text-slate-700 mb-8 text-center">Why Work With Us?</h2>
+          <h2 className="poppins-bold text-5xl lg:text-4xl text-slate-700 mb-8 text-center">Why Work With Us?</h2>
           <div className="flex flex-wrap justify-center gap-6 max-w-2xl mb-6">
             {reasons.map((reason, index) => (
               <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">

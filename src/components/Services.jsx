@@ -49,7 +49,7 @@ const Services = () => {
                         </dotlottie-player>
                     </div>
                     <div className="flex flex-wrap w-full lg:w-full items-center mb-6">
-                        <h2 className="poppins-bold text-5xl lg:text-6xl text-slate-700 pt-0 lg:pt-6 mb-6 lg:mb-4 w-full">Our Services</h2>
+                        <h2 className="poppins-bold text-5xl lg:text-4xl text-slate-700 pt-0 lg:pt-6 mb-6 lg:mb-4 w-full">Our Services</h2>
                         <div className="flex flex-wrap justify-center gap-6">
                             {services.map((service, index) => (
                                 <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 text-center">

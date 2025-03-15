@@ -161,7 +161,7 @@ const Hero = () => {
                     animate={{ y: 0 }}
                     transition={{ type: 'spring', stiffness: 50 }}
                 >
-                    <h1 className="brand-gold text-5xl lg:text-6xl poppins-semibold mt-0 sm:mt-0">
+                    <h1 className="brand-gold text-5xl lg:text-5xl poppins-semibold mt-0 sm:mt-0">
                         Transform Your Space With Precision Painting
                     </h1>
                     <p className="text-white text-3xl lg:text-3xl poppins-regular mb-4 sm:mb-5">
