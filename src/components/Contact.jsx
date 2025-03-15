@@ -58,7 +58,7 @@ const Contact = () => {
 
     return (
         <section id="quote" className="bg-slate-700 p-4 text-center">
-            <div className="container mx-auto px-4">
+            <div className="container mx-auto px-1">
                 <h2 className="poppins-bold brand-gold text-5xl lg:text-7xl">Quote Request</h2>
                 <p className="poppins-regular text-2xl lg:text-4xl text-white pb-8">No hassle. No hidden fees.</p>
                 
@@ -126,8 +126,8 @@ const Contact = () => {
                     <button 
                         type="submit" 
                         disabled={isSubmitting}
-                        className={`inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                            bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] p-8 lg:px-8 poppins-bold text-slate-700 text-3xl lg:text-5xl
+                        className={`inline-flex h-16 lg:h-20 w-96 animate-shimmer items-center justify-center rounded-md border border-yellow-400
+                            bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] p-8 lg:px-8 poppins-bold text-slate-700 text-3xl lg:text-4xl
                             transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                             focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
                             shadow-lg hover:shadow-2xl ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
