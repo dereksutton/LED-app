@@ -182,7 +182,7 @@ const Hero = () => {
                     </p>
                     <a
                         href="#quote" className="inline-flex h-16 sm:h-12 lg:h-20 animate-shimmer items-center justify-center rounded-md border border-yellow-400
-                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] px-12 sm:px-12 lg:px-12 poppins-bold text-slate-700 text-4xl lg:text-6xl
+                        bg-[linear-gradient(110deg,#FFD700,45%,#FFA500,55%,#FFD700)] bg-[length:200%_100%] p-8 sm:px-12 lg:px-12 poppins-bold text-slate-700 text-3xl lg:text-6xl
                         transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105
                         focus:outline-none focus:ring-0 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-yellow-50
                         shadow-lg hover:shadow-2xl hover:no-underline hover:text-slate-700 mt-1"
