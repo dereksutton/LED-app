@@ -7,22 +7,20 @@ import backgroundImage from '../assets/paintedhome2.jpg';
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // Use a combined approach with relative positioning for the section
-    // and absolute positioning for the overlay within that section
     return (
-        <section 
-            className="text-white relative min-h-screen overflow-hidden"
-            style={{
-                backgroundImage: `url(${backgroundImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundAttachment: 'scroll', // This is important - don't use fixed
-            }}
-        >
-            {/* Overlay that's confined to just this section */}
-            <div className="absolute inset-0 bg-black bg-opacity-50 z-10"></div>
+        <section className="text-white relative min-h-screen">
+            {/* Background image with fixed positioning for parallax effect */}
+            <div 
+                className="absolute top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat bg-fixed z-0"
+                style={{
+                    backgroundImage: `url(${backgroundImage})`,
+                }}
+            ></div>
             
+            {/* Semi-transparent overlay - also fixed to stay with background */}
+            <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10"></div>
+            
+            {/* Scrolling content layer */}
             <div className="relative z-20 flex flex-col min-h-screen">
                 <div className="flex justify-between items-center lg:p-0 w-full">
                     <motion.img
