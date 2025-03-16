@@ -1,4 +1,5 @@
 import React from 'react';
+import { ParallaxProvider, Parallax } from 'react-scroll-parallax';
 import ledWhyUs from '../assets/LED-WhyUs.png';
 
 const WhyUs = () => {
@@ -12,29 +13,50 @@ const WhyUs = () => {
   ];
 
   return (
-    <section id="whyus" className="bg-white">
-      <div className="flex flex-col lg:flex-row">
-        <div className="w-full lg:w-1/2 p-4 pb-6 flex flex-col items-center justify-center">
-          <h2 className="poppins-bold text-5xl lg:text-7xl text-slate-700 mb-6 text-center">Why Work With Us?</h2>
-          <div className="flex flex-wrap justify-center gap-6 max-w-2xl mb-6">
-            {reasons.map((reason, index) => (
-              <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">
-                <div className="text-5xl mb-4">{reason.icon}</div>
-                <h3 className="text-2xl text-slate-700 poppins-semibold mb-2">{reason.title}</h3>
-                <p className="text-xl poppins-regular text-white">{reason.description}</p>
-              </div>
-            ))}
+    <ParallaxProvider>
+      <section id="whyus" className="bg-white">
+        <div className="flex flex-col lg:flex-row">
+          <div className="w-full lg:w-1/2 p-4 pb-6 flex flex-col items-center justify-center">
+            <h2 className="poppins-bold text-5xl lg:text-7xl text-slate-700 mb-6 text-center">Why Work With Us?</h2>
+            <div className="flex flex-wrap justify-center gap-6 max-w-2xl mb-6">
+              {reasons.map((reason, index) => (
+                <div key={index} className="bg-slate-400 rounded-lg shadow-lg p-4 w-80 sm:w-80 text-center">
+                  <div className="text-5xl mb-4">{reason.icon}</div>
+                  <h3 className="text-2xl text-slate-700 poppins-semibold mb-2">{reason.title}</h3>
+                  <p className="text-xl poppins-regular text-white">{reason.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Mobile View with Working Parallax */}
+          <div className="block lg:hidden w-full relative min-h-[400px] md:min-h-[600px] overflow-hidden">
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: `url(${ledWhyUs})`,
+                backgroundPosition: 'center',
+                backgroundSize: 'cover',
+                backgroundAttachment: 'fixed'
+              }}
+            />
+          </div>
+          
+          {/* Desktop View with Standard Image (No Parallax) */}
+          <div className="hidden lg:block w-full lg:w-1/2 relative min-h-[600px] overflow-hidden">
+            <img
+              src={ledWhyUs}
+              alt="Why Work With Us"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
           </div>
         </div>
-        <div className="w-full lg:w-1/2 relative min-h-[400px] md:min-h-[600px] lg:min-h-0 lg:h-auto">
-          <img
-            src={ledWhyUs}
-            alt="Why Work With Us"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </div>
-      </div>
-    </section>
+      </section>
+    </ParallaxProvider>
   );
 };
 
