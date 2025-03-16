@@ -7,20 +7,27 @@ import backgroundImage from '../assets/paintedhome2.jpg';
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    // This approach uses a more universally compatible technique
+    // that should work across all environments including production
     return (
         <section className="text-white relative min-h-screen">
-            {/* Background image with fixed positioning for parallax effect */}
+            {/* Background image container with standard background settings */}
             <div 
-                className="absolute top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat bg-fixed z-0"
+                className="absolute top-0 left-0 w-full h-full z-0"
                 style={{
                     backgroundImage: `url(${backgroundImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    // Using standard CSS rather than Tailwind class for better compatibility
+                    backgroundAttachment: 'fixed'
                 }}
             ></div>
             
-            {/* Semi-transparent overlay - also fixed to stay with background */}
+            {/* Semi-transparent overlay */}
             <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10"></div>
             
-            {/* Scrolling content layer */}
+            {/* Content layer */}
             <div className="relative z-20 flex flex-col min-h-screen">
                 <div className="flex justify-between items-center lg:p-0 w-full">
                     <motion.img
