@@ -6,7 +6,7 @@ const Footer = () => {
     return (
         <footer className="bg-slate-500 text-white py-4">
             <div className="container mx-auto text-center px-4">
-                <p className="poppins-semibold brand-gold text-3xl">Follow Us On Social Media!</p>
+                <p className="poppins-semibold text-white text-3xl">Follow Us On Social Media!</p>
                     <ul className="flex justify-center space-x-12 mt-4">
                         <li>
                             <a href="https://www.facebook.com/ledcustompainting?mibextid=kFxxJD" className="hover:text-gray-400">
@@ -19,7 +19,7 @@ const Footer = () => {
                             </a>
                         </li>
                     </ul>
-                <p className="poppins-regular brand-gold text-md mt-16">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
+                <p className="poppins-regular text-white text-md mt-16">&copy; {new Date().getFullYear()} LED Custom Painting & More. All rights reserved.</p>
             </div>
         </footer>
     );
