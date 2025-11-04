@@ -12,6 +12,25 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'serif-luxury': ['Playfair Display', 'serif'],
+        'sans-luxury': ['Inter', 'sans-serif'],
+      },
+      colors: {
+        luxury: {
+          charcoal: '#1a1a1a',
+          champagne: '#F7E7CE',
+          rosegold: '#E8B4B8',
+          cream: '#FEFCF8',
+          midnight: '#0F172A',
+        }
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      letterSpacing: {
+        tighter: '-0.02em',
+      },
       animation: {
         shimmer: "shimmer 2s linear infinite",
         scroll: "scroll 30s linear infinite",

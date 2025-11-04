@@ -18,9 +18,40 @@ const quoteRequestSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  message: {
+  address: {
     type: String,
     required: true,
+    trim: true
+  },
+  projectType: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  propertyType: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  timeline: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  budgetRange: {
+    type: String,
+    trim: true
+  },
+  paintingArea: {
+    type: String,
+    trim: true
+  },
+  message: {
+    type: String,
+    trim: true
+  },
+  howDidYouHear: {
+    type: String,
     trim: true
   },
   createdAt: {

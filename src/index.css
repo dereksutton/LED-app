@@ -12,6 +12,11 @@
   --link-hover-color: #0056b3;
   --brand-gold: #FFD700;
   --brand-orange: #FFA500;
+  --luxury-charcoal: #1a1a1a;
+  --luxury-champagne: #F7E7CE;
+  --luxury-rose-gold: #E8B4B8;
+  --luxury-cream: #FEFCF8;
+  --luxury-midnight: #0F172A;
 }
 
 * {
@@ -30,29 +35,12 @@ body, html {
   overflow-x: hidden;
 }
 
-/* Typography */
-h1, h2, h3, p {
-  padding: 0.5em 0;
-}
-
-h1 {
-  font-size: 2rem;
-  font-weight: bold;
-}
-
-p {
-  font-size: 1rem;
-}
-
 /* Links */
 a {
   text-decoration: none;
 }
 
-a:hover, a:focus {
-  color: var(--link-hover-color);
-  text-decoration: underline;
-}
+/* Disable default link hover styles - components will handle their own */
 
 .bg-brand-gold {
   background-color: var(--brand-gold);

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const sgMail = require('@sendgrid/mail'); // Changed to SendGrid's mail package
+const { Resend } = require('resend');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
@@ -9,9 +9,9 @@ const QuoteRequest = require('./models/QuoteRequest');
 console.log('Starting server with process.env.PORT =', process.env.PORT);
 process.env.PORT = '3001';
 
-// Set SendGrid API Key
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-console.log('SendGrid API Key configured');
+// Initialize Resend with API Key
+const resend = new Resend(process.env.RESEND_API_KEY);
+console.log('Resend API Key configured');
 
 // Connect to MongoDB
 connectDB();
@@ -36,9 +36,9 @@ const limiter = rateLimit({
 
 // ✅ Input validation middleware
 const validateQuoteRequest = (req, res, next) => {
-    const { name, email, phone, message } = req.body;
+    const { name, email, phone, address, projectType, propertyType, timeline } = req.body;
 
-    if (!name || !email || !phone || !message) {
+    if (!name || !email || !phone || !address || !projectType || !propertyType || !timeline) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -52,7 +52,7 @@ const validateQuoteRequest = (req, res, next) => {
 
 // ✅ Handle Quote Request Submission using SendGrid API
 app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
-    const { name, email, phone, message } = req.body;
+    const { name, email, phone, address, projectType, propertyType, timeline, budgetRange, paintingArea, message, howDidYouHear } = req.body;
 
     try {
         // 1. Save to MongoDB
@@ -61,45 +61,68 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
             name,
             email,
             phone,
-            message
+            address,
+            projectType,
+            propertyType,
+            timeline,
+            budgetRange,
+            paintingArea,
+            message,
+            howDidYouHear
         });
         await newQuoteRequest.save();
         console.log('Quote request saved to database with ID:', newQuoteRequest._id);
 
-        // 2. Send email using SendGrid API
+        // 2. Send email using Resend API
         try {
-            console.log('Preparing email with SendGrid API...');
-            const msg = {
+            console.log('Preparing email with Resend API...');
+            const emailData = {
+                from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
                 to: 'ledcustompainting@gmail.com',
-                from: process.env.EMAIL_USER,
-                replyTo: email, // Use the customer's email as reply-to
+                reply_to: email, // Use the customer's email as reply-to
                 subject: `Quote Request from ${name}`,
-                text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nDatabase ID: ${newQuoteRequest._id}\n\nMessage:\n${message}`,
                 html: `
                     <h2>New Quote Request</h2>
+                    <h3>Personal Information</h3>
                     <p><strong>Name:</strong> ${name}</p>
                     <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Phone:</strong> ${phone}</p>
-                    <p><strong>Database ID:</strong> ${newQuoteRequest._id}</p>
-                    <p><strong>Message:</strong></p>
-                    <p>${message.replace(/\n/g, '<br>')}</p>
+                    <p><strong>Property Address:</strong> ${address}</p>
+
+                    <h3>Project Details</h3>
+                    <p><strong>Project Type:</strong> ${projectType}</p>
+                    <p><strong>Property Type:</strong> ${propertyType}</p>
+                    <p><strong>Timeline:</strong> ${timeline}</p>
+                    <p><strong>Budget Range:</strong> ${budgetRange || 'Not specified'}</p>
+                    <p><strong>Painting Area:</strong> ${paintingArea || 'Not specified'}</p>
+
+                    <h3>Additional Information</h3>
+                    <p><strong>How Did You Hear About Us:</strong> ${howDidYouHear || 'Not specified'}</p>
+                    <p><strong>Project Details & Special Requirements:</strong></p>
+                    <p>${message ? message.replace(/\n/g, '<br>') : 'No additional message'}</p>
+
                     <hr>
+                    <p><strong>Database ID:</strong> ${newQuoteRequest._id}</p>
                     <p><small>This email was sent from your website's quote request form.</small></p>
                 `,
             };
 
-            console.log('Sending email via SendGrid API...');
-            await sgMail.send(msg);
-            console.log('Email sent successfully via SendGrid API.');
-        } catch (emailError) {
-            console.error('Email sending failed via SendGrid API:', emailError);
-            
-            // More detailed error logging for SendGrid API errors
-            if (emailError.response) {
-                console.error('SendGrid API error details:');
-                console.error(emailError.response.body);
+            console.log('Sending email via Resend API...');
+            const { data, error } = await resend.emails.send(emailData);
+
+            if (error) {
+                throw error;
             }
-            
+
+            console.log('Email sent successfully via Resend API. Email ID:', data.id);
+        } catch (emailError) {
+            console.error('Email sending failed via Resend API:', emailError);
+
+            // More detailed error logging for Resend API errors
+            if (emailError.message) {
+                console.error('Resend API error details:', emailError.message);
+            }
+
             // You may want to update this to return an error to the client
             // return res.status(500).json({
             //     success: false,
