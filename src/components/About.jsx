@@ -70,8 +70,8 @@ const About = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <motion.h2 
-                        className="font-serif-luxury text-5xl lg:text-7xl text-[--luxury-champagne] mb-6"
+                    <motion.h2
+                        className="font-serif-luxury text-5xl lg:text-8xl text-[--luxury-champagne] mb-6"
                         initial={{ opacity: 0, scale: 0.8 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
@@ -174,26 +174,42 @@ const About = () => {
 
                         {/* Core Values */}
                         <motion.div variants={itemVariants}>
-                            <h4 className="font-serif-luxury text-2xl text-[--luxury-champagne] mb-8 text-center">
+                            <h4 className="font-serif-luxury text-2xl text-[--luxury-champagne] mb-10 text-center">
                                 Our Core Values
                             </h4>
-                            <div className="space-y-6">
+                            <div className="grid grid-cols-1 gap-6">
                                 {values.map((value, index) => (
                                     <motion.div
                                         key={index}
-                                        className="flex items-start space-x-4 bg-slate-800/30 backdrop-blur-sm rounded-xl p-6 border border-slate-600/20"
-                                        whileHover={{ x: 5 }}
+                                        className="relative bg-gradient-to-br from-slate-800/40 via-slate-700/50 to-slate-800/40 backdrop-blur-sm rounded-2xl p-8 border border-slate-600/30 overflow-hidden group"
+                                        whileHover={{ scale: 1.02, y: -3 }}
                                         transition={{ duration: 0.3 }}
                                     >
-                                        <div className="text-2xl">{value.icon}</div>
-                                        <div>
-                                            <h5 className="font-sans-luxury font-semibold text-lg text-white mb-2">
-                                                {value.title}
-                                            </h5>
-                                            <p className="font-sans-luxury text-slate-300">
-                                                {value.description}
-                                            </p>
+                                        {/* Background accent */}
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[--luxury-champagne]/10 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500"></div>
+
+                                        {/* Content Container */}
+                                        <div className="relative flex items-start space-x-6">
+                                            {/* Emoji Container */}
+                                            <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl flex items-center justify-center border border-slate-600/30 shadow-lg">
+                                                <span className="text-3xl transform group-hover:scale-110 transition-transform duration-300">
+                                                    {value.icon}
+                                                </span>
+                                            </div>
+
+                                            {/* Text Content */}
+                                            <div className="flex-1">
+                                                <h5 className="font-serif-luxury text-xl text-[--luxury-champagne] mb-3">
+                                                    {value.title}
+                                                </h5>
+                                                <p className="font-sans-luxury text-slate-300 leading-relaxed">
+                                                    {value.description}
+                                                </p>
+                                            </div>
                                         </div>
+
+                                        {/* Decorative line */}
+                                        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[--luxury-champagne]/20 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                                     </motion.div>
                                 ))}
                             </div>

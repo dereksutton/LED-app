@@ -161,7 +161,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
                     {/* Company Info */}
                     <motion.div
-                        className="lg:col-span-1"
+                        className="lg:col-span-1 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -173,11 +173,11 @@ const Footer = () => {
                         <p className="font-sans-luxury text-slate-300 mb-6 leading-relaxed">
                             North Florida's premier painting professionals, delivering exceptional results with 13+ years of experience and unwavering commitment to quality.
                         </p>
-                        <div className="space-y-3">
+                        <div className="space-y-3 inline-block lg:block">
                             {businessInfo.map((info, index) => (
                                 <motion.div
                                     key={index}
-                                    className="flex items-center space-x-3"
+                                    className="flex items-center space-x-3 text-left"
                                     initial={{ opacity: 0, x: -20 }}
                                     whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true }}
@@ -196,7 +196,7 @@ const Footer = () => {
 
                     {/* Navigation Menu */}
                     <motion.div
-                        className="lg:col-span-1"
+                        className="lg:col-span-1 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -205,12 +205,12 @@ const Footer = () => {
                         <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6">
                             Quick Links
                         </h3>
-                        <nav className="space-y-3">
+                        <nav className="space-y-3 inline-block lg:block">
                             {navigationSections.map((section, index) => (
                                 <motion.a
                                     key={section.name}
                                     href={section.href}
-                                    className="block font-sans-luxury text-slate-300 hover:text-[#F5E6D3] transition-colors duration-300 py-1"
+                                    className="block font-sans-luxury text-slate-300 hover:text-[#F5E6D3] transition-colors duration-300 py-1 text-left"
                                     whileHover={{ x: 5 }}
                                     initial={{ opacity: 0, x: -20 }}
                                     whileInView={{ opacity: 1, x: 0 }}
@@ -225,7 +225,7 @@ const Footer = () => {
 
                     {/* Contact Information */}
                     <motion.div
-                        className="lg:col-span-1"
+                        className="lg:col-span-1 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -234,11 +234,11 @@ const Footer = () => {
                         <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6">
                             Contact Info
                         </h3>
-                        <div className="space-y-4">
+                        <div className="space-y-4 inline-block lg:block">
                             {contactInfo.map((contact, index) => (
                                 <motion.div
                                     key={contact.label}
-                                    className="flex items-start space-x-3"
+                                    className="flex items-start space-x-3 text-left"
                                     initial={{ opacity: 0, x: -20 }}
                                     whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true }}
@@ -274,7 +274,7 @@ const Footer = () => {
 
                     {/* Social Media & CTA */}
                     <motion.div
-                        className="lg:col-span-1"
+                        className="lg:col-span-1 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -286,29 +286,29 @@ const Footer = () => {
                         <p className="font-sans-luxury text-slate-300 mb-6">
                             Stay connected and see our latest projects and transformations.
                         </p>
-                        <div className="flex space-x-4 mb-8">
-                            <SocialIcon 
-                                platform="facebook" 
-                                href="https://www.facebook.com/ledcustompainting?mibextid=kFxxJD" 
+                        <div className="flex justify-center lg:justify-start space-x-4 mb-8">
+                            <SocialIcon
+                                platform="facebook"
+                                href="https://www.facebook.com/ledcustompainting?mibextid=kFxxJD"
                             />
-                            <SocialIcon 
-                                platform="instagram" 
-                                href="https://www.instagram.com/led_custom_painting?igsh=MXMxczJ2NXp3anAxdA==" 
+                            <SocialIcon
+                                platform="instagram"
+                                href="https://www.instagram.com/led_custom_painting?igsh=MXMxczJ2NXp3anAxdA=="
                             />
                         </div>
-                        
+
                         {/* CTA Button */}
                         <motion.a
                             href="#quote"
-                            className="inline-flex items-center justify-center w-full h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group"
+                            className="inline-flex items-center justify-center w-full lg:w-auto px-8 h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group"
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                         >
                             Get Free Quote
-                            <motion.svg 
-                                className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" 
-                                fill="none" 
-                                stroke="currentColor" 
+                            <motion.svg
+                                className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300"
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

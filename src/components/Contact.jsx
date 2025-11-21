@@ -156,36 +156,36 @@ const Contact = () => {
     ];
 
     return (
-        <section id="quote" className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 py-24 overflow-hidden">
+        <section id="quote" className="relative bg-white py-24 overflow-hidden">
             {/* Background Elements */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(245,230,211,0.1),transparent_50%)]"></div>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(232,180,160,0.08),transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(44,62,80,0.03),transparent_50%)]"></div>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(245,230,211,0.05),transparent_50%)]"></div>
             
             {/* Decorative Lines */}
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F5E6D3]/30 to-transparent"></div>
-            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F5E6D3]/30 to-transparent"></div>
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#2C3E50]/20 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#2C3E50]/20 to-transparent"></div>
 
             {/* Animated Background Elements */}
             <div className="absolute inset-0">
-                <motion.div 
-                    className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-[#F5E6D3]/10 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                <motion.div
+                    className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-[#2C3E50]/05 to-transparent rounded-full blur-3xl"
+                    animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 8,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div 
-                    className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-[#E8B4A0]/10 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                <motion.div
+                    className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-[#F5E6D3]/08 to-transparent rounded-full blur-3xl"
+                    animate={{
                         scale: [1.2, 1, 1.2],
                         opacity: [0.2, 0.4, 0.2]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 6,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -208,16 +208,16 @@ const Contact = () => {
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <h2 className="font-serif-luxury text-5xl lg:text-8xl text-[#F5E6D3] mb-8">
+                        <h2 className="font-serif-luxury text-5xl lg:text-8xl text-[#2C3E50] mb-8">
                             Get Your{' '}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3]">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2C3E50] via-[#4A5F7F] to-[#2C3E50]">
                                 Free Quote
                             </span>
                         </h2>
                     </motion.div>
                     
-                    <motion.p 
-                        className="font-sans-luxury text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8"
+                    <motion.p
+                        className="font-sans-luxury text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-8"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -237,22 +237,22 @@ const Contact = () => {
                         {trustBadges.map((badge, index) => (
                             <motion.div
                                 key={index}
-                                className="flex items-center space-x-3 bg-slate-900/50 backdrop-blur-sm rounded-full px-6 py-3 border border-slate-700/30"
+                                className="flex items-center space-x-3 bg-[#2C3E50] backdrop-blur-sm rounded-full px-6 py-3 border border-[#2C3E50] shadow-md"
                                 whileHover={{ scale: 1.05, y: -2 }}
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="text-[#F5E6D3]">
                                     <IconComponent iconType={badge.icon} />
                                 </div>
-                                <span className="font-sans-luxury font-semibold text-white text-sm lg:text-base">
+                                <span className="font-sans-luxury font-semibold text-[#F5E6D3] text-sm lg:text-base">
                                     {badge.text}
                                 </span>
                             </motion.div>
                         ))}
                     </motion.div>
                     
-                    <motion.div 
-                        className="w-40 h-1 bg-gradient-to-r from-transparent via-[#F5E6D3] to-transparent mx-auto"
+                    <motion.div
+                        className="w-40 h-1 bg-gradient-to-r from-transparent via-[#2C3E50] to-transparent mx-auto"
                         initial={{ scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
                         viewport={{ once: true }}
@@ -269,7 +269,7 @@ const Contact = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                     >
-                        <div className="bg-gradient-to-br from-slate-900/90 via-slate-800/95 to-slate-900/90 backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-slate-700/50 shadow-2xl">
+                        <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-[#2C3E50]/30 shadow-2xl">
                             {status.message && (
                                 <motion.div 
                                     className={`mb-6 p-4 rounded-2xl border ${
@@ -527,16 +527,16 @@ const Contact = () => {
                                     type="submit" 
                                     disabled={isSubmitting}
                                     className={`w-full inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[#F5E6D3]/30
-                                        bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-white text-xl lg:text-2xl tracking-wide
+                                        bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-[#F5E6D3] text-xl lg:text-2xl tracking-wide
                                         transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                                        focus:outline-none shadow-2xl hover:shadow-[#F5E6D3]/20 hover:text-white backdrop-blur-sm group
+                                        focus:outline-none shadow-2xl hover:shadow-[#F5E6D3]/20 hover:text-[#F5E6D3] backdrop-blur-sm group
                                         ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     whileHover={{ scale: 1.02, y: -2 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#F5E6D3]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
@@ -596,7 +596,7 @@ const Contact = () => {
                         </div>
 
                         {/* Why Choose Us */}
-                        <div className="bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/30">
+                        <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] backdrop-blur-sm rounded-2xl p-8 border border-[#2C3E50]/30 shadow-lg">
                             <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 text-center">
                                 Why Choose LED Custom Painting?
                             </h3>
@@ -622,21 +622,21 @@ const Contact = () => {
                                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                             </svg>
                                         </div>
-                                        <span className="font-sans-luxury text-slate-300">{benefit}</span>
+                                        <span className="font-sans-luxury text-[#F5E6D3]">{benefit}</span>
                                     </motion.div>
                                 ))}
                             </div>
                         </div>
 
                         {/* Response Time */}
-                        <div className="bg-gradient-to-r from-slate-900/80 via-slate-800/90 to-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50 text-center">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#F5E6D3]/20 rounded-full mb-4">
+                        <div className="bg-gradient-to-br from-[#F5E6D3] to-[#E8B4A0] backdrop-blur-sm rounded-2xl p-6 border border-[#2C3E50]/10 text-center shadow-md">
+                            <div className="inline-flex items-center justify-center w-12 h-12 bg-white/80 rounded-full mb-4">
                                 <IconComponent iconType="clock" />
                             </div>
-                            <h4 className="font-serif-luxury text-lg text-[#F5E6D3] mb-2">
+                            <h4 className="font-serif-luxury text-lg text-[#2C3E50] mb-2">
                                 Quick Response
                             </h4>
-                            <p className="font-sans-luxury text-slate-300 text-sm">
+                            <p className="font-sans-luxury text-slate-700 text-sm">
                                 We'll contact you within 24 hours with your detailed quote
                             </p>
                         </div>

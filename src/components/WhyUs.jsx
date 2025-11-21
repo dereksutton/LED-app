@@ -543,6 +543,7 @@ const WhyUs = () => {
                                     <motion.img
                                         src={whyUsImage}
                                         alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
+                                        loading="lazy"
                                         className="w-full h-auto"
                                         whileHover={{ scale: 1.02 }}
                                         transition={{ duration: 0.4 }}
@@ -700,6 +701,7 @@ const WhyUs = () => {
                                 <motion.img
                                     src={whyUsImage}
                                     alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
+                                    loading="lazy"
                                     className="w-full h-auto"
                                     whileHover={{ scale: 1.02 }}
                                     transition={{ duration: 0.4 }}

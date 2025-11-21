@@ -71,7 +71,7 @@ const Services = () => {
     };
 
     return (
-        <section id="services" className="relative bg-gradient-to-br from-slate-50 via-white to-slate-100 py-24 overflow-hidden">
+        <section id="services" className="relative bg-gradient-to-br from-slate-50 via-white to-slate-100 py-24 overflow-hidden z-10">
             {/* Background Elements */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(120,119,198,0.1),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,206,84,0.1),transparent_50%)]"></div>
@@ -85,8 +85,8 @@ const Services = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    <motion.h2 
-                        className="font-serif-luxury text-5xl lg:text-7xl text-slate-800 mb-6"
+                    <motion.h2
+                        className="font-serif-luxury text-5xl lg:text-8xl text-slate-800 mb-6"
                         initial={{ opacity: 0, scale: 0.8 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
@@ -128,6 +128,7 @@ const Services = () => {
                                     <motion.img
                                         src={service.image}
                                         alt={service.title}
+                                        loading="lazy"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -135,8 +136,8 @@ const Services = () => {
 
                                 {/* Content */}
                                 <div className="p-8 flex-1 flex flex-col">
-                                    <motion.h3 
-                                        className="font-sans-luxury font-semibold text-2xl text-[--luxury-champagne] mb-4 group-hover:text-[--luxury-champagne]/80 transition-colors duration-300"
+                                    <motion.h3
+                                        className="font-serif-luxury text-2xl text-[--luxury-champagne] mb-4 group-hover:text-[--luxury-champagne]/80 transition-colors duration-300"
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
