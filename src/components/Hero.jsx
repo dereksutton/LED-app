@@ -26,14 +26,42 @@ const Hero = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Reload video when source changes
+    // Force autoplay on mobile - must set muted programmatically for iOS
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.load();
-            videoRef.current.play().catch(() => {
-                // Autoplay may be blocked, that's okay
-            });
-        }
+        const video = videoRef.current;
+        if (!video) return;
+
+        // iOS requires muted to be set via JavaScript, not just HTML attribute
+        video.muted = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+
+        const playVideo = async () => {
+            try {
+                video.load();
+                await video.play();
+            } catch (err) {
+                // If autoplay fails, try again with a slight delay
+                setTimeout(async () => {
+                    try {
+                        video.muted = true;
+                        await video.play();
+                    } catch (e) {
+                        console.log('Video autoplay failed:', e);
+                    }
+                }, 100);
+            }
+        };
+
+        playVideo();
+
+        // Also try to play when video data is loaded
+        video.addEventListener('loadeddata', playVideo);
+
+        return () => {
+            video.removeEventListener('loadeddata', playVideo);
+        };
     }, [isMobile]);
 
     // Simple approach that works across all browsers
@@ -47,14 +75,15 @@ const Hero = () => {
                     muted
                     loop
                     playsInline
+                    webkit-playsinline=""
+                    x5-playsinline=""
+                    preload="auto"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                         filter: 'brightness(0.8)',
                     }}
-                >
-                    <source src={isMobile ? backgroundVideoMobile : backgroundVideoOptimized} type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
+                    src={isMobile ? backgroundVideoMobile : backgroundVideoOptimized}
+                />
                 {/* Optional overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-black/20"></div>
             </div>
