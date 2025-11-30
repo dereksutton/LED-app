@@ -1,4 +1,7 @@
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + './env', override: true, });
+
+console.log('RESEND_API_KEY length:', (process.env.RESEND_API_KEY || '').length);
+
 const express = require('express');
 const { Resend } = require('resend');
 const cors = require('cors');
@@ -6,18 +9,24 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
 
-console.log('Starting server with process.env.PORT =', process.env.PORT);
-process.env.PORT = '3001';
+const PORT = process.env.PORT || 3001;
+console.log('Starting server with PORT =', PORT);
 
 // Initialize Resend with API Key
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+console.log('Resend API Key loaded?', !!resendApiKey);
+
+if (!resendApiKey) {
+    console.error('RESEND_API_KEY is missing. Check server/.env');
+}
+
+const resend = new Resend(resendApiKey);
 console.log('Resend API Key configured');
 
 // Connect to MongoDB
 connectDB();
 
 const app = express();
-const PORT = 3001;
 
 // ✅ Middleware
 app.use(express.json());
