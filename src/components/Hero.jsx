@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, Transition } from '@headlessui/react';
 import Logo from './Logo';
@@ -7,7 +7,14 @@ import backgroundVideoMobile from '../assets/led-hero-mobile.mp4';
 
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(() => {
+        // Initialize with correct value to avoid source swap on mount
+        if (typeof window !== 'undefined') {
+            return window.innerWidth <= 768;
+        }
+        return false;
+    });
+    const videoRef = useRef(null);
 
     useEffect(() => {
         // Check if mobile on mount and resize
@@ -19,17 +26,27 @@ const Hero = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Reload video when source changes
+    useEffect(() => {
+        if (videoRef.current) {
+            videoRef.current.load();
+            videoRef.current.play().catch(() => {
+                // Autoplay may be blocked, that's okay
+            });
+        }
+    }, [isMobile]);
+
     // Simple approach that works across all browsers
     return (
         <section className="relative min-h-screen overflow-hidden">
             {/* Background video container - contained within hero section */}
             <div className="absolute inset-0 z-0">
                 <video
+                    ref={videoRef}
                     autoPlay
                     muted
                     loop
                     playsInline
-                    loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                         filter: 'brightness(0.8)',
