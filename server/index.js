@@ -60,7 +60,7 @@ const validateQuoteRequest = (req, res, next) => {
 };
 
 // ✅ Handle Quote Request Submission using SendGrid API
-app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
+app.post('/api/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     const { name, email, phone, address, projectType, propertyType, timeline, budgetRange, paintingArea, message, howDidYouHear } = req.body;
 
     try {

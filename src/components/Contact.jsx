@@ -32,7 +32,7 @@ const Contact = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await fetch('http://localhost:3001/send-quote', {
+            const response = await fetch('/api/send-quote', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
