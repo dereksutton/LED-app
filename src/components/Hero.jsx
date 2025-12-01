@@ -26,43 +26,39 @@ const Hero = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Force autoplay on mobile - must set muted programmatically for iOS
+    // Handle video autoplay on mount only
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
 
         // iOS requires muted to be set via JavaScript, not just HTML attribute
         video.muted = true;
-        video.setAttribute('muted', '');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('webkit-playsinline', '');
 
-        const playVideo = async () => {
+        const attemptPlay = async () => {
             try {
-                video.load();
                 await video.play();
             } catch (err) {
-                // If autoplay fails, try again with a slight delay
-                setTimeout(async () => {
-                    try {
-                        video.muted = true;
-                        await video.play();
-                    } catch (e) {
-                        console.log('Video autoplay failed:', e);
-                    }
-                }, 100);
+                // Autoplay blocked - silent fail, video will show first frame
+                console.log('Video autoplay blocked:', err.message);
             }
         };
 
-        playVideo();
+        // Try to play when video can play through
+        const handleCanPlay = () => {
+            attemptPlay();
+        };
 
-        // Also try to play when video data is loaded
-        video.addEventListener('loadeddata', playVideo);
+        video.addEventListener('canplaythrough', handleCanPlay);
+
+        // Also try immediately in case video is already ready
+        if (video.readyState >= 3) {
+            attemptPlay();
+        }
 
         return () => {
-            video.removeEventListener('loadeddata', playVideo);
+            video.removeEventListener('canplaythrough', handleCanPlay);
         };
-    }, [isMobile]);
+    }, []);
 
     // Simple approach that works across all browsers
     return (
@@ -70,20 +66,20 @@ const Hero = () => {
             {/* Background video container - contained within hero section */}
             <div className="absolute inset-0 z-0">
                 <video
+                    key={isMobile ? 'mobile' : 'desktop'}
                     ref={videoRef}
                     autoPlay
                     muted
                     loop
                     playsInline
-                    webkit-playsinline=""
-                    x5-playsinline=""
                     preload="auto"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                         filter: 'brightness(0.8)',
                     }}
-                    src={isMobile ? backgroundVideoMobile : backgroundVideoOptimized}
-                />
+                >
+                    <source src={isMobile ? backgroundVideoMobile : backgroundVideoOptimized} type="video/mp4" />
+                </video>
                 {/* Optional overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-black/20"></div>
             </div>
