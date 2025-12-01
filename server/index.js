@@ -1,4 +1,4 @@
-require('dotenv').config({ path: __dirname + './env', override: true, });
+require('dotenv').config({ path: __dirname + '/.env', override: true, });
 
 console.log('RESEND_API_KEY length:', (process.env.RESEND_API_KEY || '').length);
 
