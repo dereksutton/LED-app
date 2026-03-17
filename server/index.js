@@ -31,8 +31,13 @@ const app = express();
 // ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Build CORS origins from environment variable + localhost for dev
+const corsOrigins = ['http://localhost:5173'];
+if (process.env.CORS_ORIGIN) {
+    corsOrigins.push(...process.env.CORS_ORIGIN.split(',').map(o => o.trim()));
+}
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://147.182.175.175', 'https://147.182.175.175'],
+    origin: corsOrigins,
     methods: ['POST', 'GET'],
     credentials: true
 }));

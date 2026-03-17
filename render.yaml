@@ -1,0 +1,44 @@
+services:
+  # Backend API server
+  - type: web
+    name: led-app-api
+    runtime: node
+    region: oregon
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false # Set manually in Render dashboard
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        value: quotes@ledcustompainting.com
+      - key: CORS_ORIGIN
+        sync: false # Set to your static site URL after first deploy
+    healthCheckPath: /health
+
+staticSites:
+  # Frontend React app
+  - name: led-app-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      - type: rewrite
+        source: /send-quote
+        destination: https://led-app-api.onrender.com/send-quote
+      - type: rewrite
+        source: /quote-requests
+        destination: https://led-app-api.onrender.com/quote-requests
+      - type: rewrite
+        source: /health
+        destination: https://led-app-api.onrender.com/health
+      - type: rewrite
+        source: /*
+        destination: /index.html
