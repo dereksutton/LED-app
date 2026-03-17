@@ -5,9 +5,8 @@ services:
     env: node
     region: oregon
     plan: starter
-    rootDir: server
-    buildCommand: npm install
-    startCommand: node index.js
+    buildCommand: cd server && npm ci --production=false
+    startCommand: cd server && npm start
     envVars:
       - key: NODE_VERSION
         value: 18
