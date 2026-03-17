@@ -90,35 +90,98 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
         // 2. Send email using Resend API
         try {
             console.log('Preparing email with Resend API...');
+
+            // Build conditional HTML rows
+            const budgetRow = budgetRange ? `<tr><td style="padding: 8px 0;"><strong>Budget Range:</strong></td><td style="padding: 8px 0;">${budgetRange}</td></tr>` : '';
+            const paintingAreaRow = paintingArea ? `<tr><td style="padding: 8px 0;"><strong>Painting Area:</strong></td><td style="padding: 8px 0;">${paintingArea}</td></tr>` : '';
+            const howHeardRow = howDidYouHear ? `<tr><td style="padding: 8px 0;"><strong>How They Heard About Us:</strong></td><td style="padding: 8px 0;">${howDidYouHear}</td></tr>` : '';
+            const messageSection = message ? `<h3 style="color: #1a1a1a;">Project Details &amp; Special Requirements:</h3><div style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #E8B4B8; margin-bottom: 20px;">${message.replace(/\n/g, '<br>')}</div>` : '';
+
+            const submittedDate = new Date().toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+                dateStyle: 'full',
+                timeStyle: 'short'
+            });
+
+            const emailHtml = `
+              <!DOCTYPE html>
+              <html lang="en">
+              <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>New Quote Request</title>
+              </head>
+              <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0F172A 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                  <h1 style="color: #F7E7CE; margin: 0; text-align: center;">New Quote Request</h1>
+                </div>
+
+                <div style="background: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none;">
+                  <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Contact Information</h2>
+                  <table style="width: 100%; margin-bottom: 20px;">
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Name:</strong></td>
+                      <td style="padding: 8px 0;">${name}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Email:</strong></td>
+                      <td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #1a1a1a;">${email}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Phone:</strong></td>
+                      <td style="padding: 8px 0;"><a href="tel:${phone}" style="color: #1a1a1a;">${phone}</a></td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Property Address:</strong></td>
+                      <td style="padding: 8px 0;">${address}</td>
+                    </tr>
+                  </table>
+
+                  <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Project Details</h2>
+                  <table style="width: 100%; margin-bottom: 20px;">
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Project Type:</strong></td>
+                      <td style="padding: 8px 0;">${projectType}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Property Type:</strong></td>
+                      <td style="padding: 8px 0;">${propertyType}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0;"><strong>Timeline:</strong></td>
+                      <td style="padding: 8px 0;">${timeline}</td>
+                    </tr>
+                    ${budgetRow}
+                    ${paintingAreaRow}
+                    ${howHeardRow}
+                  </table>
+
+                  ${messageSection}
+
+                  <div style="margin-top: 30px; padding: 20px; background: #FEFCF8; border-radius: 5px; text-align: center;">
+                    <p style="margin: 0 0 15px 0;"><strong>Submitted:</strong> ${submittedDate}</p>
+                    <a href="tel:${phone}" style="display: inline-block; padding: 12px 30px; background: #1a1a1a; color: #F7E7CE; text-decoration: none; border-radius: 5px; margin: 5px;">Call Customer</a>
+                    <a href="mailto:${email}" style="display: inline-block; padding: 12px 30px; background: #0F172A; color: #F7E7CE; text-decoration: none; border-radius: 5px; margin: 5px;">Email Customer</a>
+                  </div>
+                </div>
+
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 12px;">
+                  <p>This is an automated notification from your website's quote request form.</p>
+                  <p style="color: #999; font-size: 11px;">Database ID: ${newQuoteRequest._id}</p>
+                </div>
+              </body>
+              </html>
+            `;
+
+            const emailText = `New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\nProperty Type: ${propertyType}\nTimeline: ${timeline}\n${budgetRange ? 'Budget Range: ' + budgetRange + '\n' : ''}${paintingArea ? 'Painting Area: ' + paintingArea + '\n' : ''}${howDidYouHear ? 'How They Heard About Us: ' + howDidYouHear + '\n' : ''}${message ? '\nProject Details & Special Requirements:\n' + message + '\n' : ''}\nSubmitted: ${submittedDate}\nDatabase ID: ${newQuoteRequest._id}`;
+
             const emailData = {
                 from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
                 to: 'ledcustompainting@gmail.com',
-                reply_to: email, // Use the customer's email as reply-to
+                reply_to: email,
                 subject: `Quote Request from ${name}`,
-                html: `
-                    <h2>New Quote Request</h2>
-                    <h3>Personal Information</h3>
-                    <p><strong>Name:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${email}</p>
-                    <p><strong>Phone:</strong> ${phone}</p>
-                    <p><strong>Property Address:</strong> ${address}</p>
-
-                    <h3>Project Details</h3>
-                    <p><strong>Project Type:</strong> ${projectType}</p>
-                    <p><strong>Property Type:</strong> ${propertyType}</p>
-                    <p><strong>Timeline:</strong> ${timeline}</p>
-                    <p><strong>Budget Range:</strong> ${budgetRange || 'Not specified'}</p>
-                    <p><strong>Painting Area:</strong> ${paintingArea || 'Not specified'}</p>
-
-                    <h3>Additional Information</h3>
-                    <p><strong>How Did You Hear About Us:</strong> ${howDidYouHear || 'Not specified'}</p>
-                    <p><strong>Project Details & Special Requirements:</strong></p>
-                    <p>${message ? message.replace(/\n/g, '<br>') : 'No additional message'}</p>
-
-                    <hr>
-                    <p><strong>Database ID:</strong> ${newQuoteRequest._id}</p>
-                    <p><small>This email was sent from your website's quote request form.</small></p>
-                `,
+                html: emailHtml,
+                text: emailText,
             };
 
             console.log('Sending email via Resend API...');
