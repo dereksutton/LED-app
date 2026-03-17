@@ -23,9 +23,6 @@ if (!resendApiKey) {
 const resend = new Resend(resendApiKey);
 console.log('Resend API Key configured');
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 // Trust the first proxy (Render's reverse proxy) so express-rate-limit reads the real client IP
@@ -247,15 +244,25 @@ app.get('/health', (req, res) => {
 });
 
 // ✅ Start Server
-const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on Port ${PORT} and accepting connections from all interfaces`);
-});
-
-server.on('error', (err) => {
-    console.error('Server error:', err);
-    if (err.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Try a different port.`);
-    } else {
-        console.error('Unexpected server error:', err);
+const startServer = async () => {
+    try {
+        await connectDB();
+    } catch (error) {
+        console.error('Failed to connect to MongoDB after all retries. Server will start without DB.');
     }
-});
+
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on Port ${PORT} and accepting connections from all interfaces`);
+    });
+
+    server.on('error', (err) => {
+        console.error('Server error:', err);
+        if (err.code === 'EADDRINUSE') {
+            console.error(`Port ${PORT} is already in use. Try a different port.`);
+        } else {
+            console.error('Unexpected server error:', err);
+        }
+    });
+};
+
+startServer();
