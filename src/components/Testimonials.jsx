@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
 import InfiniteCards from './InfiniteCards';
 
@@ -29,7 +30,7 @@ const Testimonials = () => {
       title: 'Google Review',
     },
     {
-      quote: `LED Custom Painting is the best! They are SO great! Everything from setting an appointment (which is SO easy!) to fantastic workers! And they were always very punctual and did a great job! Made my ugly house the most beautiful! I still get compliments and tell them who painted it. I can't say enough good things about them!!`,
+      quote: "LED Custom Painting is the best! They are SO great! Everything from setting an appointment (which is SO easy!) to fantastic workers! And they were always very punctual and did a great job! Made my ugly house the most beautiful! I still get compliments and tell them who painted it. I can't say enough good things about them!!",
       rating: 5,
       name: 'Wendi Forte',
       title: 'Google Review',
@@ -41,13 +42,13 @@ const Testimonials = () => {
       title: 'Google Review',
     },
     {
-      quote: `Efrain and his team did an amazing job painting our house. They even went above and beyond and helped me replace a few things on the outside of the home, up high where I didn't have a ladder to get to. He is very trustworthy, walked the property with me prior to completing things, and wouldn't leave untill I was completely happy with their work. Highly recommend their services and overall just a great person. You won't be disappointed.`,
+      quote: "Efrain and his team did an amazing job painting our house. They even went above and beyond and helped me replace a few things on the outside of the home, up high where I didn't have a ladder to get to. He is very trustworthy, walked the property with me prior to completing things, and wouldn't leave untill I was completely happy with their work. Highly recommend their services and overall just a great person. You won't be disappointed.",
       rating: 5,
       name: 'Bryan Schultheis',
       title: 'Google Review',
     },
     {
-      quote: `I'm so happy I chose LED Custom Painting. LED was fast, friendly, straight forward with their price, and did phenomenal work. I will definitely call them next time I need paint work, it was truly a pleasure working with them.`,
+      quote: "I'm so happy I chose LED Custom Painting. LED was fast, friendly, straight forward with their price, and did phenomenal work. I will definitely call them next time I need paint work, it was truly a pleasure working with them.",
       rating: 5,
       name: 'Aaron Kaufman',
       title: 'Google Review',
@@ -89,13 +90,13 @@ const Testimonials = () => {
       title: 'Google Review',
     },
     {
-      quote: `One of the best experiences I've had. The attention to detail is second to none. It's all about the trim. Never painting anything on my own again!`,
+      quote: "One of the best experiences I've had. The attention to detail is second to none. It's all about the trim. Never painting anything on my own again!",
       rating: 5,
       name: 'John Henry III',
       title: 'Google Review',
     },
     {
-      quote: `I recently had the pleasure of working with LED Custom Painting, and I can't express enough how impressed I am with their work! From the initial consultation to the final reveal, their professionalism stood out at every step of the process. The team was not only knowledgeable but also incredibly attentive to my vision. They took the time to understand exactly what I wanted and offered valuable suggestions that enhanced the final outcome. The quality of their painting is simply amazing -- every detail is crisp, and the colors are vibrant and true to what we discussed.`,
+      quote: "I recently had the pleasure of working with LED Custom Painting, and I can't express enough how impressed I am with their work! From the initial consultation to the final reveal, their professionalism stood out at every step of the process. The team was not only knowledgeable but also incredibly attentive to my vision. They took the time to understand exactly what I wanted and offered valuable suggestions that enhanced the final outcome. The quality of their painting is simply amazing -- every detail is crisp, and the colors are vibrant and true to what we discussed.",
       rating: 5,
       name: 'Morgan DeLeon',
       title: 'Google Review',
@@ -134,32 +135,32 @@ const Testimonials = () => {
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(245,230,211,0.1),transparent_50%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(232,180,160,0.08),transparent_50%)]"></div>
-      
+
       {/* Decorative Lines */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F5E6D3]/30 to-transparent"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F5E6D3]/30 to-transparent"></div>
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <motion.div 
+        <motion.div
           className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-[#F5E6D3]/10 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3]
           }}
-          transition={{ 
+          transition={{
             duration: 8,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         />
-        <motion.div 
+        <motion.div
           className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-[#E8B4A0]/10 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.2, 0.4, 0.2]
           }}
-          transition={{ 
+          transition={{
             duration: 6,
             repeat: Infinity,
             ease: "easeInOut",
@@ -170,7 +171,7 @@ const Testimonials = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-20"
           initial={{ opacity: 0, y: -80 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -189,19 +190,19 @@ const Testimonials = () => {
               </span>
             </h2>
           </motion.div>
-          
-          <motion.p 
+
+          <motion.p
             className="font-sans-luxury text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            Don't just take our word for it. Hear directly from our satisfied customers about their exceptional experience with LED Custom Painting.
+            Don&apos;t just take our word for it. Hear directly from our satisfied customers about their exceptional experience with LED Custom Painting.
           </motion.p>
 
           {/* Trust Stats */}
-          <motion.div 
+          <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -224,8 +225,8 @@ const Testimonials = () => {
               </motion.div>
             ))}
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="w-40 h-1 bg-gradient-to-r from-transparent via-[#F5E6D3] to-transparent mx-auto"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
@@ -256,7 +257,7 @@ const Testimonials = () => {
         </motion.div>
 
         {/* Bottom CTA Section */}
-        <motion.div 
+        <motion.div
           className="text-center mt-20"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -280,10 +281,10 @@ const Testimonials = () => {
               whileTap={{ scale: 0.98 }}
             >
               Get Your Free Quote Today
-              <motion.svg 
-                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                fill="none" 
-                stroke="currentColor" 
+              <motion.svg
+                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

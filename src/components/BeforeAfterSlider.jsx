@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+"use client";
+
+import { useState } from 'react';
 
 const BeforeAfterCard = ({ beforeImg, afterImg }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
     <div className="relative w-full aspect-[3/2] perspective-1000">
-      <div 
+      <div
         className={`relative w-full h-full transform-style-3d transition-all duration-700 ease-in-out ${
           isFlipped ? 'rotate-y-180' : ''
         }`}

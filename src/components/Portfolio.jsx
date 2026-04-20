@@ -1,29 +1,16 @@
-// Portfolio.jsx
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
 import BeforeAfterSlider from './BeforeAfterSlider';
-import before1 from '../assets/before1.jpg';
-import after1 from '../assets/after1.jpg';
-import before2 from '../assets/before2.jpg';
-import after2 from '../assets/after2.jpg';
-import before3 from '../assets/before3.jpg';
-import after3 from '../assets/after3.jpg';
-import before4 from '../assets/before4.jpg';
-import after4 from '../assets/after4.jpg';
-import before5 from '../assets/before5.jpg';
-import after5 from '../assets/after5.jpg';
-import before6 from '../assets/before6.jpg';
-import after6 from '../assets/after6.jpg';
 
 const Portfolio = () => {
-
   const imagePairs = [
-    { before: before1, after: after1 },
-    { before: before2, after: after2 },
-    { before: before3, after: after3 },
-    { before: before4, after: after4 },
-    { before: before5, after: after5 },
-    { before: before6, after: after6 }
+    { before: '/images/before1.jpg', after: '/images/after1.jpg' },
+    { before: '/images/before2.jpg', after: '/images/after2.jpg' },
+    { before: '/images/before3.jpg', after: '/images/after3.jpg' },
+    { before: '/images/before4.jpg', after: '/images/after4.jpg' },
+    { before: '/images/before5.jpg', after: '/images/after5.jpg' },
+    { before: '/images/before6.jpg', after: '/images/after6.jpg' },
   ];
 
   const containerVariants = {
@@ -54,32 +41,32 @@ const Portfolio = () => {
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(255,206,84,0.1),transparent_50%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(248,250,252,0.05),transparent_50%)]"></div>
-      
+
       {/* Decorative Lines */}
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent"></div>
       <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent"></div>
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <motion.div 
+        <motion.div
           className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-[--luxury-champagne]/10 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3]
           }}
-          transition={{ 
+          transition={{
             duration: 8,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         />
-        <motion.div 
+        <motion.div
           className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-slate-300/20 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.2, 0.4, 0.2]
           }}
-          transition={{ 
+          transition={{
             duration: 6,
             repeat: Infinity,
             ease: "easeInOut",
@@ -90,7 +77,7 @@ const Portfolio = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header Section */}
-        <motion.div 
+        <motion.div
           className="text-center mb-20"
           variants={containerVariants}
           initial="hidden"
@@ -111,7 +98,7 @@ const Portfolio = () => {
               </span>
             </motion.h1>
           </motion.div>
-          
+
           <motion.div variants={itemVariants}>
             <p className="font-sans-luxury text-xl lg:text-2xl text-slate-300 mb-8 max-w-4xl mx-auto leading-relaxed">
               Witness the extraordinary transformations that showcase our commitment to excellence and attention to detail
@@ -128,8 +115,8 @@ const Portfolio = () => {
               </p>
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="w-40 h-1 bg-gradient-to-r from-transparent via-[--luxury-champagne] to-transparent mx-auto mt-8"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
@@ -152,7 +139,7 @@ const Portfolio = () => {
         </motion.div>
 
         {/* Bottom CTA Section */}
-        <motion.div 
+        <motion.div
           className="text-center mt-20"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -176,10 +163,10 @@ const Portfolio = () => {
               whileTap={{ scale: 0.98 }}
             >
               Start Your Transformation
-              <motion.svg 
-                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                fill="none" 
-                stroke="currentColor" 
+              <motion.svg
+                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

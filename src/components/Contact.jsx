@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+"use client";
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const Contact = () => {
@@ -32,7 +33,7 @@ const Contact = () => {
         setStatus({ type: '', message: '' });
 
         try {
-            const response = await fetch('/send-quote', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/send-quote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,9 +48,9 @@ const Contact = () => {
                     type: 'success',
                     message: 'Thank you for your request! We\'ll contact you within 24 hours with a detailed quote.'
                 });
-                setFormData({ 
-                    name: '', 
-                    email: '', 
+                setFormData({
+                    name: '',
+                    email: '',
                     phone: '',
                     address: '',
                     projectType: '',
@@ -160,7 +161,7 @@ const Contact = () => {
             {/* Background Elements */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(44,62,80,0.03),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(245,230,211,0.05),transparent_50%)]"></div>
-            
+
             {/* Decorative Lines */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#2C3E50]/20 to-transparent"></div>
             <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#2C3E50]/20 to-transparent"></div>
@@ -196,7 +197,7 @@ const Contact = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Header Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mb-16"
                     initial={{ opacity: 0, y: -80 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -215,7 +216,7 @@ const Contact = () => {
                             </span>
                         </h2>
                     </motion.div>
-                    
+
                     <motion.p
                         className="font-sans-luxury text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed mb-8"
                         initial={{ opacity: 0, y: 30 }}
@@ -227,7 +228,7 @@ const Contact = () => {
                     </motion.p>
 
                     {/* Trust Badges */}
-                    <motion.div 
+                    <motion.div
                         className="flex flex-wrap justify-center gap-6 mb-8"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -250,7 +251,7 @@ const Contact = () => {
                             </motion.div>
                         ))}
                     </motion.div>
-                    
+
                     <motion.div
                         className="w-40 h-1 bg-gradient-to-r from-transparent via-[#2C3E50] to-transparent mx-auto"
                         initial={{ scaleX: 0 }}
@@ -271,10 +272,10 @@ const Contact = () => {
                     >
                         <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-[#2C3E50]/30 shadow-2xl">
                             {status.message && (
-                                <motion.div 
+                                <motion.div
                                     className={`mb-6 p-4 rounded-2xl border ${
-                                        status.type === 'success' 
-                                            ? 'bg-green-900/50 border-green-500/50 text-green-200' 
+                                        status.type === 'success'
+                                            ? 'bg-green-900/50 border-green-500/50 text-green-200'
                                             : 'bg-red-900/50 border-red-500/50 text-red-200'
                                     }`}
                                     initial={{ opacity: 0, y: -20 }}
@@ -295,7 +296,7 @@ const Contact = () => {
                                     </div>
                                 </motion.div>
                             )}
-                            
+
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Personal Information */}
                                 <div>
@@ -523,8 +524,8 @@ const Contact = () => {
                                     </div>
                                 </div>
 
-                                <motion.button 
-                                    type="submit" 
+                                <motion.button
+                                    type="submit"
                                     disabled={isSubmitting}
                                     className={`w-full inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[#F5E6D3]/30
                                         bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-[#F5E6D3] text-xl lg:text-2xl tracking-wide
@@ -545,10 +546,10 @@ const Contact = () => {
                                     ) : (
                                         <>
                                             Get My Free Quote
-                                            <motion.svg 
-                                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                                                fill="none" 
-                                                stroke="currentColor" 
+                                            <motion.svg
+                                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                                                fill="none"
+                                                stroke="currentColor"
                                                 viewBox="0 0 24 24"
                                             >
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
