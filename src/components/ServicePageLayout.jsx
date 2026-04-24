@@ -30,7 +30,7 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
   return (
     <div className="overflow-x-hidden">
       {/* Hero */}
-      <header className="relative h-[55vh] min-h-[440px] w-full overflow-hidden">
+      <header className="relative h-[62vh] min-h-[560px] w-full overflow-hidden">
         <img
           src={service.image}
           alt={service.name}
@@ -63,7 +63,7 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
         </div>
 
         {/* Hero text */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pt-24 pb-12 text-center">
           <motion.p
             className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4"
             initial={{ opacity: 0, y: 20 }}

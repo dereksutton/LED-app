@@ -555,11 +555,10 @@ const Hero = () => {
                         transition={{ type: 'spring', stiffness: 50 }}
                     >
                         <h1
-                            className="text-[--luxury-midnight] font-serif-luxury font-bold text-4xl lg:text-7xl leading-tight tracking-tighter mb-8 lg:mb-10"
+                            className="text-[--luxury-midnight] font-serif-luxury font-bold text-4xl lg:text-7xl leading-[1.15] lg:leading-tight tracking-tighter mb-8 lg:mb-10"
                             style={{
-                                textShadow: isMobile
-                                    ? '1px 1px 0px #F7E7CE, -1px -1px 0px #F7E7CE, 1px -1px 0px #F7E7CE, -1px 1px 0px #F7E7CE, 0px 1px 0px #F7E7CE, 0px -1px 0px #F7E7CE, 1px 0px 0px #F7E7CE, -1px 0px 0px #F7E7CE'
-                                    : '2px 2px 0px #F7E7CE, -2px -2px 0px #F7E7CE, 2px -2px 0px #F7E7CE, -2px 2px 0px #F7E7CE, 0px 2px 0px #F7E7CE, 0px -2px 0px #F7E7CE, 2px 0px 0px #F7E7CE, -2px 0px 0px #F7E7CE'
+                                WebkitTextStroke: isMobile ? '1px #F7E7CE' : '1.5px #F7E7CE',
+                                paintOrder: 'stroke fill',
                             }}
                         >
                             Transform Your Space With Precision Painting
