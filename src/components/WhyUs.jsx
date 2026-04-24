@@ -541,7 +541,7 @@ const WhyUs = () => {
                                 {/* Main image container */}
                                 <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-400/20">
                                     <motion.img
-                                        src="/images/whyus.png"
+                                        src="/images/whyus.webp"
                                         alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
                                         loading="lazy"
                                         className="w-full h-auto"
@@ -699,7 +699,7 @@ const WhyUs = () => {
                             {/* Main image container */}
                             <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-400/20">
                                 <motion.img
-                                    src="/images/whyus.png"
+                                    src="/images/whyus.webp"
                                     alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
                                     loading="lazy"
                                     className="w-full h-auto"

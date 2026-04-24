@@ -15,6 +15,7 @@ const Hero = () => {
         return false;
     });
     const videoRef = useRef(null);
+    const starRatingLottieRef = useRef(null);
 
     useEffect(() => {
         // Check if mobile on mount and resize
@@ -24,6 +25,49 @@ const Hero = () => {
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // The 5-star rating lottie is rendered imperatively so it reloads reliably on
+    // every mount, client-side back-nav, and browser bfcache restore (where React
+    // state is frozen/thawed and useEffect alone wouldn't re-run).
+    useEffect(() => {
+        const container = starRatingLottieRef.current;
+        if (!container || typeof window === 'undefined') return;
+        const src = 'https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie';
+
+        let cancelled = false;
+
+        const mountPlayer = () => {
+            customElements.whenDefined('dotlottie-player').then(() => {
+                if (cancelled || !container.isConnected) return;
+                // Remove any existing player so a fresh element is created.
+                while (container.firstChild) container.removeChild(container.firstChild);
+                const player = document.createElement('dotlottie-player');
+                player.setAttribute('src', src);
+                player.setAttribute('background', 'transparent');
+                player.setAttribute('speed', '1');
+                player.setAttribute('loop', '');
+                player.setAttribute('autoplay', '');
+                player.style.width = '100%';
+                player.style.maxWidth = '400px';
+                player.style.margin = '0 auto';
+                container.appendChild(player);
+            });
+        };
+
+        mountPlayer();
+
+        const handlePageShow = (e) => {
+            // Back-forward cache restore: React state is thawed but the lottie
+            // player's animation frames aren't — remount the element.
+            if (e.persisted) mountPlayer();
+        };
+        window.addEventListener('pageshow', handlePageShow);
+
+        return () => {
+            cancelled = true;
+            window.removeEventListener('pageshow', handlePageShow);
+        };
     }, []);
 
     // Handle video autoplay on mount only
@@ -524,16 +568,7 @@ const Hero = () => {
                             Quality You Can See, Service You Can Trust.
                         </p>
                         <div className="text-[--luxury-champagne] text-xl lg:text-2xl font-sans-luxury font-semibold mb-8 lg:mb-12 text-center" style={{textShadow: '2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 1px 2px 0px #1e293b, 0px 1px 0px #1e293b, 0px -1px 0px #1e293b, 1px 0px 0px #1e293b, -1px 0px 0px #1e293b'}}>
-                            <div className="mb-4">
-                                <dotlottie-player
-                                    src="https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie"
-                                    background="transparent"
-                                    speed="1"
-                                    style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}
-                                    loop
-                                    autoplay
-                                ></dotlottie-player>
-                            </div>
+                            <div className="mb-4" ref={starRatingLottieRef} />
                             <p>Proudly Maintaining a 5-Star Rating on Google</p>
                         </div>
                         <a

@@ -167,10 +167,10 @@ const Footer = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 mb-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-x-10 mb-12">
                     {/* Company Info */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-3 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -205,7 +205,7 @@ const Footer = () => {
 
                     {/* Navigation Menu */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-2 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -234,7 +234,7 @@ const Footer = () => {
 
                     {/* Services Menu */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-2 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -263,7 +263,7 @@ const Footer = () => {
 
                     {/* Contact Information */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-3 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -312,7 +312,7 @@ const Footer = () => {
 
                     {/* Social Media & CTA */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-2 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -338,7 +338,7 @@ const Footer = () => {
                         {/* CTA Button */}
                         <motion.a
                             href="#quote"
-                            className="inline-flex items-center justify-center w-full lg:w-auto px-8 h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group"
+                            className="inline-flex items-center justify-center w-full lg:w-auto px-6 h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group whitespace-nowrap"
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                         >

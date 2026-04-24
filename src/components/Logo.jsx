@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 const Logo = () => {
     return (
         <motion.img
-            src="/images/LED-logo.png"
+            src="/images/LED-logo.webp"
             alt="LED Custom Painting Logo"
             className="h-64 lg:h-80"
             initial={{ x: '-100vw' }}

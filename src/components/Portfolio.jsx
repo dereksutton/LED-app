@@ -5,12 +5,12 @@ import BeforeAfterSlider from './BeforeAfterSlider';
 
 const Portfolio = () => {
   const imagePairs = [
-    { before: '/images/before1.jpg', after: '/images/after1.jpg' },
-    { before: '/images/before2.jpg', after: '/images/after2.jpg' },
-    { before: '/images/before3.jpg', after: '/images/after3.jpg' },
-    { before: '/images/before4.jpg', after: '/images/after4.jpg' },
-    { before: '/images/before5.jpg', after: '/images/after5.jpg' },
-    { before: '/images/before6.jpg', after: '/images/after6.jpg' },
+    { before: '/images/before1.webp', after: '/images/after1.webp' },
+    { before: '/images/before2.webp', after: '/images/after2.webp' },
+    { before: '/images/before3.webp', after: '/images/after3.webp' },
+    { before: '/images/before4.webp', after: '/images/after4.webp' },
+    { before: '/images/before5.webp', after: '/images/after5.webp' },
+    { before: '/images/before6.webp', after: '/images/after6.webp' },
   ];
 
   const containerVariants = {

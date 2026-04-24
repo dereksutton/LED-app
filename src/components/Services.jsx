@@ -9,37 +9,37 @@ const Services = () => {
             title: 'Interior Painting',
             slug: 'interior-painting',
             description: 'Transform your indoor spaces with precision and artistry. Our expert team uses premium paints and techniques.',
-            image: '/images/services-interior.png',
+            image: '/images/services-interior.webp',
         },
         {
             title: 'Exterior Painting',
             slug: 'exterior-painting',
             description: 'Enhance your home\'s curb appeal with weather-resistant finishes that protect and beautify.',
-            image: '/images/services-exterior.png',
+            image: '/images/services-exterior.webp',
         },
         {
             title: 'Pressure Washing',
             slug: 'pressure-washing',
             description: 'Restore surfaces to their original brilliance with professional-grade cleaning equipment.',
-            image: '/images/services-pressurewashing.png',
+            image: '/images/services-pressurewashing.webp',
         },
         {
             title: 'Cabinet Refinishing',
             slug: 'cabinet-refinishing',
             description: 'Breathe new life into your kitchen with expert cabinet restoration and custom finishes.',
-            image: '/images/services-cabinets.png',
+            image: '/images/services-cabinets.webp',
         },
         {
             title: 'Ceiling Services',
             slug: 'ceiling-services',
             description: 'Modernize your space with popcorn removal and elegant knockdown texture applications.',
-            image: '/images/services-ceilings.png',
+            image: '/images/services-ceilings.webp',
         },
         {
             title: 'Commercial Services',
             slug: 'commercial-painting',
             description: 'Professional painting solutions for parking lots, buildings, and commercial properties.',
-            image: '/images/services-parkinglot.png',
+            image: '/images/services-parkinglot.webp',
         },
     ];
 

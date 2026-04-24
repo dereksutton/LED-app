@@ -35,7 +35,7 @@ export default function ServicesIndex() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,230,211,0.08),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
           {/* Back link */}
-          <div className="mb-8">
+          <div className="mb-8 flex justify-center">
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
@@ -46,11 +46,15 @@ export default function ServicesIndex() {
               Back to Home
             </Link>
           </div>
-          <h1 className="font-serif-luxury text-4xl lg:text-6xl text-[--luxury-champagne] mb-6">
+          <p className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4">
             Our Services
+          </p>
+          <div className="mx-auto h-px w-12 bg-[--luxury-champagne]/40 mb-6" />
+          <h1 className="font-serif-luxury font-bold text-4xl md:text-5xl lg:text-6xl text-[--luxury-champagne] tracking-tight leading-tight">
+            Professional Painting &amp; Property Services
           </h1>
-          <p className="font-sans-luxury text-xl text-slate-300 max-w-3xl mx-auto">
-            Professional painting and property services throughout Jacksonville and North Florida. Licensed, insured, and backed by a 3-year warranty.
+          <p className="mt-6 font-sans-luxury text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Throughout Jacksonville and North Florida. Licensed, insured, and backed by a 3-year warranty — from single-room refreshes to full commercial buildouts.
           </p>
         </div>
       </header>
@@ -58,31 +62,31 @@ export default function ServicesIndex() {
       <div className="h-px w-full bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent" />
 
       {/* Services Grid */}
-      <main className="bg-gradient-to-br from-slate-50 via-white to-slate-100 py-16 lg:py-24">
+      <main className="bg-gradient-to-br from-slate-50 via-white to-slate-100 py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}/`}
-                className="group relative block overflow-hidden rounded-2xl border border-slate-700 shadow-lg transition-all duration-300 hover:shadow-2xl hover:border-[--luxury-champagne]/50 hover:scale-[1.02] min-h-[320px] no-underline"
+                className="group relative block overflow-hidden rounded-2xl border border-slate-700 shadow-lg transition-all duration-300 hover:shadow-2xl hover:border-[--luxury-champagne]/60 hover:-translate-y-1 min-h-[360px] no-underline"
               >
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{ backgroundImage: `url(${service.image})` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/40 to-black/55 transition-all duration-300 group-hover:from-black/45 group-hover:via-black/30 group-hover:to-black/45" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
 
-                <div className="relative z-10 flex h-full min-h-[320px] flex-col justify-end p-8">
-                  <h2 className="text-2xl font-serif-luxury font-bold text-white mb-2">
+                <div className="relative z-10 flex h-full min-h-[360px] flex-col justify-end p-8">
+                  <h2 className="text-2xl font-serif-luxury font-bold text-white mb-3 tracking-tight">
                     {service.name}
                   </h2>
-                  <p className="text-sm font-sans-luxury text-gray-200 leading-relaxed mb-4 line-clamp-2">
+                  <p className="text-sm font-sans-luxury text-slate-200 leading-relaxed mb-5 line-clamp-2">
                     {service.tagline}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-sm font-sans-luxury font-semibold text-[--luxury-midnight] bg-[--luxury-champagne]/90 rounded-full px-4 py-1.5 self-start transition-colors group-hover:bg-[--luxury-champagne]">
+                  <span className="inline-flex items-center gap-1.5 text-sm font-sans-luxury font-semibold text-[--luxury-midnight] bg-[--luxury-champagne] rounded-full px-5 py-2 self-start shadow-lg shadow-black/30 ring-1 ring-[--luxury-champagne]/60 transition-transform duration-300 group-hover:translate-x-0.5">
                     Learn More
-                    <svg className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </span>

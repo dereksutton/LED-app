@@ -2,33 +2,25 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import SectionHeader from "./SectionHeader";
 
 const ServiceFAQ = ({ faqs, title }) => {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900">
+    <section className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 py-20 lg:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(245,230,211,0.08),transparent_50%)]" />
 
-      <div className="relative max-w-4xl mx-auto px-4 py-16 sm:py-20 md:px-8">
-        {/* Section header */}
-        <motion.div
-          className="mb-10 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#E8B4A0]">
-            FAQ
-          </p>
-          <div className="mx-auto mt-2 h-px w-12 bg-[--luxury-champagne]/30" />
-          <h2 className="mt-4 text-3xl md:text-4xl font-serif-luxury font-bold tracking-tight text-[--luxury-champagne]">
-            {title}
-          </h2>
-        </motion.div>
+      <div className="relative max-w-4xl mx-auto px-6 md:px-8">
+        <SectionHeader
+          eyebrow="FAQ"
+          title={title}
+          subtitle="Quick answers to the most common questions we hear. Not seeing yours? Give us a call at (904) 385-0426."
+          variant="dark"
+          align="center"
+          className="mb-12"
+        />
 
-        {/* FAQ items */}
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <motion.div
@@ -37,7 +29,7 @@ const ServiceFAQ = ({ faqs, title }) => {
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: i * 0.06 }}
+              transition={{ duration: 0.35, delay: i * 0.05 }}
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
@@ -46,7 +38,7 @@ const ServiceFAQ = ({ faqs, title }) => {
               >
                 <span>{faq.q}</span>
                 <motion.svg
-                  className="h-5 w-5 flex-shrink-0 text-[#E8B4A0]"
+                  className="h-5 w-5 flex-shrink-0 text-[--luxury-rose-gold]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

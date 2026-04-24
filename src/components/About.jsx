@@ -131,7 +131,7 @@ const About = () => {
                                 transition={{ duration: 0.3 }}
                             >
                                 <img
-                                    src="/images/paintedhome2.jpg"
+                                    src="/images/paintedhome2.webp"
                                     alt="Beautifully painted home showcasing our craftsmanship"
                                     className="w-full h-80 object-cover"
                                 />
