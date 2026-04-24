@@ -1,17 +1,26 @@
-import React from 'react';
+"use client";
 import { motion } from 'framer-motion';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
 
     const navigationSections = [
-        { name: 'About', href: '#about' },
-        { name: 'Services', href: '#services' },
-        { name: 'Why Choose Us', href: '#whyus' },
-        { name: 'Portfolio', href: '#portfolio' },
-        { name: 'Our Guarantee', href: '#guarantee' },
-        { name: 'Testimonials', href: '#testimonials' },
-        { name: 'Get Quote', href: '#quote' }
+        { name: 'About', href: '/#about' },
+        { name: 'Why Choose Us', href: '/#whyus' },
+        { name: 'Portfolio', href: '/#portfolio' },
+        { name: 'Our Guarantee', href: '/#guarantee' },
+        { name: 'Testimonials', href: '/#testimonials' },
+        { name: 'Get Quote', href: '/contact/' }
+    ];
+
+    const serviceLinks = [
+        { name: 'All Services', href: '/services/' },
+        { name: 'Interior Painting', href: '/services/interior-painting/' },
+        { name: 'Exterior Painting', href: '/services/exterior-painting/' },
+        { name: 'Pressure Washing', href: '/services/pressure-washing/' },
+        { name: 'Cabinet Refinishing', href: '/services/cabinet-refinishing/' },
+        { name: 'Ceiling Services', href: '/services/ceiling-services/' },
+        { name: 'Commercial Painting', href: '/services/commercial-painting/' },
     ];
 
     const contactInfo = [
@@ -123,31 +132,31 @@ const Footer = () => {
             {/* Background Elements */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(245,230,211,0.08),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(232,180,160,0.06),transparent_50%)]"></div>
-            
+
             {/* Decorative Top Line */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#F5E6D3]/30 to-transparent"></div>
 
             {/* Animated Background Elements */}
             <div className="absolute inset-0">
-                <motion.div 
+                <motion.div
                     className="absolute top-10 right-10 w-64 h-64 bg-gradient-to-r from-[#F5E6D3]/05 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 10,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div 
+                <motion.div
                     className="absolute bottom-10 left-10 w-48 h-48 bg-gradient-to-r from-[#E8B4A0]/05 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1.2, 1, 1.2],
                         opacity: [0.2, 0.4, 0.2]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 8,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -158,10 +167,10 @@ const Footer = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-x-10 mb-12">
                     {/* Company Info */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-3 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -196,7 +205,7 @@ const Footer = () => {
 
                     {/* Navigation Menu */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-2 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -223,9 +232,38 @@ const Footer = () => {
                         </nav>
                     </motion.div>
 
+                    {/* Services Menu */}
+                    <motion.div
+                        className="lg:col-span-2 text-center lg:text-left"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                    >
+                        <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6">
+                            Our Services
+                        </h3>
+                        <nav className="space-y-3 inline-block lg:block">
+                            {serviceLinks.map((service, index) => (
+                                <motion.a
+                                    key={service.name}
+                                    href={service.href}
+                                    className="block font-sans-luxury text-slate-300 hover:text-[#F5E6D3] transition-colors duration-300 py-1 text-left"
+                                    whileHover={{ x: 5 }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    whileInView={{ opacity: 1, x: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                >
+                                    {service.name}
+                                </motion.a>
+                            ))}
+                        </nav>
+                    </motion.div>
+
                     {/* Contact Information */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-3 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -274,7 +312,7 @@ const Footer = () => {
 
                     {/* Social Media & CTA */}
                     <motion.div
-                        className="lg:col-span-1 text-center lg:text-left"
+                        className="lg:col-span-2 text-center lg:text-left"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
@@ -300,7 +338,7 @@ const Footer = () => {
                         {/* CTA Button */}
                         <motion.a
                             href="#quote"
-                            className="inline-flex items-center justify-center w-full lg:w-auto px-8 h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group"
+                            className="inline-flex items-center justify-center w-full lg:w-auto px-6 h-12 bg-gradient-to-r from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] rounded-full font-serif-luxury font-semibold text-[#2C3E50] hover:shadow-lg hover:shadow-[#F5E6D3]/20 transition-all duration-300 group whitespace-nowrap"
                             whileHover={{ scale: 1.02, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -331,16 +369,16 @@ const Footer = () => {
                                 &copy; {currentYear} LED Custom Painting & More. All rights reserved.
                             </p>
                             <div className="flex items-center space-x-4 text-slate-400 text-sm">
-                                <motion.a 
-                                    href="#" 
+                                <motion.a
+                                    href="#"
                                     className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300"
                                     whileHover={{ scale: 1.05 }}
                                 >
                                     Privacy Policy
                                 </motion.a>
                                 <span>•</span>
-                                <motion.a 
-                                    href="#" 
+                                <motion.a
+                                    href="#"
                                     className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300"
                                     whileHover={{ scale: 1.05 }}
                                 >
@@ -348,7 +386,7 @@ const Footer = () => {
                                 </motion.a>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                             <span className="font-sans-luxury text-slate-400 text-sm">
                                 Proudly serving

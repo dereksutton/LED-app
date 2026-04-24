@@ -1,11 +1,11 @@
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
-import logo from '../assets/LED-logo.png';
 
 const Logo = () => {
     return (
         <motion.img
-            src={logo}
+            src="/images/LED-logo.webp"
             alt="LED Custom Painting Logo"
             className="h-64 lg:h-80"
             initial={{ x: '-100vw' }}

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "../utils/cn";
 
@@ -70,7 +72,7 @@ const InfiniteCards = ({
               "w-[380px] flex-shrink-0 rounded-2xl border border-slate-600/50",
               "bg-gradient-to-br from-slate-900/90 via-slate-800/95 to-slate-900/90 backdrop-blur-sm shadow-xl shadow-slate-900/50"
             )}
-            whileHover={{ 
+            whileHover={{
               scale: 1.02,
               y: -5,
               transition: { duration: 0.3 }
@@ -85,16 +87,16 @@ const InfiniteCards = ({
               </div>
 
               <p className="font-sans-luxury text-base text-slate-200 mb-6 leading-relaxed italic flex-1">
-                "{item.quote}"
+                &ldquo;{item.quote}&rdquo;
               </p>
-              
+
               <footer className="mt-auto border-t border-slate-700/50 pt-6">
                 <div className="flex flex-col space-y-3">
                   {/* Star Rating */}
                   <div className="flex justify-center">
                     <StarRating rating={item.rating || 5} />
                   </div>
-                  
+
                   {/* Customer Info */}
                   <div className="text-center">
                     <cite className="font-serif-luxury font-semibold text-[#F5E6D3] not-italic text-lg">
@@ -115,7 +117,7 @@ const InfiniteCards = ({
                 </div>
               </footer>
             </blockquote>
-            
+
             {/* Hover border glow */}
             <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[#F5E6D3]/20 via-transparent to-[#F5E6D3]/20 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
           </motion.div>

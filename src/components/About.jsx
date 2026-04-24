@@ -1,6 +1,6 @@
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
-import paintedHomeImage from '../assets/paintedhome2.jpg';
 
 const About = () => {
     const stats = [
@@ -14,17 +14,17 @@ const About = () => {
         {
             title: 'Quality First',
             description: 'We use only premium materials and proven techniques to ensure lasting results.',
-            icon: '🎯'
+            icon: '\uD83C\uDFAF'
         },
         {
             title: 'Trust & Reliability',
             description: 'Licensed, insured, and committed to delivering on our promises every time.',
-            icon: '🛡️'
+            icon: '\uD83D\uDEE1\uFE0F'
         },
         {
             title: 'Customer Experience',
             description: 'We take the "PAIN" out of painting with seamless, stress-free service.',
-            icon: '⭐'
+            icon: '\u2B50'
         }
     ];
 
@@ -56,14 +56,14 @@ const About = () => {
             {/* Background Elements */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_70%,rgba(255,206,84,0.1),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_90%_20%,rgba(248,250,252,0.05),transparent_50%)]"></div>
-            
+
             {/* Decorative Lines */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent"></div>
             <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent"></div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Header Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mb-20"
                     initial={{ opacity: 0, y: -50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ const About = () => {
                     >
                         Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-[--luxury-champagne] via-[--luxury-rose-gold] to-[--luxury-champagne]">Story</span>
                     </motion.h2>
-                    <motion.div 
+                    <motion.div
                         className="w-32 h-1 bg-gradient-to-r from-transparent via-[--luxury-champagne] to-transparent mx-auto"
                         initial={{ scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
@@ -100,30 +100,30 @@ const About = () => {
                     >
                         <motion.div variants={itemVariants}>
                             <h3 className="font-serif-luxury text-3xl lg:text-4xl text-white mb-6">
-                                Taking the <span className="text-[--luxury-champagne] font-bold">"PAIN"</span> out of Painting
+                                Taking the <span className="text-[--luxury-champagne] font-bold">&ldquo;PAIN&rdquo;</span> out of Painting
                             </h3>
                             <p className="font-sans-luxury text-xl text-slate-300 leading-relaxed">
-                                Here at <span className="text-[--luxury-champagne] font-semibold">LED Custom Painting</span>, we believe the experience you have is equally as important as the final results. 
-                                Our commitment to excellence has made us North Florida's trusted painting professionals since 2011.
+                                Here at <span className="text-[--luxury-champagne] font-semibold">LED Custom Painting</span>, we believe the experience you have is equally as important as the final results.
+                                Our commitment to excellence has made us North Florida&apos;s trusted painting professionals since 2011.
                             </p>
                         </motion.div>
 
                         <motion.div variants={itemVariants} className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-600/30">
                             <p className="font-sans-luxury text-lg text-slate-200 leading-relaxed">
-                                Specializing in <span className="text-[--luxury-champagne] font-semibold">Residential & Commercial Painting Services</span>, 
-                                <span className="text-[--luxury-champagne] font-semibold"> Parking Lot Striping</span>, and 
-                                <span className="text-[--luxury-champagne] font-semibold"> Ceiling Services</span>, we work around your schedule and budget to deliver projects 
-                                <span className="text-[--luxury-champagne] font-semibold"> efficiently</span> and 
+                                Specializing in <span className="text-[--luxury-champagne] font-semibold">Residential &amp; Commercial Painting Services</span>,
+                                <span className="text-[--luxury-champagne] font-semibold"> Parking Lot Striping</span>, and
+                                <span className="text-[--luxury-champagne] font-semibold"> Ceiling Services</span>, we work around your schedule and budget to deliver projects
+                                <span className="text-[--luxury-champagne] font-semibold"> efficiently</span> and
                                 <span className="text-[--luxury-champagne] font-semibold"> properly</span>.
                             </p>
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
                             <p className="font-sans-luxury text-xl text-slate-300 leading-relaxed mb-8">
-                                Whether transforming your home's interior, enhancing curb appeal, or managing commercial projects, 
+                                Whether transforming your home&apos;s interior, enhancing curb appeal, or managing commercial projects,
                                 our team delivers precision craftsmanship with unmatched customer service.
                             </p>
-                            
+
                             {/* Image */}
                             <motion.div
                                 className="relative overflow-hidden rounded-2xl shadow-2xl shadow-slate-900/50"
@@ -131,7 +131,7 @@ const About = () => {
                                 transition={{ duration: 0.3 }}
                             >
                                 <img
-                                    src={paintedHomeImage}
+                                    src="/images/paintedhome2.webp"
                                     alt="Beautifully painted home showcasing our craftsmanship"
                                     className="w-full h-80 object-cover"
                                 />
@@ -218,7 +218,7 @@ const About = () => {
                 </div>
 
                 {/* Call to Action */}
-                <motion.div 
+                <motion.div
                     className="text-center"
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -230,8 +230,8 @@ const About = () => {
                             Ready to Experience the LED Difference?
                         </h3>
                         <p className="font-sans-luxury text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
-                            Join hundreds of satisfied customers who chose quality, reliability, and exceptional service. 
-                            Let's bring your vision to life.
+                            Join hundreds of satisfied customers who chose quality, reliability, and exceptional service.
+                            Let&apos;s bring your vision to life.
                         </p>
                         <motion.a
                             href="#quote"
@@ -243,10 +243,10 @@ const About = () => {
                             whileTap={{ scale: 0.98 }}
                         >
                             Start Your Project Today
-                            <motion.svg 
-                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                                fill="none" 
-                                stroke="currentColor" 
+                            <motion.svg
+                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

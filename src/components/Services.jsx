@@ -1,43 +1,45 @@
-import React from 'react';
+"use client";
+
 import { motion } from 'framer-motion';
-import interiorImage from '../assets/services-interior.png';
-import exteriorImage from '../assets/services-exterior.png';
-import pressureWashingImage from '../assets/services-pressurewashing.png';
-import cabinetsImage from '../assets/services-cabinets.png';
-import ceilingsImage from '../assets/services-ceilings.png';
-import parkingLotImage from '../assets/services-parkinglot.png';
+import Link from 'next/link';
 
 const Services = () => {
     const services = [
         {
             title: 'Interior Painting',
+            slug: 'interior-painting',
             description: 'Transform your indoor spaces with precision and artistry. Our expert team uses premium paints and techniques.',
-            image: interiorImage,
+            image: '/images/services-interior.webp',
         },
         {
             title: 'Exterior Painting',
+            slug: 'exterior-painting',
             description: 'Enhance your home\'s curb appeal with weather-resistant finishes that protect and beautify.',
-            image: exteriorImage,
+            image: '/images/services-exterior.webp',
         },
         {
             title: 'Pressure Washing',
+            slug: 'pressure-washing',
             description: 'Restore surfaces to their original brilliance with professional-grade cleaning equipment.',
-            image: pressureWashingImage,
+            image: '/images/services-pressurewashing.webp',
         },
         {
             title: 'Cabinet Refinishing',
+            slug: 'cabinet-refinishing',
             description: 'Breathe new life into your kitchen with expert cabinet restoration and custom finishes.',
-            image: cabinetsImage,
+            image: '/images/services-cabinets.webp',
         },
         {
             title: 'Ceiling Services',
+            slug: 'ceiling-services',
             description: 'Modernize your space with popcorn removal and elegant knockdown texture applications.',
-            image: ceilingsImage,
+            image: '/images/services-ceilings.webp',
         },
         {
             title: 'Commercial Services',
+            slug: 'commercial-painting',
             description: 'Professional painting solutions for parking lots, buildings, and commercial properties.',
-            image: parkingLotImage,
+            image: '/images/services-parkinglot.webp',
         },
     ];
 
@@ -53,13 +55,13 @@ const Services = () => {
     };
 
     const cardVariants = {
-        hidden: { 
-            opacity: 0, 
+        hidden: {
+            opacity: 0,
             y: 50,
             scale: 0.9
         },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             y: 0,
             scale: 1,
             transition: {
@@ -75,10 +77,10 @@ const Services = () => {
             {/* Background Elements */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_80%,rgba(120,119,198,0.1),transparent_50%)]"></div>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,206,84,0.1),transparent_50%)]"></div>
-            
+
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Header Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mb-20"
                     initial={{ opacity: 0, y: -50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -94,7 +96,7 @@ const Services = () => {
                     >
                         Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-700 via-slate-600 to-slate-800">Premium</span> Services
                     </motion.h2>
-                    <motion.div 
+                    <motion.div
                         className="w-32 h-1 bg-gradient-to-r from-transparent via-slate-400 to-transparent mx-auto"
                         initial={{ scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
@@ -104,7 +106,7 @@ const Services = () => {
                 </motion.div>
 
                 {/* Services Grid */}
-                <motion.div 
+                <motion.div
                     className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
                     variants={containerVariants}
                     initial="hidden"
@@ -115,13 +117,14 @@ const Services = () => {
                         <motion.div
                             key={index}
                             variants={cardVariants}
-                            whileHover={{ 
-                                y: -15, 
+                            whileHover={{
+                                y: -15,
                                 scale: 1.02,
                                 transition: { duration: 0.3, ease: "easeOut" }
                             }}
                             className="group relative"
                         >
+                          <Link href={`/services/${service.slug}/`} className="block no-underline h-full">
                             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight] shadow-xl shadow-slate-900/50 border border-slate-700/50 backdrop-blur-sm h-full flex flex-col">
                                 {/* Image Container */}
                                 <div className="relative h-64 overflow-hidden">
@@ -145,7 +148,7 @@ const Services = () => {
                                     >
                                         {service.title}
                                     </motion.h3>
-                                    <motion.p 
+                                    <motion.p
                                         className="font-sans-luxury text-gray-300 leading-relaxed text-lg group-hover:text-gray-200 transition-colors duration-300 flex-1"
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
@@ -154,14 +157,21 @@ const Services = () => {
                                     >
                                         {service.description}
                                     </motion.p>
+                                    <span className="inline-flex items-center gap-1 font-sans-luxury font-semibold text-[--luxury-champagne] text-sm mt-4 group-hover:gap-2 transition-all duration-300">
+                                        Learn More
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </span>
                                 </div>
 
                                 {/* Hover Effect Overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                                
+
                                 {/* Border Glow Effect */}
                                 <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-slate-300/50 via-transparent to-slate-300/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                             </div>
+                          </Link>
 
                             {/* Floating Shadow */}
                             <div className="absolute inset-0 -z-10 rounded-2xl bg-slate-900/5 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
@@ -170,7 +180,7 @@ const Services = () => {
                 </motion.div>
 
                 {/* Call to Action */}
-                <motion.div 
+                <motion.div
                     className="text-center mt-20"
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -189,8 +199,8 @@ const Services = () => {
                             Ready to Transform Your Space?
                         </h3>
                         <p className="text-xl font-sans-luxury text-slate-600 max-w-2xl mx-auto">
-                            Join hundreds of satisfied customers who trust LED Custom Painting for exceptional results. 
-                            <span className="font-semibold text-slate-700"> Free estimates • Licensed & Insured • 5-Star Service</span>
+                            Join hundreds of satisfied customers who trust LED Custom Painting for exceptional results.
+                            <span className="font-semibold text-slate-700"> Free estimates &bull; Licensed &amp; Insured &bull; 5-Star Service</span>
                         </p>
                     </motion.div>
 
@@ -204,10 +214,10 @@ const Services = () => {
                         whileTap={{ scale: 0.98 }}
                     >
                         Get Your Free Quote
-                        <motion.svg 
-                            className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                            fill="none" 
-                            stroke="currentColor" 
+                        <motion.svg
+                            className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                            fill="none"
+                            stroke="currentColor"
                             viewBox="0 0 24 24"
                         >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

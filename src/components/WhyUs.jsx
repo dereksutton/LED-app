@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+"use client";
+import { useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import whyUsImage from '../assets/whyus.png';
 
 const WhyUs = () => {
     const [activeCard, setActiveCard] = useState(0);
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
-    
+
     const rotateX = useSpring(useTransform(mouseY, [-300, 300], [15, -15]));
     const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-15, 15]));
 
@@ -113,14 +113,14 @@ const WhyUs = () => {
     };
 
     const cardVariants = {
-        hidden: { 
-            opacity: 0, 
+        hidden: {
+            opacity: 0,
             y: 60,
             scale: 0.8,
             rotateX: -15
         },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             y: 0,
             scale: 1,
             rotateX: 0,
@@ -155,25 +155,25 @@ const WhyUs = () => {
         <section id="whyus" className="relative bg-gradient-to-br from-slate-50 via-white to-slate-100 py-32 overflow-hidden">
             {/* Animated Background Elements */}
             <div className="absolute inset-0">
-                <motion.div 
+                <motion.div
                     className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-[--luxury-champagne]/10 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.3, 0.5, 0.3]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 8,
                         repeat: Infinity,
                         ease: "easeInOut"
                     }}
                 />
-                <motion.div 
+                <motion.div
                     className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-slate-300/20 to-transparent rounded-full blur-3xl"
-                    animate={{ 
+                    animate={{
                         scale: [1.2, 1, 1.2],
                         opacity: [0.2, 0.4, 0.2]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 6,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -184,7 +184,7 @@ const WhyUs = () => {
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
                 {/* Header Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mb-20"
                     initial={{ opacity: 0, y: -80 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -203,8 +203,8 @@ const WhyUs = () => {
                             </span>
                         </h2>
                     </motion.div>
-                    
-                    <motion.p 
+
+                    <motion.p
                         className="font-sans-luxury text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -213,8 +213,8 @@ const WhyUs = () => {
                     >
                         Discover the six pillars that make LED Custom Painting North Florida's most trusted painting professionals
                     </motion.p>
-                    
-                    <motion.div 
+
+                    <motion.div
                         className="w-40 h-1 bg-gradient-to-r from-transparent via-[--luxury-champagne] to-transparent mx-auto mt-8"
                         initial={{ scaleX: 0 }}
                         whileInView={{ scaleX: 1 }}
@@ -237,7 +237,7 @@ const WhyUs = () => {
                             variants={cardVariants}
                             className={`group relative cursor-pointer`}
                             onMouseEnter={() => setActiveCard(index)}
-                            whileHover={{ 
+                            whileHover={{
                                 scale: 1.05,
                                 z: 10
                             }}
@@ -245,21 +245,21 @@ const WhyUs = () => {
                         >
                             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-700/90 to-slate-800/80 backdrop-blur-sm border border-slate-600/30 shadow-xl shadow-slate-900/30">
                                 {/* Animated gradient overlay */}
-                                <motion.div 
+                                <motion.div
                                     className="absolute inset-0 bg-gradient-to-r from-transparent via-[--luxury-champagne]/10 to-transparent"
                                     initial={{ x: '-100%' }}
-                                    whileHover={{ 
+                                    whileHover={{
                                         x: '100%',
-                                        transition: { 
+                                        transition: {
                                             duration: 0.8,
                                             ease: "easeInOut"
                                         }
                                     }}
                                 />
-                                
+
                                 <div className="relative p-6">
                                     {/* Icon with floating animation */}
-                                    <motion.div 
+                                    <motion.div
                                         className="flex justify-center mb-4"
                                         animate={activeCard === index ? floatingAnimation : {}}
                                     >
@@ -269,16 +269,16 @@ const WhyUs = () => {
                                             </div>
                                         </div>
                                     </motion.div>
-                                    
+
                                     <h3 className="font-serif-luxury text-lg text-[--luxury-champagne] mb-3 text-center group-hover:text-white transition-colors duration-300">
                                         {reason.title}
                                     </h3>
-                                    
+
                                     <p className="font-sans-luxury text-sm text-slate-300 leading-relaxed mb-4 text-center">
                                         {reason.description}
                                     </p>
-                                    
-                                    <motion.div 
+
+                                    <motion.div
                                         className="flex justify-center"
                                         whileHover={{ scale: 1.05 }}
                                         transition={{ duration: 0.2 }}
@@ -290,11 +290,11 @@ const WhyUs = () => {
                                         </div>
                                     </motion.div>
                                 </div>
-                                
+
                                 {/* Hover border glow */}
                                 <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[--luxury-champagne]/30 via-transparent to-[--luxury-champagne]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                             </div>
-                            
+
                             {/* Floating shadow */}
                             <div className="absolute inset-0 -z-10 rounded-2xl bg-[--luxury-champagne]/20 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500" />
                         </motion.div>
@@ -316,27 +316,27 @@ const WhyUs = () => {
                             <motion.div
                                 className={`group relative cursor-pointer`}
                                 onMouseEnter={() => setActiveCard(4)}
-                                whileHover={{ 
+                                whileHover={{
                                     scale: 1.05,
                                     z: 10
                                 }}
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-700/90 to-slate-800/80 backdrop-blur-sm border border-slate-600/30 shadow-xl shadow-slate-900/30">
-                                    <motion.div 
+                                    <motion.div
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-[--luxury-champagne]/10 to-transparent"
                                         initial={{ x: '-100%' }}
-                                        whileHover={{ 
+                                        whileHover={{
                                             x: '100%',
-                                            transition: { 
+                                            transition: {
                                                 duration: 0.8,
                                                 ease: "easeInOut"
                                             }
                                         }}
                                     />
-                                    
+
                                     <div className="relative p-6">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex justify-center mb-4"
                                             animate={activeCard === 4 ? floatingAnimation : {}}
                                         >
@@ -346,16 +346,16 @@ const WhyUs = () => {
                                             </div>
                                             </div>
                                         </motion.div>
-                                        
+
                                         <h3 className="font-serif-luxury text-lg text-[--luxury-champagne] mb-3 text-center group-hover:text-white transition-colors duration-300">
                                             {reasons[4].title}
                                         </h3>
-                                        
+
                                         <p className="font-sans-luxury text-sm text-slate-300 leading-relaxed mb-4 text-center">
                                             {reasons[4].description}
                                         </p>
-                                        
-                                        <motion.div 
+
+                                        <motion.div
                                             className="flex justify-center"
                                             whileHover={{ scale: 1.05 }}
                                             transition={{ duration: 0.2 }}
@@ -367,7 +367,7 @@ const WhyUs = () => {
                                             </div>
                                         </motion.div>
                                     </div>
-                                    
+
                                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[--luxury-champagne]/30 via-transparent to-[--luxury-champagne]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                 </div>
                                 <div className="absolute inset-0 -z-10 rounded-2xl bg-[--luxury-champagne]/20 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500" />
@@ -385,27 +385,27 @@ const WhyUs = () => {
                             <motion.div
                                 className={`group relative cursor-pointer`}
                                 onMouseEnter={() => setActiveCard(5)}
-                                whileHover={{ 
+                                whileHover={{
                                     scale: 1.05,
                                     z: 10
                                 }}
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-700/90 to-slate-800/80 backdrop-blur-sm border border-slate-600/30 shadow-xl shadow-slate-900/30">
-                                    <motion.div 
+                                    <motion.div
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-[--luxury-champagne]/10 to-transparent"
                                         initial={{ x: '-100%' }}
-                                        whileHover={{ 
+                                        whileHover={{
                                             x: '100%',
-                                            transition: { 
+                                            transition: {
                                                 duration: 0.8,
                                                 ease: "easeInOut"
                                             }
                                         }}
                                     />
-                                    
+
                                     <div className="relative p-6">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex justify-center mb-4"
                                             animate={activeCard === 5 ? floatingAnimation : {}}
                                         >
@@ -415,16 +415,16 @@ const WhyUs = () => {
                                             </div>
                                             </div>
                                         </motion.div>
-                                        
+
                                         <h3 className="font-serif-luxury text-lg text-[--luxury-champagne] mb-3 text-center group-hover:text-white transition-colors duration-300">
                                             {reasons[5].title}
                                         </h3>
-                                        
+
                                         <p className="font-sans-luxury text-sm text-slate-300 leading-relaxed mb-4 text-center">
                                             {reasons[5].description}
                                         </p>
-                                        
-                                        <motion.div 
+
+                                        <motion.div
                                             className="flex justify-center"
                                             whileHover={{ scale: 1.05 }}
                                             transition={{ duration: 0.2 }}
@@ -436,7 +436,7 @@ const WhyUs = () => {
                                             </div>
                                         </motion.div>
                                     </div>
-                                    
+
                                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[--luxury-champagne]/30 via-transparent to-[--luxury-champagne]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                 </div>
                                 <div className="absolute inset-0 -z-10 rounded-2xl bg-[--luxury-champagne]/20 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500" />
@@ -458,27 +458,27 @@ const WhyUs = () => {
                             <motion.div
                                 className={`group relative cursor-pointer`}
                                 onMouseEnter={() => setActiveCard(4)}
-                                whileHover={{ 
+                                whileHover={{
                                     scale: 1.05,
                                     z: 10
                                 }}
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-700/90 to-slate-800/80 backdrop-blur-sm border border-slate-600/30 shadow-xl shadow-slate-900/30">
-                                    <motion.div 
+                                    <motion.div
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-[--luxury-champagne]/10 to-transparent"
                                         initial={{ x: '-100%' }}
-                                        whileHover={{ 
+                                        whileHover={{
                                             x: '100%',
-                                            transition: { 
+                                            transition: {
                                                 duration: 0.8,
                                                 ease: "easeInOut"
                                             }
                                         }}
                                     />
-                                    
+
                                     <div className="relative p-6">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex justify-center mb-4"
                                             animate={activeCard === 4 ? floatingAnimation : {}}
                                         >
@@ -488,16 +488,16 @@ const WhyUs = () => {
                                             </div>
                                             </div>
                                         </motion.div>
-                                        
+
                                         <h3 className="font-serif-luxury text-lg text-[--luxury-champagne] mb-3 text-center group-hover:text-white transition-colors duration-300">
                                             {reasons[4].title}
                                         </h3>
-                                        
+
                                         <p className="font-sans-luxury text-sm text-slate-300 leading-relaxed mb-4 text-center">
                                             {reasons[4].description}
                                         </p>
-                                        
-                                        <motion.div 
+
+                                        <motion.div
                                             className="flex justify-center"
                                             whileHover={{ scale: 1.05 }}
                                             transition={{ duration: 0.2 }}
@@ -509,7 +509,7 @@ const WhyUs = () => {
                                             </div>
                                         </motion.div>
                                     </div>
-                                    
+
                                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[--luxury-champagne]/30 via-transparent to-[--luxury-champagne]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                 </div>
                                 <div className="absolute inset-0 -z-10 rounded-2xl bg-[--luxury-champagne]/20 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500" />
@@ -517,7 +517,7 @@ const WhyUs = () => {
                         </motion.div>
 
                         {/* Center Image */}
-                        <motion.div 
+                        <motion.div
                             className="lg:col-span-2 relative"
                             initial={{ opacity: 0, scale: 0.8 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -532,7 +532,7 @@ const WhyUs = () => {
                         >
                             <motion.div
                                 className="relative"
-                                style={{ 
+                                style={{
                                     rotateX,
                                     rotateY,
                                     transformStyle: "preserve-3d"
@@ -541,25 +541,25 @@ const WhyUs = () => {
                                 {/* Main image container */}
                                 <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-400/20">
                                     <motion.img
-                                        src={whyUsImage}
+                                        src="/images/whyus.webp"
                                         alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
                                         loading="lazy"
                                         className="w-full h-auto"
                                         whileHover={{ scale: 1.02 }}
                                         transition={{ duration: 0.4 }}
                                     />
-                                    
+
                                     {/* Gradient overlay */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent" />
-                                    
+
                                     {/* Floating elements */}
-                                    <motion.div 
+                                    <motion.div
                                         className="absolute top-8 right-8 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl"
-                                        animate={{ 
+                                        animate={{
                                             y: [0, -8, 0],
                                             rotate: [0, 2, 0]
                                         }}
-                                        transition={{ 
+                                        transition={{
                                             duration: 4,
                                             repeat: Infinity,
                                             ease: "easeInOut"
@@ -570,14 +570,14 @@ const WhyUs = () => {
                                             <div className="font-sans-luxury text-sm text-slate-600">Years</div>
                                         </div>
                                     </motion.div>
-                                    
-                                    <motion.div 
+
+                                    <motion.div
                                         className="absolute bottom-8 left-8 bg-slate-900/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-slate-700/50"
-                                        animate={{ 
+                                        animate={{
                                             y: [0, 8, 0],
                                             rotate: [0, -2, 0]
                                         }}
-                                        transition={{ 
+                                        transition={{
                                             duration: 3,
                                             repeat: Infinity,
                                             ease: "easeInOut",
@@ -590,13 +590,13 @@ const WhyUs = () => {
                                         </div>
                                     </motion.div>
                                 </div>
-                                
+
                                 {/* 3D depth layers */}
-                                <div 
+                                <div
                                     className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-200/30 to-slate-400/30 -z-10 blur-sm"
                                     style={{ transform: 'translateZ(-20px) scale(0.95)' }}
                                 />
-                                <div 
+                                <div
                                     className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-300/20 to-slate-500/20 -z-20 blur-md"
                                     style={{ transform: 'translateZ(-40px) scale(0.9)' }}
                                 />
@@ -615,27 +615,27 @@ const WhyUs = () => {
                             <motion.div
                                 className={`group relative cursor-pointer`}
                                 onMouseEnter={() => setActiveCard(5)}
-                                whileHover={{ 
+                                whileHover={{
                                     scale: 1.05,
                                     z: 10
                                 }}
                                 transition={{ duration: 0.3 }}
                             >
                                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-800/80 via-slate-700/90 to-slate-800/80 backdrop-blur-sm border border-slate-600/30 shadow-xl shadow-slate-900/30">
-                                    <motion.div 
+                                    <motion.div
                                         className="absolute inset-0 bg-gradient-to-r from-transparent via-[--luxury-champagne]/10 to-transparent"
                                         initial={{ x: '-100%' }}
-                                        whileHover={{ 
+                                        whileHover={{
                                             x: '100%',
-                                            transition: { 
+                                            transition: {
                                                 duration: 0.8,
                                                 ease: "easeInOut"
                                             }
                                         }}
                                     />
-                                    
+
                                     <div className="relative p-6">
-                                        <motion.div 
+                                        <motion.div
                                             className="flex justify-center mb-4"
                                             animate={activeCard === 5 ? floatingAnimation : {}}
                                         >
@@ -645,16 +645,16 @@ const WhyUs = () => {
                                             </div>
                                             </div>
                                         </motion.div>
-                                        
+
                                         <h3 className="font-serif-luxury text-lg text-[--luxury-champagne] mb-3 text-center group-hover:text-white transition-colors duration-300">
                                             {reasons[5].title}
                                         </h3>
-                                        
+
                                         <p className="font-sans-luxury text-sm text-slate-300 leading-relaxed mb-4 text-center">
                                             {reasons[5].description}
                                         </p>
-                                        
-                                        <motion.div 
+
+                                        <motion.div
                                             className="flex justify-center"
                                             whileHover={{ scale: 1.05 }}
                                             transition={{ duration: 0.2 }}
@@ -666,7 +666,7 @@ const WhyUs = () => {
                                             </div>
                                         </motion.div>
                                     </div>
-                                    
+
                                     <div className="absolute inset-0 rounded-2xl border-2 border-transparent bg-gradient-to-r from-[--luxury-champagne]/30 via-transparent to-[--luxury-champagne]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                 </div>
                                 <div className="absolute inset-0 -z-10 rounded-2xl bg-[--luxury-champagne]/20 blur-xl scale-95 opacity-0 group-hover:opacity-100 transition-all duration-500" />
@@ -675,7 +675,7 @@ const WhyUs = () => {
                     </div>
 
                     {/* Mobile Image Container - Shows image second on mobile */}
-                    <motion.div 
+                    <motion.div
                         className="lg:hidden relative"
                         initial={{ opacity: 0, scale: 0.8 }}
                         whileInView={{ opacity: 1, scale: 1 }}
@@ -690,7 +690,7 @@ const WhyUs = () => {
                     >
                         <motion.div
                             className="relative"
-                            style={{ 
+                            style={{
                                 rotateX,
                                 rotateY,
                                 transformStyle: "preserve-3d"
@@ -699,25 +699,25 @@ const WhyUs = () => {
                             {/* Main image container */}
                             <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-slate-400/20">
                                 <motion.img
-                                    src={whyUsImage}
+                                    src="/images/whyus.webp"
                                     alt="Professional LED Custom Painting team showcasing exceptional craftsmanship"
                                     loading="lazy"
                                     className="w-full h-auto"
                                     whileHover={{ scale: 1.02 }}
                                     transition={{ duration: 0.4 }}
                                 />
-                                
+
                                 {/* Gradient overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent" />
-                                
+
                                 {/* Floating elements */}
-                                <motion.div 
+                                <motion.div
                                     className="absolute top-8 right-8 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl"
-                                    animate={{ 
+                                    animate={{
                                         y: [0, -8, 0],
                                         rotate: [0, 2, 0]
                                     }}
-                                    transition={{ 
+                                    transition={{
                                         duration: 4,
                                         repeat: Infinity,
                                         ease: "easeInOut"
@@ -728,14 +728,14 @@ const WhyUs = () => {
                                         <div className="font-sans-luxury text-sm text-slate-600">Years</div>
                                     </div>
                                 </motion.div>
-                                
-                                <motion.div 
+
+                                <motion.div
                                     className="absolute bottom-8 left-8 bg-slate-900/90 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-slate-700/50"
-                                    animate={{ 
+                                    animate={{
                                         y: [0, 8, 0],
                                         rotate: [0, -2, 0]
                                     }}
-                                    transition={{ 
+                                    transition={{
                                         duration: 3,
                                         repeat: Infinity,
                                         ease: "easeInOut",
@@ -748,22 +748,22 @@ const WhyUs = () => {
                                     </div>
                                 </motion.div>
                             </div>
-                            
+
                             {/* 3D depth layers */}
-                            <div 
+                            <div
                                 className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-200/30 to-slate-400/30 -z-10 blur-sm"
                                 style={{ transform: 'translateZ(-20px) scale(0.95)' }}
                             />
-                            <div 
+                            <div
                                 className="absolute inset-0 rounded-3xl bg-gradient-to-br from-slate-300/20 to-slate-500/20 -z-20 blur-md"
                                 style={{ transform: 'translateZ(-40px) scale(0.9)' }}
                             />
                         </motion.div>
                     </motion.div>
                 </div>
-                
+
                 {/* Bottom CTA Section */}
-                <motion.div 
+                <motion.div
                     className="text-center mt-24"
                     initial={{ opacity: 0, y: 80 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -787,10 +787,10 @@ const WhyUs = () => {
                             whileTap={{ scale: 0.98 }}
                         >
                             Get Started Now
-                            <motion.svg 
-                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" 
-                                fill="none" 
-                                stroke="currentColor" 
+                            <motion.svg
+                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
+                                fill="none"
+                                stroke="currentColor"
                                 viewBox="0 0 24 24"
                             >
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />

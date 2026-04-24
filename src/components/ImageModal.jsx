@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+
 import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
 
@@ -12,7 +13,7 @@ const ImageModal = ({ imageSrc, isOpen, onClose }) => {
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
       onClick={handleOverlayClick}
     >
