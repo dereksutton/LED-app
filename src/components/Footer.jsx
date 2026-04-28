@@ -277,19 +277,19 @@ const Footer = () => {
                                 &copy; {currentYear} LED Custom Painting & More. All rights reserved.
                             </p>
                             <div className="flex items-center space-x-4 text-slate-400 text-sm">
-                                <a
-                                    href="#"
-                                    className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300"
+                                <Link
+                                    href="/privacy-policy/"
+                                    className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300 no-underline"
                                 >
                                     Privacy Policy
-                                </a>
+                                </Link>
                                 <span>•</span>
-                                <a
-                                    href="#"
-                                    className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300"
+                                <Link
+                                    href="/terms-of-service/"
+                                    className="font-sans-luxury hover:text-[#F5E6D3] transition-colors duration-300 no-underline"
                                 >
                                     Terms of Service
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
