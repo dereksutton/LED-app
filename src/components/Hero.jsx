@@ -561,7 +561,7 @@ const Hero = () => {
                                 paintOrder: 'stroke fill',
                             }}
                         >
-                            Transform Your Space With Precision Painting
+                            Precision Painting Contractors in Jacksonville &amp; North Florida
                         </h1>
                         <p className="text-[--luxury-champagne] text-2xl lg:text-4xl font-sans-luxury font-medium mb-8 lg:mb-12 leading-relaxed max-w-4xl" style={{textShadow: '2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 1px 2px 0px #1e293b, 0px 1px 0px #1e293b, 0px -1px 0px #1e293b, 1px 0px 0px #1e293b, -1px 0px 0px #1e293b'}}>
                             Quality You Can See, Service You Can Trust.

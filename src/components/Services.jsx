@@ -103,6 +103,26 @@ const Services = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 1, delay: 0.5 }}
                     ></motion.div>
+                    <motion.p
+                        className="font-sans-luxury text-lg lg:text-xl text-slate-600 max-w-3xl mx-auto mt-8 leading-relaxed"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                    >
+                        LED Custom Painting &amp; More is a licensed and insured team of painting
+                        contractors serving Jacksonville,{' '}
+                        <Link
+                            href="/painters-fleming-island-fl/"
+                            className="font-semibold text-slate-800 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-800 transition-colors"
+                        >
+                            Fleming Island
+                        </Link>
+                        , and communities across North Florida. From interior and exterior painting
+                        to cabinet refinishing, pressure washing, ceiling services, and commercial
+                        painting, we deliver durable, beautiful results backed by a 3-year warranty
+                        and 13+ years of local experience.
+                    </motion.p>
                 </motion.div>
 
                 {/* Services Grid */}

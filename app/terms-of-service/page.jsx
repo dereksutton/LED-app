@@ -5,7 +5,7 @@ export const metadata = {
   title: 'Terms of Service | LED Custom Painting Jacksonville FL',
   description: 'Terms governing the use of ledcustompainting.com and quote requests submitted through this site.',
   alternates: {
-    canonical: '/terms-of-service',
+    canonical: '/terms-of-service/',
   },
   robots: {
     index: false,
@@ -15,7 +15,7 @@ export const metadata = {
     type: 'website',
     title: 'Terms of Service | LED Custom Painting Jacksonville FL',
     description: 'Terms governing the use of ledcustompainting.com and quote requests submitted through this site.',
-    url: 'https://ledcustompainting.com/terms-of-service',
+    url: 'https://ledcustompainting.com/terms-of-service/',
     locale: 'en_US',
     siteName: 'LED Custom Painting & More',
   },

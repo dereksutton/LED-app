@@ -2,9 +2,11 @@ import './globals.css';
 import Script from 'next/script';
 
 export const metadata = {
-  title: 'LED Custom Painting & More - Professional Painting Services in North Florida',
-  description: "Transform your space with North Florida's premier painting professionals. Licensed & insured with 13+ years experience. Interior, exterior, commercial painting & more. Free quotes!",
-  keywords: 'painting services, interior painting, exterior painting, commercial painting, cabinet refinishing, pressure washing, North Florida, Jacksonville, professional painters, licensed painters, insured painters, free quotes, LED Custom Painting',
+  title: 'Jacksonville Painting Contractors | LED Custom Painting',
+  description:
+    'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior, cabinet refinishing & pressure washing. Free quote today.',
+  keywords:
+    'painting contractors, painting services, interior painting, exterior painting, commercial painting, cabinet refinishing, pressure washing, Jacksonville, Fleming Island, Orange Park, Clay County, North Florida, professional painters, licensed painters, free quotes, LED Custom Painting',
   authors: [{ name: 'LED Custom Painting & More' }],
   metadataBase: new URL('https://ledcustompainting.com'),
   alternates: {
@@ -13,14 +15,15 @@ export const metadata = {
   openGraph: {
     type: 'website',
     url: 'https://ledcustompainting.com/',
-    title: 'LED Custom Painting & More - Professional Painting Services in North Florida',
-    description: "Transform your space with North Florida's premier painting professionals. Licensed & insured with 13+ years experience. Interior, exterior, commercial painting & more. Free quotes!",
+    title: 'Jacksonville Painting Contractors | LED Custom Painting',
+    description:
+      'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior, cabinet refinishing & pressure washing. Free quote today.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'LED Custom Painting & More - Professional Painting Services in North Florida',
+        alt: 'LED Custom Painting — painting contractors serving Jacksonville & North Florida',
       },
     ],
     locale: 'en_US',
@@ -28,12 +31,13 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'LED Custom Painting & More - Professional Painting Services in North Florida',
-    description: "Transform your space with North Florida's premier painting professionals. Licensed & insured with 13+ years experience.",
+    title: 'Jacksonville Painting Contractors | LED Custom Painting',
+    description:
+      'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior & commercial painting. Free quotes.',
     images: [
       {
         url: '/og-image.jpg',
-        alt: 'LED Custom Painting & More - Professional Painting Services in North Florida',
+        alt: 'LED Custom Painting — painting contractors serving Jacksonville & North Florida',
       },
     ],
   },
@@ -83,18 +87,20 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "LocalBusiness",
+              "@type": ["LocalBusiness", "HousePainter"],
               "@id": "https://ledcustompainting.com/#business",
               "name": "LED Custom Painting & More",
-              "url": "https://ledcustompainting.com",
+              "description":
+                "Licensed and insured painting contractors serving Jacksonville, Fleming Island, and North Florida with interior, exterior, cabinet, ceiling, and commercial painting plus pressure washing.",
+              "url": "https://ledcustompainting.com/",
               "image": "https://ledcustompainting.com/og-image.jpg",
+              "logo": "https://ledcustompainting.com/images/LED-logo.webp",
               "telephone": "(904) 385-0426",
               "email": "info@ledcustompainting.com",
               "address": {
                 "@type": "PostalAddress",
                 "addressLocality": "Jacksonville",
                 "addressRegion": "FL",
-                "postalCode": "32256",
                 "addressCountry": "US",
               },
               "geo": {
@@ -102,15 +108,16 @@ export default function RootLayout({ children }) {
                 "latitude": 30.3322,
                 "longitude": -81.6557,
               },
-              "areaServed": {
-                "@type": "GeoCircle",
-                "geoMidpoint": {
-                  "@type": "GeoCoordinates",
-                  "latitude": 30.3322,
-                  "longitude": -81.6557,
-                },
-                "geoRadius": "50000",
-              },
+              "areaServed": [
+                { "@type": "City", "name": "Jacksonville", "addressRegion": "FL" },
+                { "@type": "City", "name": "Fleming Island", "addressRegion": "FL" },
+                { "@type": "City", "name": "Orange Park", "addressRegion": "FL" },
+                { "@type": "City", "name": "Middleburg", "addressRegion": "FL" },
+                { "@type": "City", "name": "Green Cove Springs", "addressRegion": "FL" },
+                { "@type": "City", "name": "Ponte Vedra", "addressRegion": "FL" },
+                { "@type": "AdministrativeArea", "name": "Clay County, FL" },
+                { "@type": "AdministrativeArea", "name": "Duval County, FL" },
+              ],
               "priceRange": "$$",
               "openingHoursSpecification": [
                 {
@@ -129,11 +136,12 @@ export default function RootLayout({ children }) {
               "aggregateRating": {
                 "@type": "AggregateRating",
                 "ratingValue": "5.0",
-                "reviewCount": "127",
+                "reviewCount": "82",
                 "bestRating": "5",
                 "worstRating": "1",
               },
               "sameAs": [
+                "https://www.google.com/maps?cid=13284018097086639388",
                 "https://www.facebook.com/ledcustompainting",
                 "https://www.instagram.com/led_custom_painting",
               ],

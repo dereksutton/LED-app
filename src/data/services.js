@@ -3,6 +3,8 @@ export const services = [
     slug: 'interior-painting',
     name: 'Interior Painting',
     tagline: 'Transform Your Living Spaces with Expert Interior Painting',
+    seoTitle: 'Interior Painting in Jacksonville, FL | LED Custom Painting',
+    seoDescription: 'Expert interior painting in Jacksonville & North Florida — walls, ceilings, trim & cabinets. Premium paint, 3-year warranty. Free quote: (904) 385-0426.',
     image: '/images/services-interior.webp',
     images: [
       '/images/services/interior-painting-1.webp',
@@ -102,6 +104,8 @@ Whether you're updating a single room or refreshing your entire home, we work ar
     slug: 'exterior-painting',
     name: 'Exterior Painting',
     tagline: 'Protect and Beautify Your Home\'s Exterior',
+    seoTitle: 'Exterior Painting in Jacksonville, FL | LED Custom Painting',
+    seoDescription: 'Exterior house painting in Jacksonville & North Florida — siding, stucco, trim & fascia. Weather-grade coatings, 3-year warranty. Call (904) 385-0426.',
     image: '/images/services-exterior.webp',
     images: [
       '/images/services/exterior-painting-1.webp',
@@ -201,6 +205,8 @@ From stucco homes and wood siding to trim, fascia, soffits, and shutters, we han
     slug: 'pressure-washing',
     name: 'Pressure Washing',
     tagline: 'Restore Your Property\'s Original Beauty',
+    seoTitle: 'Pressure Washing in Jacksonville, FL | LED Custom Painting',
+    seoDescription: 'Professional pressure washing in Jacksonville & North Florida — driveways, siding, decks, patios & roofs. Eco-safe cleaning. Call (904) 385-0426.',
     image: '/images/services-pressurewashing.webp',
     images: [
       '/images/services/pressure-washing-1.webp',
@@ -300,6 +306,8 @@ Pressure washing isn't just cosmetic. Regular cleaning prevents permanent staini
     slug: 'cabinet-refinishing',
     name: 'Cabinet Refinishing',
     tagline: 'Transform Your Kitchen Without a Full Remodel',
+    seoTitle: 'Cabinet Refinishing in Jacksonville | LED Custom Painting',
+    seoDescription: 'Cabinet refinishing in Jacksonville & North Florida — a factory-smooth kitchen makeover for 50-70% less than replacement. Free quote: (904) 385-0426.',
     image: '/images/services-cabinets.webp',
     images: [
       '/images/services/cabinet-refinishing-1.webp',
@@ -399,6 +407,8 @@ We refinish kitchen cabinets, bathroom vanities, laundry room cabinets, and buil
     slug: 'ceiling-services',
     name: 'Ceiling Services',
     tagline: 'Modernize Your Ceilings with Expert Removal and Refinishing',
+    seoTitle: 'Ceiling Painting & Popcorn Removal | LED Custom Painting',
+    seoDescription: 'Popcorn ceiling removal & ceiling painting in Jacksonville & North Florida — smooth & knockdown finishes, water-stain repair. Call (904) 385-0426.',
     image: '/images/services-ceilings.webp',
     images: [
       '/images/services/ceiling-services-1.webp',
@@ -498,6 +508,8 @@ We also handle ceiling painting, water stain repair, and accent ceiling treatmen
     slug: 'commercial-painting',
     name: 'Commercial Painting',
     tagline: 'Professional Painting Solutions for Your Business',
+    seoTitle: 'Commercial Painting in Jacksonville | LED Custom Painting',
+    seoDescription: 'Commercial painting in Jacksonville & North Florida — offices, retail, warehouses, HOAs & parking-lot striping. Flexible hours. Call (904) 385-0426.',
     image: '/images/services-parkinglot.webp',
     images: [
       '/images/services/commercial-painting-1.webp',

@@ -36,7 +36,7 @@ const contactInfo = [
     {
         icon: 'location',
         label: 'Service Area',
-        value: 'North Florida',
+        value: 'Jacksonville & Fleming Island, FL',
         href: null,
     },
 ];
@@ -267,6 +267,25 @@ const Footer = () => {
                             </svg>
                         </Link>
                     </div>
+                </div>
+
+                {/* Service Area */}
+                <div className="mb-10 rounded-2xl bg-slate-800/40 border border-slate-700/40 p-6 lg:p-7">
+                    <h3 className="font-serif-luxury text-lg text-[#F5E6D3] mb-3 text-center lg:text-left">
+                        Our Service Area
+                    </h3>
+                    <p className="font-sans-luxury text-slate-300 text-sm leading-relaxed text-center lg:text-left">
+                        LED Custom Painting &amp; More proudly serves{' '}
+                        <Link
+                            href="/painters-fleming-island-fl/"
+                            className="text-[#F5E6D3] hover:text-white transition-colors duration-300 no-underline"
+                        >
+                            painting contractors in Fleming Island, FL
+                        </Link>
+                        , plus Jacksonville, Orange Park, Middleburg, Green Cove Springs,
+                        Doctors Inlet, Oakleaf, and Ponte Vedra — serving communities
+                        throughout Clay and Duval counties.
+                    </p>
                 </div>
 
                 {/* Bottom Bar */}

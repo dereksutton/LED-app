@@ -10,20 +10,23 @@ export async function generateMetadata({ params }) {
   const service = getServiceBySlug(slug);
   if (!service) return {};
 
-  const title = `${service.name} Jacksonville FL | LED Custom Painting`;
-  const description = `Professional ${service.name.toLowerCase()} services in Jacksonville & North Florida. Licensed, insured, 3-year warranty. Free quotes — (904) 385-0426.`;
+  const title =
+    service.seoTitle || `${service.name} in Jacksonville, FL | LED Custom Painting`;
+  const description =
+    service.seoDescription ||
+    `Professional ${service.name.toLowerCase()} in Jacksonville & North Florida. Licensed, insured, 3-year warranty. Free quote: (904) 385-0426.`;
 
   return {
     title,
     description,
     alternates: {
-      canonical: `/services/${service.slug}`,
+      canonical: `/services/${service.slug}/`,
     },
     openGraph: {
       type: 'website',
       title,
       description,
-      url: `https://ledcustompainting.com/services/${service.slug}`,
+      url: `https://ledcustompainting.com/services/${service.slug}/`,
       images: [
         {
           url: service.image,
@@ -66,11 +69,18 @@ export default async function ServicePage({ params }) {
   const serviceSchema = {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: service.name,
+    name: `${service.name} in Jacksonville, FL`,
     description: service.description.split('\n\n')[0],
     provider: { '@id': 'https://ledcustompainting.com/#business' },
-    areaServed: { '@type': 'City', name: 'Jacksonville', addressRegion: 'FL' },
+    areaServed: [
+      { '@type': 'City', name: 'Jacksonville', addressRegion: 'FL' },
+      { '@type': 'City', name: 'Fleming Island', addressRegion: 'FL' },
+      { '@type': 'City', name: 'Orange Park', addressRegion: 'FL' },
+      { '@type': 'City', name: 'Middleburg', addressRegion: 'FL' },
+      { '@type': 'City', name: 'Green Cove Springs', addressRegion: 'FL' },
+    ],
     serviceType: service.name,
+    url: `https://ledcustompainting.com/services/${service.slug}/`,
   };
 
   const faqSchema = {

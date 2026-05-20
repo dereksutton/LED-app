@@ -2,34 +2,72 @@ import Link from 'next/link';
 import { services } from '../../src/data/services';
 import Footer from '../../src/components/Footer';
 import CTABanner from '../../src/components/CTABanner';
+import Breadcrumbs from '../../src/components/Breadcrumbs';
 
 export const metadata = {
-  title: 'Painting Services Jacksonville FL | LED Custom Painting',
-  description: 'Professional painting services in Jacksonville & North Florida. Interior, exterior, pressure washing, cabinet refinishing, ceiling services, and commercial painting. Free quotes.',
+  title: 'Painting Services in Jacksonville, FL | LED Custom Painting',
+  description:
+    'Professional painting services in Jacksonville & North Florida — interior, exterior, cabinet, ceiling & commercial painting plus pressure washing. Free quotes.',
   alternates: {
-    canonical: '/services',
+    canonical: '/services/',
   },
   openGraph: {
     type: 'website',
-    title: 'Painting Services Jacksonville FL | LED Custom Painting',
-    description: 'Professional painting services in Jacksonville & North Florida. Interior, exterior, pressure washing, cabinet refinishing, ceiling services, and commercial painting.',
-    url: 'https://ledcustompainting.com/services',
+    title: 'Painting Services in Jacksonville, FL | LED Custom Painting',
+    description:
+      'Professional painting services in Jacksonville & North Florida — interior, exterior, cabinet, ceiling & commercial painting plus pressure washing.',
+    url: 'https://ledcustompainting.com/services/',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'LED Custom Painting Services in Jacksonville FL',
+        alt: 'LED Custom Painting services in Jacksonville, FL',
       },
     ],
     locale: 'en_US',
     siteName: 'LED Custom Painting & More',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Painting Services in Jacksonville, FL | LED Custom Painting',
+    description:
+      'Interior, exterior, cabinet, ceiling & commercial painting plus pressure washing across Jacksonville & North Florida.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        alt: 'LED Custom Painting services in Jacksonville, FL',
+      },
+    ],
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Home',
+      item: 'https://ledcustompainting.com/',
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: 'Services',
+      item: 'https://ledcustompainting.com/services/',
+    },
+  ],
 };
 
 export default function ServicesIndex() {
   return (
     <div className="overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       {/* Hero */}
       <header className="relative bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight] py-24 lg:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,230,211,0.08),transparent_60%)]" />
@@ -61,9 +99,33 @@ export default function ServicesIndex() {
 
       <div className="h-px w-full bg-gradient-to-r from-transparent via-[--luxury-champagne]/30 to-transparent" />
 
+      {/* Breadcrumb */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-3">
+          <Breadcrumbs items={[{ name: 'Home', href: '/' }, { name: 'Services' }]} />
+        </div>
+      </div>
+
       {/* Services Grid */}
       <main className="bg-gradient-to-br from-slate-50 via-white to-slate-100 py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <p className="font-sans-luxury text-lg text-slate-600 leading-relaxed">
+              LED Custom Painting &amp; More brings 13+ years of professional painting
+              experience to homeowners and businesses across Jacksonville,{' '}
+              <Link
+                href="/painters-fleming-island-fl/"
+                className="font-semibold text-slate-800 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-800 transition-colors"
+              >
+                Fleming Island
+              </Link>
+              , and North Florida. Every service below is handled by licensed, insured
+              crews, finished with premium Sherwin-Williams and Benjamin Moore coatings,
+              and backed by our written 3-year warranty. Choose a service to see our
+              process, what is included, and answers to common questions — then request a
+              free, no-obligation quote.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <Link

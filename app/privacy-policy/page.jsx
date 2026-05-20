@@ -5,7 +5,7 @@ export const metadata = {
   title: 'Privacy Policy | LED Custom Painting Jacksonville FL',
   description: 'How LED Custom Painting & More collects, uses, and protects information you share through ledcustompainting.com.',
   alternates: {
-    canonical: '/privacy-policy',
+    canonical: '/privacy-policy/',
   },
   robots: {
     index: false,
@@ -15,7 +15,7 @@ export const metadata = {
     type: 'website',
     title: 'Privacy Policy | LED Custom Painting Jacksonville FL',
     description: 'How LED Custom Painting & More collects, uses, and protects information you share through ledcustompainting.com.',
-    url: 'https://ledcustompainting.com/privacy-policy',
+    url: 'https://ledcustompainting.com/privacy-policy/',
     locale: 'en_US',
     siteName: 'LED Custom Painting & More',
   },
