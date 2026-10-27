@@ -24,11 +24,16 @@
 
 body, html {
   width: 100%;
-  height: 100%;
   font-family: 'Inter', sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* overflow-x on body only: it propagates to the viewport, keeping a single
+   scroll container. Setting it on html too (with height: 100%) made html and
+   body scroll independently — double scrollbar + blank space past the footer. */
+body {
   overflow-x: hidden;
 }
 

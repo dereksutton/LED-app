@@ -191,7 +191,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body style={{ margin: '0 auto', textAlign: 'center', overflowX: 'hidden' }}>
+      <body style={{ margin: '0 auto', textAlign: 'center' }}>
         {children}
 
         {/* Google Analytics (gtag.js) */}
