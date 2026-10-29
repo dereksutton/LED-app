@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import SiteHeader from '../../src/components/SiteHeader';
 import Footer from '../../src/components/Footer';
 
 export const metadata = {
@@ -25,21 +25,9 @@ const LAST_UPDATED = 'April 27, 2026';
 
 export default function PrivacyPolicyPage() {
   return (
+    <>
+    <SiteHeader />
     <div className="overflow-x-hidden">
-      {/* Top nav */}
-      <div className="bg-[--luxury-midnight] py-4 px-6">
-        <div className="max-w-7xl mx-auto">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-      </div>
 
       {/* Hero header */}
       <header className="relative bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight] py-16 lg:py-24">
@@ -169,5 +157,6 @@ export default function PrivacyPolicyPage() {
 
       <Footer />
     </div>
+    </>
   );
 }

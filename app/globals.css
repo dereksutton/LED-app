@@ -194,3 +194,10 @@ button {
   font-weight: 900;
   font-style: italic;
 }
+
+/* Leave room for the fixed mobile call / quote bar. */
+@media (max-width: 1023px) {
+  body {
+    padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+  }
+}

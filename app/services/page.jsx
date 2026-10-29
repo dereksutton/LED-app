@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SiteHeader from '../../src/components/SiteHeader';
 import { services } from '../../src/data/services';
 import Footer from '../../src/components/Footer';
 import CTABanner from '../../src/components/CTABanner';
@@ -63,6 +64,8 @@ const breadcrumbSchema = {
 
 export default function ServicesIndex() {
   return (
+    <>
+    <SiteHeader />
     <div className="overflow-x-hidden">
       <script
         type="application/ld+json"
@@ -72,18 +75,6 @@ export default function ServicesIndex() {
       <header className="relative bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight] py-24 lg:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,230,211,0.08),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          {/* Back link */}
-          <div className="mb-8 flex justify-center">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Home
-            </Link>
-          </div>
           <p className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4">
             Our Services
           </p>
@@ -162,5 +153,6 @@ export default function ServicesIndex() {
       <CTABanner />
       <Footer />
     </div>
+    </>
   );
 }

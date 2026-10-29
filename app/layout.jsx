@@ -1,6 +1,7 @@
 import './globals.css';
 import Script from 'next/script';
 import Analytics from '../src/components/Analytics';
+import MobileActionBar from '../src/components/MobileActionBar';
 
 export const metadata = {
   title: 'Jacksonville Painting Contractors | LED Custom Painting',
@@ -194,6 +195,7 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ margin: '0 auto', textAlign: 'center' }}>
         {children}
+        <MobileActionBar />
 
         <Analytics />
 
