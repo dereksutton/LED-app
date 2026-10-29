@@ -30,12 +30,10 @@ const quoteRequestSchema = new mongoose.Schema({
   },
   propertyType: {
     type: String,
-    required: true,
     trim: true
   },
   timeline: {
     type: String,
-    required: true,
     trim: true
   },
   budgetRange: {

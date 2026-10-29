@@ -59,7 +59,7 @@ const buildLeadEmail = (lead, { to, from }) => {
               <td style="padding: 8px 0;"><strong>Phone:</strong></td>
               <td style="padding: 8px 0;"><a href="${telHref(phone)}" style="color: #1a1a1a;">${escapeHtml(phone)}</a></td>
             </tr>
-            ${row('Property Address', address)}
+            ${row('Property Address or ZIP', address)}
           </table>
 
           <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Project Details</h2>
@@ -89,6 +89,8 @@ const buildLeadEmail = (lead, { to, from }) => {
     `;
 
     const optional = [
+        ['Property Type', propertyType],
+        ['Timeline', timeline],
         ['Budget Range', budgetRange],
         ['Painting Area', paintingArea],
         ['How They Heard About Us', howDidYouHear],
@@ -97,7 +99,7 @@ const buildLeadEmail = (lead, { to, from }) => {
         .map(([label, value]) => `${label}: ${value}\n`)
         .join('');
 
-    const text = `New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\nProperty Type: ${propertyType}\nTimeline: ${timeline}\n${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
+    const text = `New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\n${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
 
     return {
         from,

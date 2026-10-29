@@ -3,8 +3,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { buildLeadEmail } = require('./lib/leadEmail');
 
-const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType', 'propertyType', 'timeline'];
-const OPTIONAL_FIELDS = ['budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
+const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType'];
+const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
 const MAX_LENGTH = { message: 5000, default: 300 };
 const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
 
