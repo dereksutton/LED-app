@@ -5,6 +5,7 @@ const { Resend } = require('resend');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
 const { createApp } = require('./app');
+const { createTwilioSms } = require('./lib/followUps');
 
 const PORT = process.env.PORT || 3001;
 
@@ -42,13 +43,24 @@ if (process.env.CORS_ORIGIN) {
     corsOrigins.push(...process.env.CORS_ORIGIN.split(',').map((o) => o.trim()));
 }
 
+// Owner text alerts: on only when all four Twilio settings are present.
+const sendSms = createTwilioSms({
+    accountSid: process.env.TWILIO_ACCOUNT_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+    from: process.env.TWILIO_FROM_NUMBER,
+    to: process.env.LEAD_NOTIFY_SMS,
+});
+
 const app = createApp({
     sendEmail,
     saveLead,
+    sendSms,
+    customerReply: process.env.CUSTOMER_AUTOREPLY === 'true' ? { phone: '(904) 385-0426' } : null,
     notifyTo: process.env.LEAD_NOTIFY_EMAIL || 'ledcustompainting@gmail.com',
     notifyFrom: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
     corsOrigins,
 });
+console.log(`Owner text alerts ${sendSms ? 'on' : 'off'}; customer auto-reply ${process.env.CUSTOMER_AUTOREPLY === 'true' ? 'on' : 'off'}.`);
 
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
