@@ -50,34 +50,22 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pt-24 pb-12 text-center">
           <motion.p
             className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
           >
             {service.name}
           </motion.p>
           <motion.h1
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif-luxury font-bold text-white max-w-4xl leading-tight tracking-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
           >
             {service.tagline}
           </motion.h1>
           <motion.p
             className="mt-5 font-sans-luxury text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
           >
             Professional {service.name.toLowerCase()} in Jacksonville &amp; North Florida — licensed, insured, and backed by a 3-year warranty.
           </motion.p>
           <motion.a
             href="#quote"
             className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[--luxury-champagne] px-8 py-3.5 font-sans-luxury font-semibold text-[--luxury-midnight] text-base shadow-xl shadow-black/30 hover:shadow-2xl hover:-translate-y-0.5 transition-all no-underline"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
           >
             Get a Free Quote
             <svg

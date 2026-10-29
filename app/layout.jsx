@@ -201,7 +201,7 @@ export default function RootLayout({ children }) {
 
         {/* DotLottie Player Web Component */}
         <Script
-          src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+          src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
           type="module"
           strategy="afterInteractive"
         />

@@ -201,3 +201,14 @@ button {
     padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Outline on the home hero headline so it reads over the video. */
+.hero-title-stroke {
+  -webkit-text-stroke: 1px #F7E7CE;
+  paint-order: stroke fill;
+}
+@media (min-width: 769px) {
+  .hero-title-stroke {
+    -webkit-text-stroke-width: 1.5px;
+  }
+}
