@@ -35,9 +35,6 @@ services:
         source: /send-quote
         destination: https://led-app-api.onrender.com/send-quote
       - type: rewrite
-        source: /quote-requests
-        destination: https://led-app-api.onrender.com/quote-requests
-      - type: rewrite
         source: /health
         destination: https://led-app-api.onrender.com/health
     autoDeploy: false

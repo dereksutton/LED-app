@@ -227,17 +227,6 @@ app.post('/send-quote', limiter, validateQuoteRequest, async (req, res) => {
     }
 });
 
-// ✅ Get all quote requests (protected route - requires authentication in production)
-app.get('/quote-requests', async (req, res) => {
-    try {
-        const quoteRequests = await QuoteRequest.find().sort({ createdAt: -1 });
-        res.json(quoteRequests);
-    } catch (error) {
-        console.error('Error fetching quote requests:', error);
-        res.status(500).json({ error: 'Failed to fetch quote requests' });
-    }
-});
-
 // ✅ Health check route
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'Server is running' });
