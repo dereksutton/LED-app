@@ -1,5 +1,6 @@
 "use client";
 import { motion } from 'framer-motion';
+import { claims } from '../data/site';
 
 const Guarantee = () => {
     const IconComponent = ({ iconType }) => {
@@ -50,7 +51,7 @@ const Guarantee = () => {
         },
         {
             title: "3-Year Warranty",
-            description: "Our work comes with a comprehensive transferable 3-year warranty, protecting against peeling, bubbling, cracking, or splitting.",
+            description: `Our work comes with a comprehensive transferable ${claims.warranty}, protecting against peeling, bubbling, cracking, or splitting.`,
             icon: "shield",
             highlight: "Fully Transferable"
         },

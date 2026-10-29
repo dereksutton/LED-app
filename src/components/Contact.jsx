@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { trackLead } from '../lib/analytics';
+import { claims } from '../data/site';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -122,7 +123,7 @@ const Contact = () => {
 
     const trustBadges = [
         { icon: 'shield', text: 'Licensed & Insured' },
-        { icon: 'award', text: 'A+ BBB Rating' },
+        { icon: 'award', text: claims.bbb },
         { icon: 'clock', text: '24hr Response' }
     ];
 
@@ -468,10 +469,10 @@ const Contact = () => {
                             <div className="space-y-4">
                                 {[
                                     'Free detailed estimates',
-                                    '3-year warranty on all work',
+                                    `${claims.warranty} on all work`,
                                     'Licensed & fully insured',
                                     'A+ Better Business Bureau rating',
-                                    '13+ years of experience',
+                                    `${claims.experience} of experience`,
                                     'Local North Florida company'
                                 ].map((benefit, index) => (
                                     <motion.div

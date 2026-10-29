@@ -4,6 +4,7 @@ import { services } from '../../src/data/services';
 import Footer from '../../src/components/Footer';
 import CTABanner from '../../src/components/CTABanner';
 import Breadcrumbs from '../../src/components/Breadcrumbs';
+import { claims } from '../../src/data/site';
 
 export const metadata = {
   title: 'Painting Services in Jacksonville, FL | LED Custom Painting',
@@ -102,7 +103,7 @@ export default function ServicesIndex() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-16">
             <p className="font-sans-luxury text-lg text-slate-600 leading-relaxed">
-              LED Custom Painting &amp; More brings 13+ years of professional painting
+              LED Custom Painting &amp; More brings {claims.experience} of professional painting
               experience to homeowners and businesses across Jacksonville,{' '}
               <Link
                 href="/painters-fleming-island-fl/"

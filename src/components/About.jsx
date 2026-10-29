@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
+import { claims } from '../data/site';
 
 const About = () => {
     const stats = [
@@ -104,7 +105,7 @@ const About = () => {
                             </h3>
                             <p className="font-sans-luxury text-xl text-slate-300 leading-relaxed">
                                 Here at <span className="text-[--luxury-champagne] font-semibold">LED Custom Painting</span>, we believe the experience you have is equally as important as the final results.
-                                Our commitment to excellence has made us North Florida&apos;s trusted painting professionals since 2011.
+                                Our commitment to excellence has made us North Florida&apos;s trusted painting professionals since {claims.foundedYear}.
                             </p>
                         </motion.div>
 
@@ -230,7 +231,7 @@ const About = () => {
                             Ready to Experience the LED Difference?
                         </h3>
                         <p className="font-sans-luxury text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
-                            Join hundreds of satisfied customers who chose quality, reliability, and exceptional service.
+                            Join {claims.customers} who chose quality, reliability, and exceptional service.
                             Let&apos;s bring your vision to life.
                         </p>
                         <motion.a

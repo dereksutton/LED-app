@@ -7,3 +7,16 @@ export const site = {
   phoneHref: 'tel:+19043850426',
   email: 'info@ledcustompainting.com',
 };
+
+// Trust claims. Every page reads these, so a change here updates the whole
+// site, including the Google review markup.
+export const claims = {
+  experience: '13+ years',
+  foundedYear: 2011,
+  warranty: '3-year warranty',
+  bbb: 'A+ BBB Rating',
+  rating: '5.0',
+  reviewCount: 82,
+  customers: 'hundreds of satisfied customers',
+  reviewsLine: 'hundreds of 5-star reviews',
+};

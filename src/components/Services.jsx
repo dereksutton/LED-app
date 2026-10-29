@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { claims } from '../data/site';
 
 const Services = () => {
     const services = [
@@ -120,8 +121,8 @@ const Services = () => {
                         </Link>
                         , and communities across North Florida. From interior and exterior painting
                         to cabinet refinishing, pressure washing, ceiling services, and commercial
-                        painting, we deliver durable, beautiful results backed by a 3-year warranty
-                        and 13+ years of local experience.
+                        painting, we deliver durable, beautiful results backed by a {claims.warranty}{' '}
+                        and {claims.experience} of local experience.
                     </motion.p>
                 </motion.div>
 
@@ -219,7 +220,7 @@ const Services = () => {
                             Ready to Transform Your Space?
                         </h3>
                         <p className="text-xl font-sans-luxury text-slate-600 max-w-2xl mx-auto">
-                            Join hundreds of satisfied customers who trust LED Custom Painting for exceptional results.
+                            Join {claims.customers} who trust LED Custom Painting for exceptional results.
                             <span className="font-semibold text-slate-700"> Free estimates &bull; Licensed &amp; Insured &bull; 5-Star Service</span>
                         </p>
                     </motion.div>

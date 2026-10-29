@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import InfiniteCards from './InfiniteCards';
+import { claims } from '../data/site';
 
 const Testimonials = () => {
   const testimonials = [
@@ -269,7 +270,7 @@ const Testimonials = () => {
               Join Our Satisfied Customers
             </h3>
             <p className="font-sans-luxury text-xl text-slate-700 mb-8 max-w-3xl mx-auto">
-              Experience the same exceptional service and quality that has earned us hundreds of 5-star reviews.
+              Experience the same exceptional service and quality that has earned us {claims.reviewsLine}.
             </p>
             <motion.a
               href="#quote"

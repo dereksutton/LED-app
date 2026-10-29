@@ -1,3 +1,5 @@
+import { claims } from './site';
+
 export const services = [
   {
     slug: 'interior-painting',
@@ -14,7 +16,7 @@ export const services = [
 
 From accent walls and ceiling refreshes to full-home repaints, our team handles projects of every scale. We use only top-tier paints from Sherwin-Williams and Benjamin Moore, ensuring rich color, smooth finishes, and lasting durability. Our thorough prep process — including patching, sanding, priming, and careful masking — means flawless results and zero mess left behind.
 
-Whether you're updating a single room or refreshing your entire home, we work around your schedule and protect your furniture and flooring throughout the process. With 13+ years of experience and a 5-star Google rating, LED Custom Painting delivers interior painting Jacksonville FL homeowners trust.`,
+Whether you're updating a single room or refreshing your entire home, we work around your schedule and protect your furniture and flooring throughout the process. With ${claims.experience} of experience and a 5-star Google rating, LED Custom Painting delivers interior painting Jacksonville FL homeowners trust.`,
     benefits: [
       'Premium Sherwin-Williams and Benjamin Moore paints',
       'Thorough prep: patching, sanding, priming, and masking',
@@ -115,7 +117,7 @@ Whether you're updating a single room or refreshing your entire home, we work ar
 
 Our exterior painting process starts with thorough preparation — power washing, scraping, sanding, caulking, and priming — to ensure paint adheres properly and lasts for years. We use weather-resistant, UV-protective exterior coatings that stand up to Jacksonville's harsh climate while maintaining vibrant color.
 
-From stucco homes and wood siding to trim, fascia, soffits, and shutters, we handle every exterior surface with care. Our team is fully licensed, insured, and equipped to work safely at any height. With a 3-year warranty and 13+ years of local experience, we're the exterior painting Jacksonville FL homeowners rely on.`,
+From stucco homes and wood siding to trim, fascia, soffits, and shutters, we handle every exterior surface with care. Our team is fully licensed, insured, and equipped to work safely at any height. With a ${claims.warranty} and ${claims.experience} of local experience, we're the exterior painting Jacksonville FL homeowners rely on.`,
     benefits: [
       'Complete power washing and surface prep included',
       'UV-resistant, weather-grade exterior coatings',

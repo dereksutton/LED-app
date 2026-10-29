@@ -5,6 +5,7 @@ import Footer from '../../src/components/Footer';
 import Contact from '../../src/components/Contact';
 import SectionHeader from '../../src/components/SectionHeader';
 import Breadcrumbs from '../../src/components/Breadcrumbs';
+import { claims } from '../../src/data/site';
 
 export const metadata = {
   title: 'Fleming Island Painting Contractors | LED Custom Painting',
@@ -61,7 +62,7 @@ const serviceBlurbs = {
 
 const reasons = [
   'Licensed and insured for every Fleming Island project',
-  '13+ years painting Clay County homes and businesses',
+  `${claims.experience} painting Clay County homes and businesses`,
   'Free, detailed, no-pressure written estimates',
   'Premium Sherwin-Williams and Benjamin Moore coatings',
   '3-year written warranty on all workmanship',

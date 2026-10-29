@@ -2,6 +2,7 @@ import './globals.css';
 import Script from 'next/script';
 import Analytics from '../src/components/Analytics';
 import MobileActionBar from '../src/components/MobileActionBar';
+import { claims } from '../src/data/site';
 
 export const metadata = {
   title: 'Jacksonville Painting Contractors | LED Custom Painting',
@@ -137,8 +138,8 @@ export default function RootLayout({ children }) {
               ],
               "aggregateRating": {
                 "@type": "AggregateRating",
-                "ratingValue": "5.0",
-                "reviewCount": "82",
+                "ratingValue": claims.rating,
+                "reviewCount": String(claims.reviewCount),
                 "bestRating": "5",
                 "worstRating": "1",
               },
