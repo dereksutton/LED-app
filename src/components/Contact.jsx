@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { trackLead } from '../lib/analytics';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -14,7 +15,8 @@ const Contact = () => {
         budgetRange: '',
         paintingArea: '',
         message: '',
-        howDidYouHear: ''
+        howDidYouHear: '',
+        website: ''
     });
     const [status, setStatus] = useState({
         type: '',
@@ -44,6 +46,7 @@ const Contact = () => {
             const data = await response.json();
 
             if (response.ok) {
+                trackLead({ service: formData.projectType });
                 setStatus({
                     type: 'success',
                     message: 'Thank you for your request! We\'ll contact you within 24 hours with a detailed quote.'
@@ -59,7 +62,8 @@ const Contact = () => {
                     budgetRange: '',
                     paintingArea: '',
                     message: '',
-                    howDidYouHear: ''
+                    howDidYouHear: '',
+                    website: ''
                 });
             } else {
                 setStatus({
@@ -126,6 +130,7 @@ const Contact = () => {
         'Interior Painting',
         'Exterior Painting',
         'Cabinet Refinishing',
+        'Ceiling Services',
         'Pressure Washing',
         'Commercial Painting',
         'Other'
@@ -298,6 +303,11 @@ const Contact = () => {
                             )}
 
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Honeypot: hidden from people, filled by bots, dropped by the API */}
+                                <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}>
+                                    <label htmlFor="website">Website</label>
+                                    <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" value={formData.website} onChange={handleChange} />
+                                </div>
                                 {/* Personal Information */}
                                 <div>
                                     <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 flex items-center">

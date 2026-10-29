@@ -1,5 +1,6 @@
 import './globals.css';
 import Script from 'next/script';
+import Analytics from '../src/components/Analytics';
 
 export const metadata = {
   title: 'Jacksonville Painting Contractors | LED Custom Painting',
@@ -194,17 +195,7 @@ export default function RootLayout({ children }) {
       <body style={{ margin: '0 auto', textAlign: 'center' }}>
         {children}
 
-        {/* Google Analytics (gtag.js) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-059TGJP58C"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-059TGJP58C');`}
-        </Script>
+        <Analytics />
 
         {/* DotLottie Player Web Component */}
         <Script
