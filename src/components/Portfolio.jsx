@@ -85,7 +85,7 @@ const Portfolio = () => {
           viewport={{ once: true }}
         >
           <motion.div variants={itemVariants}>
-            <motion.h1
+            <motion.h2
               className="font-serif-luxury text-5xl lg:text-8xl text-[--luxury-champagne] mb-8 mx-auto"
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -96,7 +96,7 @@ const Portfolio = () => {
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[--luxury-champagne] via-[--luxury-rose-gold] to-[--luxury-champagne]">
                 Transformations
               </span>
-            </motion.h1>
+            </motion.h2>
           </motion.div>
 
           <motion.div variants={itemVariants}>
@@ -158,7 +158,7 @@ const Portfolio = () => {
               className="inline-flex h-14 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[--luxury-champagne]/30
               bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-6 lg:px-16 py-3 lg:py-6 font-serif-luxury font-semibold text-white text-base lg:text-2xl tracking-wide whitespace-nowrap
               transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-              focus:outline-none shadow-2xl hover:shadow-[--luxury-champagne]/20 hover:text-white backdrop-blur-sm group"
+               shadow-2xl hover:shadow-[--luxury-champagne]/20 hover:text-white backdrop-blur-sm group"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >

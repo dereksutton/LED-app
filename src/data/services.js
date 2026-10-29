@@ -26,8 +26,8 @@ Whether you're updating a single room or refreshing your entire home, we work ar
       'Flexible scheduling around your routine',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
-      { value: '500+', label: 'Homes Painted' },
+      { value: claims.years, label: 'Years Experience' },
+      { value: claims.jobs, label: 'Homes Painted' },
       { value: '5.0★', label: 'Google Rating' },
       { value: '3-Yr', label: 'Written Warranty' },
     ],
@@ -127,7 +127,7 @@ From stucco homes and wood siding to trim, fascia, soffits, and shutters, we han
       'Licensed, insured, and safety-equipped crews',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '300+', label: 'Exteriors Painted' },
       { value: 'FL', label: 'Licensed & Insured' },
       { value: '3-Yr', label: 'Written Warranty' },
@@ -228,7 +228,7 @@ Pressure washing isn't just cosmetic. Regular cleaning prevents permanent staini
       'Same-day quotes and fast scheduling',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '1000+', label: 'Properties Cleaned' },
       { value: 'Eco', label: 'Safe Detergents' },
       { value: 'Same', label: 'Day Quotes' },
@@ -430,7 +430,7 @@ We also handle ceiling painting, water stain repair, and accent ceiling treatmen
       'Dramatic visual transformation of any room',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '200+', label: 'Ceilings Refinished' },
       { value: 'Safe', label: 'Asbestos-Era Aware' },
       { value: '3-Yr', label: 'Written Warranty' },
@@ -531,7 +531,7 @@ From interior office repaints and retail refreshes to exterior building painting
       'Licensed, insured, and OSHA safety compliant',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '100+', label: 'Commercial Projects' },
       { value: 'OSHA', label: 'Compliant Crews' },
       { value: 'COI', label: 'On Request' },

@@ -14,7 +14,9 @@ const InfiniteCards = ({
 }) => {
   const [isReady, setIsReady] = useState(false);
 
+  // Start the scroll only after hydration so server and client markup match.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsReady(true);
   }, []);
 

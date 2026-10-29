@@ -10,8 +10,11 @@ export const site = {
 
 // Trust claims. Every page reads these, so a change here updates the whole
 // site, including the Google review markup.
+const years = '13+';
 export const claims = {
-  experience: '13+ years',
+  years,
+  experience: `${years} years`,
+  jobs: '500+',
   foundedYear: 2011,
   warranty: '3-year warranty',
   bbb: 'A+ BBB Rating',

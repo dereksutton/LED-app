@@ -4,6 +4,45 @@ import { motion } from 'framer-motion';
 import { trackLead } from '../lib/analytics';
 import { claims } from '../data/site';
 
+const IconComponent = ({ iconType }) => {
+    const iconProps = {
+        className: "w-6 h-6",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: "2",
+        viewBox: "0 0 24 24"
+    };
+
+    switch (iconType) {
+        case 'shield':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            );
+        case 'clock':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            );
+        case 'phone':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+            );
+        case 'award':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+            );
+        default:
+            return null;
+    }
+};
+
 const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
@@ -79,45 +118,6 @@ const Contact = () => {
             });
         } finally {
             setIsSubmitting(false);
-        }
-    };
-
-    const IconComponent = ({ iconType }) => {
-        const iconProps = {
-            className: "w-6 h-6",
-            fill: "none",
-            stroke: "currentColor",
-            strokeWidth: "2",
-            viewBox: "0 0 24 24"
-        };
-
-        switch (iconType) {
-            case 'shield':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                );
-            case 'clock':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                );
-            case 'phone':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                );
-            case 'award':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                );
-            default:
-                return null;
         }
     };
 
@@ -503,7 +503,7 @@ const Contact = () => {
                                 Quick Response
                             </h4>
                             <p className="font-sans-luxury text-slate-700 text-sm">
-                                We'll contact you within 24 hours with your detailed quote
+                                We&apos;ll contact you within 24 hours with your detailed quote
                             </p>
                         </div>
                     </motion.div>

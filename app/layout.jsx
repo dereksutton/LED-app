@@ -2,6 +2,7 @@ import './globals.css';
 import Script from 'next/script';
 import Analytics from '../src/components/Analytics';
 import MobileActionBar from '../src/components/MobileActionBar';
+import MotionProvider from '../src/components/MotionProvider';
 import { claims } from '../src/data/site';
 
 export const metadata = {
@@ -195,7 +196,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ margin: '0 auto', textAlign: 'center' }}>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <MobileActionBar />
 
         <Analytics />

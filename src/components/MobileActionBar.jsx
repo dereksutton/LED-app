@@ -1,15 +1,17 @@
 "use client";
-import { useEffect, useState } from 'react';
 import { site } from '../data/site';
 
 // Fixed call / quote bar on phones. Points the quote button at the form on
 // the current page when there is one, otherwise at the contact page.
 export default function MobileActionBar() {
-  const [quoteHref, setQuoteHref] = useState('/contact/');
-
-  useEffect(() => {
-    if (document.getElementById('quote')) setQuoteHref('#quote');
-  }, []);
+  const goToQuote = (e) => {
+    const form = document.getElementById('quote');
+    if (form) {
+      e.preventDefault();
+      form.scrollIntoView({ behavior: 'smooth' });
+      history.replaceState(null, '', '#quote');
+    }
+  };
 
   return (
     <div className="lg:hidden fixed bottom-0 inset-x-0 z-50 grid grid-cols-2 border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.25)] pb-[env(safe-area-inset-bottom)] bg-slate-900">
@@ -23,7 +25,8 @@ export default function MobileActionBar() {
         Call Now
       </a>
       <a
-        href={quoteHref}
+        href="/contact/"
+        onClick={goToQuote}
         className="flex items-center justify-center py-4 bg-[--luxury-champagne] text-[--luxury-midnight] font-sans-luxury font-semibold no-underline"
       >
         Free Quote

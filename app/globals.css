@@ -212,3 +212,22 @@ button {
     -webkit-text-stroke-width: 1.5px;
   }
 }
+
+/* Keyboard focus ring: a champagne line over a dark band, so it shows on
+   both the dark and the light sections. */
+:focus-visible {
+  outline: 2px solid #F5E6D3;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px #0f172a !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

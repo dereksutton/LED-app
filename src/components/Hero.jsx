@@ -71,10 +71,8 @@ const Hero = () => {
                                     {({ open }) => (
                                         <>
                                             <Menu.Button
-                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button transition-all duration-300"
+                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold transition-all duration-300"
                                                 style={{
-                                                    outline: 'none',
-                                                    boxShadow: 'none',
                                                     border: 'none',
                                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                                 }}
@@ -153,10 +151,8 @@ const Hero = () => {
                                     {({ open }) => (
                                         <>
                                             <Menu.Button
-                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button transition-all duration-300"
+                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold transition-all duration-300"
                                                 style={{
-                                                    outline: 'none',
-                                                    boxShadow: 'none',
                                                     border: 'none',
                                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                                 }}
@@ -231,17 +227,18 @@ const Hero = () => {
                             className="lg:hidden mt-4"
                         >
                             <button
+                                type="button"
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="text-[#F5E6D3] focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button"
+                                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                                aria-expanded={isMenuOpen}
+                                className="text-[#F5E6D3]"
                                 style={{
                                     backgroundColor: 'transparent',
-                                    outline: 'none',
-                                    boxShadow: 'none',
                                     border: 'none',
                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                 }}
                             >
-                                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg aria-hidden="true" className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}></path>
                                 </svg>
                             </button>
@@ -490,7 +487,7 @@ const Hero = () => {
                             href="#quote" className="inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-slate-700/30
                             bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-white text-xl lg:text-2xl tracking-wide
                             transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                            focus:outline-none shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm"
+                             shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm"
                         >
                             Get a Free Quote
                         </a>

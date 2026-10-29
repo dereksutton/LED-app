@@ -45,7 +45,7 @@ const contactInfo = [
 const businessInfo = [
     'Licensed & Insured',
     claims.bbb,
-    '13+ Years Experience',
+    `${claims.years} Years Experience`,
     '3-Year Warranty',
 ];
 
