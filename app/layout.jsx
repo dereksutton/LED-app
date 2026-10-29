@@ -4,7 +4,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import Analytics from '../src/components/Analytics';
 import MobileActionBar from '../src/components/MobileActionBar';
 import MotionProvider from '../src/components/MotionProvider';
-import { claims } from '../src/data/site';
+import { claims, site } from '../src/data/site';
 
 export const metadata = {
   title: 'Jacksonville Painting Contractors | LED Custom Painting',
@@ -142,7 +142,7 @@ export default function RootLayout({ children }) {
                 "worstRating": "1",
               },
               "sameAs": [
-                "https://www.google.com/maps?cid=13284018097086639388",
+                site.googleReviewsUrl,
                 "https://www.facebook.com/ledcustompainting",
                 "https://www.instagram.com/led_custom_painting",
               ],

@@ -134,6 +134,8 @@ const About = () => {
                                 <img
                                     src="/images/paintedhome2.webp"
                                     alt="Beautifully painted home showcasing our craftsmanship"
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-80 object-cover"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent"></div>

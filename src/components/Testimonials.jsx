@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import InfiniteCards from './InfiniteCards';
-import { claims } from '../data/site';
+import { claims, site } from '../data/site';
 
 const Testimonials = () => {
   const testimonials = [
@@ -291,6 +291,16 @@ const Testimonials = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </motion.svg>
             </motion.a>
+            <p className="mt-6 mb-0 font-sans-luxury text-slate-700">
+              <a
+                href={site.googleReviewsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#2C3E50] underline underline-offset-4 hover:text-slate-900"
+              >
+                Read all our reviews on Google
+              </a>
+            </p>
           </div>
         </motion.div>
       </div>
