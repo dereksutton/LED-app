@@ -1,5 +1,6 @@
 import './globals.css';
 import Script from 'next/script';
+import { Inter, Playfair_Display } from 'next/font/google';
 import Analytics from '../src/components/Analytics';
 import MobileActionBar from '../src/components/MobileActionBar';
 import MotionProvider from '../src/components/MotionProvider';
@@ -73,18 +74,14 @@ export const viewport = {
   themeColor: '#2C3E50',
 };
 
+// Self-hosted at build time, so there's no render-blocking Google Fonts request.
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-inter', display: 'swap' });
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'], variable: '--font-playfair', display: 'swap' });
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        {/* Google Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-
         {/* Structured Data: LocalBusiness */}
         <script
           type="application/ld+json"

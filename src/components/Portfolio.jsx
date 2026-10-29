@@ -5,12 +5,12 @@ import BeforeAfterSlider from './BeforeAfterSlider';
 
 const Portfolio = () => {
   const imagePairs = [
-    { before: '/images/before1.webp', after: '/images/after1.webp' },
-    { before: '/images/before2.webp', after: '/images/after2.webp' },
-    { before: '/images/before3.webp', after: '/images/after3.webp' },
-    { before: '/images/before4.webp', after: '/images/after4.webp' },
-    { before: '/images/before5.webp', after: '/images/after5.webp' },
-    { before: '/images/before6.webp', after: '/images/after6.webp' },
+    { before: '/images/before1.webp', after: '/images/after1.webp', label: 'Exterior repaint, garage and trim' },
+    { before: '/images/before2.webp', after: '/images/after2.webp', label: 'Exterior repaint, single-story home' },
+    { before: '/images/before3.webp', after: '/images/after3.webp', label: 'Exterior repaint, stucco home' },
+    { before: '/images/before4.webp', after: '/images/after4.webp', label: 'Interior room repaint' },
+    { before: '/images/before5.webp', after: '/images/after5.webp', label: 'Exterior repaint, two-story siding' },
+    { before: '/images/before6.webp', after: '/images/after6.webp', label: 'Built-ins and fireplace refinish' },
   ];
 
   const containerVariants = {

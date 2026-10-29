@@ -13,8 +13,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'serif-luxury': ['Playfair Display', 'serif'],
-        'sans-luxury': ['Inter', 'sans-serif'],
+        'serif-luxury': ['var(--font-playfair)', 'serif'],
+        'sans-luxury': ['var(--font-inter)', 'sans-serif'],
       },
       colors: {
         luxury: {
