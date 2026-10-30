@@ -42,11 +42,17 @@ export default function AdminShell({ children }) {
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Link href="/admin/" className="font-bold text-slate-900 no-underline">LED <span className="font-normal text-slate-500">Business</span></Link>
-          <div className="flex items-center gap-3 text-sm">
-            {user && <span className="hidden text-slate-500 sm:inline">{user.name}</span>}
-            <button type="button" onClick={signOut} className="rounded-lg px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-100">Sign out</button>
+        {/* The logo's lettering is white, so it sits on the site's navy. */}
+        <div className="bg-slate-900">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
+            <Link href="/admin/" className="flex items-center gap-2 no-underline" aria-label="LED Custom Painting dashboard home">
+              <img src="/images/LED-logo-trim-96.webp" srcSet="/images/LED-logo-trim-96.webp 1x, /images/LED-logo-trim-192.webp 2x" alt="LED Custom Painting & More" width="79" height="48" className="h-12 w-auto" />
+              <span className="text-sm font-medium text-slate-300">Business</span>
+            </Link>
+            <div className="flex items-center gap-3 text-sm">
+              {user && <span className="hidden text-slate-300 sm:inline">{user.name}</span>}
+              <button type="button" onClick={signOut} className="rounded-lg px-3 py-1.5 font-medium text-white hover:bg-white/10">Sign out</button>
+            </div>
           </div>
         </div>
         <nav aria-label="Dashboard" className="mx-auto max-w-6xl overflow-x-auto px-2">
