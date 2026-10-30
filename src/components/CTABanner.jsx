@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-const CTABanner = ({ heading = "Ready to Get Started?", subheading = "Get a free, no-obligation quote for your project today." }) => {
+const CTABanner = ({ heading = "Ready to Get Started?", subheading = "Get a free, no-obligation quote for your project today.", href = "/contact/" }) => {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight]" />
@@ -25,7 +25,7 @@ const CTABanner = ({ heading = "Ready to Get Started?", subheading = "Get a free
           </p>
         </div>
         <Link
-          href="/#quote"
+          href={href}
           className="inline-flex h-14 animate-shimmer items-center justify-center rounded-full border border-[--luxury-champagne]/30
             bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-10 font-serif-luxury font-semibold text-white text-lg tracking-wide whitespace-nowrap
             transition-all duration-500 ease-out transform hover:-translate-y-1 hover:scale-105

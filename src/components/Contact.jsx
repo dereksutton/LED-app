@@ -1,6 +1,47 @@
 "use client";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { trackLead } from '../lib/analytics';
+import { claims } from '../data/site';
+
+const IconComponent = ({ iconType }) => {
+    const iconProps = {
+        className: "w-6 h-6",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: "2",
+        viewBox: "0 0 24 24"
+    };
+
+    switch (iconType) {
+        case 'shield':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            );
+        case 'clock':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            );
+        case 'phone':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+            );
+        case 'award':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+            );
+        default:
+            return null;
+    }
+};
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -14,7 +55,8 @@ const Contact = () => {
         budgetRange: '',
         paintingArea: '',
         message: '',
-        howDidYouHear: ''
+        howDidYouHear: '',
+        website: ''
     });
     const [status, setStatus] = useState({
         type: '',
@@ -44,6 +86,7 @@ const Contact = () => {
             const data = await response.json();
 
             if (response.ok) {
+                trackLead({ service: formData.projectType });
                 setStatus({
                     type: 'success',
                     message: 'Thank you for your request! We\'ll contact you within 24 hours with a detailed quote.'
@@ -59,7 +102,8 @@ const Contact = () => {
                     budgetRange: '',
                     paintingArea: '',
                     message: '',
-                    howDidYouHear: ''
+                    howDidYouHear: '',
+                    website: ''
                 });
             } else {
                 setStatus({
@@ -77,48 +121,9 @@ const Contact = () => {
         }
     };
 
-    const IconComponent = ({ iconType }) => {
-        const iconProps = {
-            className: "w-6 h-6",
-            fill: "none",
-            stroke: "currentColor",
-            strokeWidth: "2",
-            viewBox: "0 0 24 24"
-        };
-
-        switch (iconType) {
-            case 'shield':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                );
-            case 'clock':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                );
-            case 'phone':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                );
-            case 'award':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                );
-            default:
-                return null;
-        }
-    };
-
     const trustBadges = [
         { icon: 'shield', text: 'Licensed & Insured' },
-        { icon: 'award', text: 'A+ BBB Rating' },
+        { icon: 'award', text: claims.bbb },
         { icon: 'clock', text: '24hr Response' }
     ];
 
@@ -126,6 +131,7 @@ const Contact = () => {
         'Interior Painting',
         'Exterior Painting',
         'Cabinet Refinishing',
+        'Ceiling Services',
         'Pressure Washing',
         'Commercial Painting',
         'Other'
@@ -155,6 +161,9 @@ const Contact = () => {
         '$10,000 - $20,000',
         'Over $20,000'
     ];
+
+    const labelClass = 'block text-slate-300 mb-2 font-sans-luxury font-semibold';
+    const inputClass = 'w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/40 transition-colors duration-300';
 
     return (
         <section id="quote" className="relative bg-white py-24 overflow-hidden">
@@ -271,6 +280,7 @@ const Contact = () => {
                         transition={{ duration: 0.8, delay: 0.4 }}
                     >
                         <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-[#2C3E50]/30 shadow-2xl">
+                            <div aria-live="polite">
                             {status.message && (
                                 <motion.div
                                     className={`mb-6 p-4 rounded-2xl border ${
@@ -296,207 +306,89 @@ const Contact = () => {
                                     </div>
                                 </motion.div>
                             )}
+                            </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Personal Information */}
-                                <div>
-                                    <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 flex items-center">
-                                        <svg className="w-6 h-6 mr-3 text-[#E8B4A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        Personal Information
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="name" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Full Name *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="name"
-                                                name="name"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                placeholder="Enter your full name"
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="email" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Email Address *
-                                            </label>
-                                            <input
-                                                type="email"
-                                                id="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                placeholder="Enter your email"
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="phone" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Phone Number *
-                                            </label>
-                                            <input
-                                                type="tel"
-                                                id="phone"
-                                                name="phone"
-                                                value={formData.phone}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                placeholder="(555) 123-4567"
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="address" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Property Address *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="address"
-                                                name="address"
-                                                value={formData.address}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                placeholder="Enter property address"
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
+                            <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                                {/* Honeypot: hidden from people, filled by bots, dropped by the API */}
+                                <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}>
+                                    <label htmlFor="website">Website</label>
+                                    <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" value={formData.website} onChange={handleChange} />
+                                </div>
+
+                                <p className="font-sans-luxury text-slate-300 m-0">
+                                    Takes about 30 seconds. We&apos;ll call or text to confirm details.
+                                </p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div>
+                                        <label htmlFor="name" className={labelClass}>Name *</label>
+                                        <input type="text" id="name" name="name" autoComplete="name" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="Your name" disabled={isSubmitting} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="phone" className={labelClass}>Phone *</label>
+                                        <input type="tel" id="phone" name="phone" autoComplete="tel" inputMode="tel" value={formData.phone} onChange={handleChange} required className={inputClass} placeholder="(904) 555-0123" disabled={isSubmitting} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="email" className={labelClass}>Email *</label>
+                                        <input type="email" id="email" name="email" autoComplete="email" value={formData.email} onChange={handleChange} required className={inputClass} placeholder="you@example.com" disabled={isSubmitting} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="projectType" className={labelClass}>Service *</label>
+                                        <select id="projectType" name="projectType" value={formData.projectType} onChange={handleChange} required className={inputClass} disabled={isSubmitting}>
+                                            <option value="">Choose a service</option>
+                                            {projectTypes.map((type) => (
+                                                <option key={type} value={type}>{type}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label htmlFor="address" className={labelClass}>Property address or ZIP *</label>
+                                        <input type="text" id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Street address, or just your ZIP" disabled={isSubmitting} />
                                     </div>
                                 </div>
 
-                                {/* Project Details */}
-                                <div>
-                                    <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 flex items-center">
-                                        <svg className="w-6 h-6 mr-3 text-[#E8B4A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                <details className="group rounded-xl border border-slate-600/60 bg-slate-800/30 open:bg-slate-800/40">
+                                    <summary className="cursor-pointer select-none list-none px-5 py-4 font-sans-luxury font-semibold text-[#F5E6D3] flex items-center justify-between">
+                                        Add project details (optional)
+                                        <svg className="w-5 h-5 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
-                                        Project Details
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    </summary>
+                                    <div className="px-5 pb-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
-                                            <label htmlFor="projectType" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Project Type *
-                                            </label>
-                                            <select
-                                                id="projectType"
-                                                name="projectType"
-                                                value={formData.projectType}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                disabled={isSubmitting}
-                                            >
-                                                <option value="">Select project type</option>
-                                                {projectTypes.map(type => (
-                                                    <option key={type} value={type}>{type}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label htmlFor="propertyType" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Property Type *
-                                            </label>
-                                            <select
-                                                id="propertyType"
-                                                name="propertyType"
-                                                value={formData.propertyType}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                disabled={isSubmitting}
-                                            >
+                                            <label htmlFor="propertyType" className={labelClass}>Property type</label>
+                                            <select id="propertyType" name="propertyType" value={formData.propertyType} onChange={handleChange} className={inputClass} disabled={isSubmitting}>
                                                 <option value="">Select property type</option>
-                                                {propertyTypes.map(type => (
+                                                {propertyTypes.map((type) => (
                                                     <option key={type} value={type}>{type}</option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div>
-                                            <label htmlFor="paintingArea" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Approximate Square Footage
-                                            </label>
-                                            <input
-                                                type="text"
-                                                id="paintingArea"
-                                                name="paintingArea"
-                                                value={formData.paintingArea}
-                                                onChange={handleChange}
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                placeholder="e.g., 2,500 sq ft"
-                                                disabled={isSubmitting}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="budgetRange" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Budget Range
-                                            </label>
-                                            <select
-                                                id="budgetRange"
-                                                name="budgetRange"
-                                                value={formData.budgetRange}
-                                                onChange={handleChange}
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                disabled={isSubmitting}
-                                            >
-                                                <option value="">Select budget range</option>
-                                                {budgetRanges.map(range => (
-                                                    <option key={range} value={range}>{range}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Timeline & Additional Info */}
-                                <div>
-                                    <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 flex items-center">
-                                        <svg className="w-6 h-6 mr-3 text-[#E8B4A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Timeline & Details
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <label htmlFor="timeline" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                Preferred Timeline *
-                                            </label>
-                                            <select
-                                                id="timeline"
-                                                name="timeline"
-                                                value={formData.timeline}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                disabled={isSubmitting}
-                                            >
+                                            <label htmlFor="timeline" className={labelClass}>Timeline</label>
+                                            <select id="timeline" name="timeline" value={formData.timeline} onChange={handleChange} className={inputClass} disabled={isSubmitting}>
                                                 <option value="">Select timeline</option>
-                                                {timelines.map(time => (
+                                                {timelines.map((time) => (
                                                     <option key={time} value={time}>{time}</option>
                                                 ))}
                                             </select>
                                         </div>
                                         <div>
-                                            <label htmlFor="howDidYouHear" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                                How Did You Hear About Us?
-                                            </label>
-                                            <select
-                                                id="howDidYouHear"
-                                                name="howDidYouHear"
-                                                value={formData.howDidYouHear}
-                                                onChange={handleChange}
-                                                className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300"
-                                                disabled={isSubmitting}
-                                            >
+                                            <label htmlFor="paintingArea" className={labelClass}>Areas to paint</label>
+                                            <input type="text" id="paintingArea" name="paintingArea" value={formData.paintingArea} onChange={handleChange} className={inputClass} placeholder="e.g. living room, exterior trim" disabled={isSubmitting} />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="budgetRange" className={labelClass}>Budget range</label>
+                                            <select id="budgetRange" name="budgetRange" value={formData.budgetRange} onChange={handleChange} className={inputClass} disabled={isSubmitting}>
+                                                <option value="">Select budget range</option>
+                                                {budgetRanges.map((range) => (
+                                                    <option key={range} value={range}>{range}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label htmlFor="howDidYouHear" className={labelClass}>How did you hear about us?</label>
+                                            <select id="howDidYouHear" name="howDidYouHear" value={formData.howDidYouHear} onChange={handleChange} className={inputClass} disabled={isSubmitting}>
                                                 <option value="">Select one</option>
                                                 <option value="Google Search">Google Search</option>
                                                 <option value="Facebook">Facebook</option>
@@ -506,57 +398,30 @@ const Contact = () => {
                                                 <option value="Other">Other</option>
                                             </select>
                                         </div>
+                                        <div className="md:col-span-2">
+                                            <label htmlFor="message" className={labelClass}>Anything else we should know?</label>
+                                            <textarea id="message" name="message" value={formData.message} onChange={handleChange} rows="4" className={`${inputClass} resize-none`} placeholder="Colors, surfaces, problem areas, best time to reach you..." disabled={isSubmitting} />
+                                        </div>
                                     </div>
-                                    <div className="mt-6">
-                                        <label htmlFor="message" className="block text-slate-300 mb-2 font-sans-luxury font-semibold">
-                                            Project Details & Special Requirements
-                                        </label>
-                                        <textarea
-                                            id="message"
-                                            name="message"
-                                            value={formData.message}
-                                            onChange={handleChange}
-                                            rows="5"
-                                            className="w-full p-4 bg-slate-800/50 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-[#F5E6D3] focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all duration-300 resize-none"
-                                            placeholder="Please describe your project in detail, including any specific colors, surfaces, or special requirements..."
-                                            disabled={isSubmitting}
-                                        />
-                                    </div>
-                                </div>
+                                </details>
 
-                                <motion.button
+                                <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className={`w-full inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[#F5E6D3]/30
-                                        bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-[#F5E6D3] text-xl lg:text-2xl tracking-wide
-                                        transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                                        focus:outline-none shadow-2xl hover:shadow-[#F5E6D3]/20 hover:text-[#F5E6D3] backdrop-blur-sm group
-                                        ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    className={`w-full inline-flex h-16 items-center justify-center rounded-full bg-[#F5E6D3] px-10 font-sans-luxury font-bold text-[#1e293b] text-lg lg:text-xl shadow-xl transition-all duration-300 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5E6D3] ${isSubmitting ? 'opacity-60 cursor-not-allowed' : ''}`}
                                 >
                                     {isSubmitting ? (
                                         <>
-                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#F5E6D3]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Sending Request...
+                                            Sending...
                                         </>
                                     ) : (
-                                        <>
-                                            Get My Free Quote
-                                            <motion.svg
-                                                className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform duration-300"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                            </motion.svg>
-                                        </>
+                                        'Get My Free Quote'
                                     )}
-                                </motion.button>
+                                </button>
                             </form>
                         </div>
                     </motion.div>
@@ -604,10 +469,10 @@ const Contact = () => {
                             <div className="space-y-4">
                                 {[
                                     'Free detailed estimates',
-                                    '3-year warranty on all work',
+                                    `${claims.warranty} on all work`,
                                     'Licensed & fully insured',
                                     'A+ Better Business Bureau rating',
-                                    '13+ years of experience',
+                                    `${claims.experience} of experience`,
                                     'Local North Florida company'
                                 ].map((benefit, index) => (
                                     <motion.div
@@ -638,7 +503,7 @@ const Contact = () => {
                                 Quick Response
                             </h4>
                             <p className="font-sans-luxury text-slate-700 text-sm">
-                                We'll contact you within 24 hours with your detailed quote
+                                We&apos;ll contact you within 24 hours with your detailed quote
                             </p>
                         </div>
                     </motion.div>

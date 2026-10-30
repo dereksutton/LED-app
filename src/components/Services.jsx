@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { claims } from '../data/site';
 
 const Services = () => {
     const services = [
@@ -120,8 +121,8 @@ const Services = () => {
                         </Link>
                         , and communities across North Florida. From interior and exterior painting
                         to cabinet refinishing, pressure washing, ceiling services, and commercial
-                        painting, we deliver durable, beautiful results backed by a 3-year warranty
-                        and 13+ years of local experience.
+                        painting, we deliver durable, beautiful results backed by a {claims.warranty}{' '}
+                        and {claims.experience} of local experience.
                     </motion.p>
                 </motion.div>
 
@@ -219,7 +220,7 @@ const Services = () => {
                             Ready to Transform Your Space?
                         </h3>
                         <p className="text-xl font-sans-luxury text-slate-600 max-w-2xl mx-auto">
-                            Join hundreds of satisfied customers who trust LED Custom Painting for exceptional results.
+                            Join {claims.customers} who trust LED Custom Painting for exceptional results.
                             <span className="font-semibold text-slate-700"> Free estimates &bull; Licensed &amp; Insured &bull; 5-Star Service</span>
                         </p>
                     </motion.div>
@@ -229,7 +230,7 @@ const Services = () => {
                         className="inline-flex h-14 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-slate-700/30
                         bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-6 lg:px-16 py-3 lg:py-6 font-serif-luxury font-semibold text-white text-base lg:text-2xl tracking-wide whitespace-nowrap
                         transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                        focus:outline-none shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm group"
+                         shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm group"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                     >

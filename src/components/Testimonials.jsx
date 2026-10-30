@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import InfiniteCards from './InfiniteCards';
+import { claims, site } from '../data/site';
 
 const Testimonials = () => {
   const testimonials = [
@@ -124,9 +125,9 @@ const Testimonials = () => {
   };
 
   const trustStats = [
-    { number: "500+", label: "Happy Clients" },
+    { number: claims.jobs, label: "Happy Clients" },
     { number: "5-Star", label: "Average Rating" },
-    { number: "13+", label: "Years Experience" },
+    { number: claims.years, label: "Years Experience" },
     { number: "100%", label: "Satisfaction Rate" }
   ];
 
@@ -269,14 +270,14 @@ const Testimonials = () => {
               Join Our Satisfied Customers
             </h3>
             <p className="font-sans-luxury text-xl text-slate-700 mb-8 max-w-3xl mx-auto">
-              Experience the same exceptional service and quality that has earned us hundreds of 5-star reviews.
+              Experience the same exceptional service and quality that has earned us {claims.reviewsLine}.
             </p>
             <motion.a
               href="#quote"
               className="inline-flex h-14 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[#F5E6D3]/30
               bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-6 lg:px-16 py-3 lg:py-6 font-serif-luxury font-semibold text-white text-base lg:text-2xl tracking-wide whitespace-nowrap
               transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-              focus:outline-none shadow-2xl hover:shadow-[#F5E6D3]/20 hover:text-white backdrop-blur-sm group"
+               shadow-2xl hover:shadow-[#F5E6D3]/20 hover:text-white backdrop-blur-sm group"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -290,6 +291,16 @@ const Testimonials = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </motion.svg>
             </motion.a>
+            <p className="mt-6 mb-0 font-sans-luxury text-slate-700">
+              <a
+                href={site.googleReviewsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#2C3E50] underline underline-offset-4 hover:text-slate-900"
+              >
+                Read all our reviews on Google
+              </a>
+            </p>
           </div>
         </motion.div>
       </div>

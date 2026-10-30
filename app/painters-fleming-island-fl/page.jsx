@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import SiteHeader from '../../src/components/SiteHeader';
 import { services } from '../../src/data/services';
 import Footer from '../../src/components/Footer';
-import CTABanner from '../../src/components/CTABanner';
+import Contact from '../../src/components/Contact';
 import SectionHeader from '../../src/components/SectionHeader';
 import Breadcrumbs from '../../src/components/Breadcrumbs';
+import { claims } from '../../src/data/site';
 
 export const metadata = {
   title: 'Fleming Island Painting Contractors | LED Custom Painting',
@@ -60,7 +62,7 @@ const serviceBlurbs = {
 
 const reasons = [
   'Licensed and insured for every Fleming Island project',
-  '13+ years painting Clay County homes and businesses',
+  `${claims.experience} painting Clay County homes and businesses`,
   'Free, detailed, no-pressure written estimates',
   'Premium Sherwin-Williams and Benjamin Moore coatings',
   '3-year written warranty on all workmanship',
@@ -137,6 +139,8 @@ const serviceSchema = {
 
 export default function FlemingIslandPage() {
   return (
+    <>
+    <SiteHeader quoteHref="#quote" />
     <div className="overflow-x-hidden">
       <script
         type="application/ld+json"
@@ -151,17 +155,6 @@ export default function FlemingIslandPage() {
       <header className="relative bg-gradient-to-br from-[--luxury-midnight] via-slate-800 to-[--luxury-midnight] py-24 lg:py-32">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,230,211,0.08),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 text-center">
-          <div className="mb-8 flex justify-center">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Back to Home
-            </Link>
-          </div>
           <p className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4">
             Fleming Island, FL
           </p>
@@ -175,7 +168,7 @@ export default function FlemingIslandPage() {
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-4">
             <a
-              href="/#quote"
+              href="#quote"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[--luxury-champagne] px-8 py-3.5 font-sans-luxury font-semibold text-[--luxury-midnight] text-base shadow-xl shadow-black/30 hover:-translate-y-0.5 transition-all no-underline"
             >
               Get a Free Quote
@@ -414,13 +407,11 @@ export default function FlemingIslandPage() {
           </div>
         </section>
 
-        <CTABanner
-          heading="Ready to Paint Your Fleming Island Home?"
-          subheading="Get a free, no-obligation quote from a local, licensed painting contractor."
-        />
+        <Contact />
       </main>
 
       <Footer />
     </div>
+    </>
   );
 }

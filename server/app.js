@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { buildLeadEmail } = require('./lib/leadEmail');
+const { buildCustomerReply, buildOwnerSms } = require('./lib/followUps');
 
-const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType', 'propertyType', 'timeline'];
-const OPTIONAL_FIELDS = ['budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
+const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType'];
+const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
 const MAX_LENGTH = { message: 5000, default: 300 };
 const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
 
@@ -32,8 +33,13 @@ const parseQuoteRequest = (body = {}) => {
  * without Resend or MongoDB.
  *   sendEmail(message) -> Promise, rejects on failure
  *   saveLead(lead)     -> Promise<id>, rejects on failure
+ *   sendSms(body)      -> optional; texts the owner about each lead
+ *   customerReply      -> optional { phone }; emails the visitor a confirmation
  */
-const createApp = ({ sendEmail, saveLead, notifyTo, notifyFrom, corsOrigins = [], rateLimitMax = 5 }) => {
+const createApp = ({
+    sendEmail, saveLead, notifyTo, notifyFrom, sendSms = null, customerReply = null,
+    corsOrigins = [], rateLimitMax = 5,
+}) => {
     const app = express();
 
     // Trust the first proxy (Render's reverse proxy) so express-rate-limit reads the real client IP
@@ -81,6 +87,23 @@ const createApp = ({ sendEmail, saveLead, notifyTo, notifyFrom, corsOrigins = []
                 message: 'We could not send your request. Please call us at (904) 385-0426.',
             });
         }
+
+        // Extras never change the visitor's result; failures are only logged.
+        const followUps = [];
+        if (sendSms) {
+            followUps.push(['SMS', sendSms(buildOwnerSms(lead))]);
+        }
+        if (customerReply) {
+            followUps.push(['AUTOREPLY', sendEmail(buildCustomerReply({
+                to: lead.email, from: notifyFrom, replyTo: notifyTo, phone: customerReply.phone,
+            }))]);
+        }
+        const results = await Promise.allSettled(followUps.map(([, p]) => p));
+        results.forEach((r, i) => {
+            if (r.status === 'rejected') {
+                console.error(`[LEAD_${followUps[i][0]}_FAILED]`, r.reason && r.reason.message);
+            }
+        });
 
         res.status(200).json({ success: true, message: 'Quote request received.' });
     });

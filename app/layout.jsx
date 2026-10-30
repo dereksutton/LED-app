@@ -1,5 +1,10 @@
 import './globals.css';
 import Script from 'next/script';
+import { Inter, Playfair_Display } from 'next/font/google';
+import Analytics from '../src/components/Analytics';
+import MobileActionBar from '../src/components/MobileActionBar';
+import MotionProvider from '../src/components/MotionProvider';
+import { claims, site } from '../src/data/site';
 
 export const metadata = {
   title: 'Jacksonville Painting Contractors | LED Custom Painting',
@@ -69,18 +74,14 @@ export const viewport = {
   themeColor: '#2C3E50',
 };
 
+// Self-hosted at build time, so there's no render-blocking Google Fonts request.
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700'], variable: '--font-inter', display: 'swap' });
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['400', '600', '700', '800'], variable: '--font-playfair', display: 'swap' });
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
-        {/* Google Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-
         {/* Structured Data: LocalBusiness */}
         <script
           type="application/ld+json"
@@ -135,13 +136,13 @@ export default function RootLayout({ children }) {
               ],
               "aggregateRating": {
                 "@type": "AggregateRating",
-                "ratingValue": "5.0",
-                "reviewCount": "82",
+                "ratingValue": claims.rating,
+                "reviewCount": String(claims.reviewCount),
                 "bestRating": "5",
                 "worstRating": "1",
               },
               "sameAs": [
-                "https://www.google.com/maps?cid=13284018097086639388",
+                site.googleReviewsUrl,
                 "https://www.facebook.com/ledcustompainting",
                 "https://www.instagram.com/led_custom_painting",
               ],
@@ -192,23 +193,14 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body style={{ margin: '0 auto', textAlign: 'center' }}>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
+        <MobileActionBar />
 
-        {/* Google Analytics (gtag.js) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-059TGJP58C"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-059TGJP58C');`}
-        </Script>
+        <Analytics />
 
         {/* DotLottie Player Web Component */}
         <Script
-          src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"
+          src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
           type="module"
           strategy="afterInteractive"
         />

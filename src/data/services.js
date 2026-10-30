@@ -1,3 +1,5 @@
+import { claims } from './site';
+
 export const services = [
   {
     slug: 'interior-painting',
@@ -14,7 +16,7 @@ export const services = [
 
 From accent walls and ceiling refreshes to full-home repaints, our team handles projects of every scale. We use only top-tier paints from Sherwin-Williams and Benjamin Moore, ensuring rich color, smooth finishes, and lasting durability. Our thorough prep process — including patching, sanding, priming, and careful masking — means flawless results and zero mess left behind.
 
-Whether you're updating a single room or refreshing your entire home, we work around your schedule and protect your furniture and flooring throughout the process. With 13+ years of experience and a 5-star Google rating, LED Custom Painting delivers interior painting Jacksonville FL homeowners trust.`,
+Whether you're updating a single room or refreshing your entire home, we work around your schedule and protect your furniture and flooring throughout the process. With ${claims.experience} of experience and a 5-star Google rating, LED Custom Painting delivers interior painting Jacksonville FL homeowners trust.`,
     benefits: [
       'Premium Sherwin-Williams and Benjamin Moore paints',
       'Thorough prep: patching, sanding, priming, and masking',
@@ -24,8 +26,8 @@ Whether you're updating a single room or refreshing your entire home, we work ar
       'Flexible scheduling around your routine',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
-      { value: '500+', label: 'Homes Painted' },
+      { value: claims.years, label: 'Years Experience' },
+      { value: claims.jobs, label: 'Homes Painted' },
       { value: '5.0★', label: 'Google Rating' },
       { value: '3-Yr', label: 'Written Warranty' },
     ],
@@ -115,7 +117,7 @@ Whether you're updating a single room or refreshing your entire home, we work ar
 
 Our exterior painting process starts with thorough preparation — power washing, scraping, sanding, caulking, and priming — to ensure paint adheres properly and lasts for years. We use weather-resistant, UV-protective exterior coatings that stand up to Jacksonville's harsh climate while maintaining vibrant color.
 
-From stucco homes and wood siding to trim, fascia, soffits, and shutters, we handle every exterior surface with care. Our team is fully licensed, insured, and equipped to work safely at any height. With a 3-year warranty and 13+ years of local experience, we're the exterior painting Jacksonville FL homeowners rely on.`,
+From stucco homes and wood siding to trim, fascia, soffits, and shutters, we handle every exterior surface with care. Our team is fully licensed, insured, and equipped to work safely at any height. With a ${claims.warranty} and ${claims.experience} of local experience, we're the exterior painting Jacksonville FL homeowners rely on.`,
     benefits: [
       'Complete power washing and surface prep included',
       'UV-resistant, weather-grade exterior coatings',
@@ -125,7 +127,7 @@ From stucco homes and wood siding to trim, fascia, soffits, and shutters, we han
       'Licensed, insured, and safety-equipped crews',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '300+', label: 'Exteriors Painted' },
       { value: 'FL', label: 'Licensed & Insured' },
       { value: '3-Yr', label: 'Written Warranty' },
@@ -226,7 +228,7 @@ Pressure washing isn't just cosmetic. Regular cleaning prevents permanent staini
       'Same-day quotes and fast scheduling',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '1000+', label: 'Properties Cleaned' },
       { value: 'Eco', label: 'Safe Detergents' },
       { value: 'Same', label: 'Day Quotes' },
@@ -428,7 +430,7 @@ We also handle ceiling painting, water stain repair, and accent ceiling treatmen
       'Dramatic visual transformation of any room',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '200+', label: 'Ceilings Refinished' },
       { value: 'Safe', label: 'Asbestos-Era Aware' },
       { value: '3-Yr', label: 'Written Warranty' },
@@ -529,7 +531,7 @@ From interior office repaints and retail refreshes to exterior building painting
       'Licensed, insured, and OSHA safety compliant',
     ],
     stats: [
-      { value: '13+', label: 'Years Experience' },
+      { value: claims.years, label: 'Years Experience' },
       { value: '100+', label: 'Commercial Projects' },
       { value: 'OSHA', label: 'Compliant Crews' },
       { value: 'COI', label: 'On Request' },

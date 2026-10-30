@@ -1,6 +1,59 @@
 "use client";
 import { useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { claims } from '../data/site';
+
+const IconComponent = ({ iconType }) => {
+    const iconProps = {
+        className: "w-8 h-8",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: "2",
+        viewBox: "0 0 24 24"
+    };
+
+    switch (iconType) {
+        case 'home':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            );
+        case 'search':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            );
+        case 'chat':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+            );
+        case 'star':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            );
+        case 'location':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            );
+        case 'heart':
+            return (
+                <svg {...iconProps}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+            );
+        default:
+            return null;
+    }
+};
 
 const WhyUs = () => {
     const [activeCard, setActiveCard] = useState(0);
@@ -9,58 +62,6 @@ const WhyUs = () => {
 
     const rotateX = useSpring(useTransform(mouseY, [-300, 300], [15, -15]));
     const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-15, 15]));
-
-    const IconComponent = ({ iconType }) => {
-        const iconProps = {
-            className: "w-8 h-8",
-            fill: "none",
-            stroke: "currentColor",
-            strokeWidth: "2",
-            viewBox: "0 0 24 24"
-        };
-
-        switch (iconType) {
-            case 'home':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                );
-            case 'search':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                );
-            case 'chat':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                );
-            case 'star':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
-                );
-            case 'location':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                );
-            case 'heart':
-                return (
-                    <svg {...iconProps}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                );
-            default:
-                return null;
-        }
-    };
 
     const reasons = [
         {
@@ -91,7 +92,7 @@ const WhyUs = () => {
             icon: "location",
             title: "Local Expertise",
             description: "As North Florida's premier painting specialists, we understand your community's unique architectural needs.",
-            highlight: "13+ Years Local Experience"
+            highlight: `${claims.years} Years Local Experience`
         },
         {
             icon: "heart",
@@ -211,7 +212,7 @@ const WhyUs = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.3 }}
                     >
-                        Discover the six pillars that make LED Custom Painting North Florida's most trusted painting professionals
+                        Discover the six pillars that make LED Custom Painting North Florida&apos;s most trusted painting professionals
                     </motion.p>
 
                     <motion.div
@@ -566,7 +567,7 @@ const WhyUs = () => {
                                         }}
                                     >
                                         <div className="text-center">
-                                            <div className="font-serif-luxury text-2xl font-bold text-slate-800">13+</div>
+                                            <div className="font-serif-luxury text-2xl font-bold text-slate-800">{claims.years}</div>
                                             <div className="font-sans-luxury text-sm text-slate-600">Years</div>
                                         </div>
                                     </motion.div>
@@ -724,7 +725,7 @@ const WhyUs = () => {
                                     }}
                                 >
                                     <div className="text-center">
-                                        <div className="font-serif-luxury text-2xl font-bold text-slate-800">13+</div>
+                                        <div className="font-serif-luxury text-2xl font-bold text-slate-800">{claims.years}</div>
                                         <div className="font-sans-luxury text-sm text-slate-600">Years</div>
                                     </div>
                                 </motion.div>
@@ -775,14 +776,14 @@ const WhyUs = () => {
                             Experience the LED Difference Today
                         </h3>
                         <p className="font-sans-luxury text-xl text-slate-300 mb-8 max-w-3xl mx-auto">
-                            Join thousands of satisfied customers who chose excellence. Let's transform your vision into reality.
+                            Join {claims.customers} who chose excellence. Let&apos;s transform your vision into reality.
                         </p>
                         <motion.a
                             href="#quote"
                             className="inline-flex h-14 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-slate-700/30
                             bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-6 lg:px-16 py-3 lg:py-6 font-serif-luxury font-semibold text-white text-base lg:text-2xl tracking-wide whitespace-nowrap
                             transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                            focus:outline-none shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm group"
+                             shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm group"
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                         >

@@ -132,3 +132,12 @@ test('honeypot submissions are dropped silently', async () => {
     assert.equal(res.status, 200);
     assert.equal(saved.length + sent.length, 0);
 });
+
+test('short form without property type or timeline is accepted', async () => {
+    reset();
+    const { propertyType, timeline, ...shortLead } = validLead;
+    const res = await post(shortLead);
+    assert.equal(res.status, 200);
+    assert.equal(saved.length, 1);
+    assert.doesNotMatch(sent[0].text, /undefined/);
+});

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import SiteHeader from '../../src/components/SiteHeader';
 import Contact from '../../src/components/Contact';
 import Footer from '../../src/components/Footer';
 import Breadcrumbs from '../../src/components/Breadcrumbs';
@@ -59,25 +59,13 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
+    <>
+    <SiteHeader quoteHref="#quote" />
     <div className="overflow-x-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      {/* Simple nav bar */}
-      <div className="bg-[--luxury-midnight] py-4 px-6">
-        <div className="max-w-7xl mx-auto">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-      </div>
 
       {/* Breadcrumb */}
       <div className="bg-white border-b border-slate-200">
@@ -162,5 +150,6 @@ export default function ContactPage() {
 
       <Footer />
     </div>
+    </>
   );
 }

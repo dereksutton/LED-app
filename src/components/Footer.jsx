@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { claims } from '../data/site';
 
 const navigationSections = [
     { name: 'Home', href: '/' },
@@ -43,8 +44,8 @@ const contactInfo = [
 
 const businessInfo = [
     'Licensed & Insured',
-    'A+ BBB Rating',
-    '13+ Years Experience',
+    claims.bbb,
+    `${claims.years} Years Experience`,
     '3-Year Warranty',
 ];
 
@@ -141,7 +142,7 @@ const Footer = () => {
                             LED Custom Painting
                         </h3>
                         <p className="font-sans-luxury text-slate-300 mb-6 leading-relaxed">
-                            North Florida&apos;s premier painting professionals, delivering exceptional results with 13+ years of experience and unwavering commitment to quality.
+                            North Florida&apos;s premier painting professionals, delivering exceptional results with {claims.experience} of experience and unwavering commitment to quality.
                         </p>
                         <div className="space-y-3 inline-block lg:block">
                             {businessInfo.map((info) => (

@@ -7,101 +7,21 @@ import Logo from './Logo';
 
 const Hero = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(() => {
-        // Initialize with correct value to avoid source swap on mount
-        if (typeof window !== 'undefined') {
-            return window.innerWidth <= 768;
-        }
-        return false;
-    });
     const videoRef = useRef(null);
-    const starRatingLottieRef = useRef(null);
 
-    useEffect(() => {
-        // Check if mobile on mount and resize
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    // The 5-star rating lottie is rendered imperatively so it reloads reliably on
-    // every mount, client-side back-nav, and browser bfcache restore (where React
-    // state is frozen/thawed and useEffect alone wouldn't re-run).
-    useEffect(() => {
-        const container = starRatingLottieRef.current;
-        if (!container || typeof window === 'undefined') return;
-        const src = 'https://lottie.host/3e9cd2ba-8d91-41a0-9e14-5bdb198d2408/cME3iszBZ8.lottie';
-
-        let cancelled = false;
-
-        const mountPlayer = () => {
-            customElements.whenDefined('dotlottie-player').then(() => {
-                if (cancelled || !container.isConnected) return;
-                // Remove any existing player so a fresh element is created.
-                while (container.firstChild) container.removeChild(container.firstChild);
-                const player = document.createElement('dotlottie-player');
-                player.setAttribute('src', src);
-                player.setAttribute('background', 'transparent');
-                player.setAttribute('speed', '1');
-                player.setAttribute('loop', '');
-                player.setAttribute('autoplay', '');
-                player.style.width = '100%';
-                player.style.maxWidth = '400px';
-                player.style.margin = '0 auto';
-                container.appendChild(player);
-            });
-        };
-
-        mountPlayer();
-
-        const handlePageShow = (e) => {
-            // Back-forward cache restore: React state is thawed but the lottie
-            // player's animation frames aren't — remount the element.
-            if (e.persisted) mountPlayer();
-        };
-        window.addEventListener('pageshow', handlePageShow);
-
-        return () => {
-            cancelled = true;
-            window.removeEventListener('pageshow', handlePageShow);
-        };
-    }, []);
-
-    // Handle video autoplay on mount only
+    // iOS needs muted set from JS before autoplay will start. Skip playback
+    // entirely for visitors who ask for reduced motion; the poster stays.
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
-
-        // iOS requires muted to be set via JavaScript, not just HTML attribute
-        video.muted = true;
-
-        const attemptPlay = async () => {
-            try {
-                await video.play();
-            } catch (err) {
-                // Autoplay blocked - silent fail, video will show first frame
-                console.log('Video autoplay blocked:', err.message);
-            }
-        };
-
-        // Try to play when video can play through
-        const handleCanPlay = () => {
-            attemptPlay();
-        };
-
-        video.addEventListener('canplaythrough', handleCanPlay);
-
-        // Also try immediately in case video is already ready
-        if (video.readyState >= 3) {
-            attemptPlay();
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            video.pause();
+            return;
         }
-
-        return () => {
-            video.removeEventListener('canplaythrough', handleCanPlay);
-        };
+        video.muted = true;
+        video.play().catch(() => {
+            // Autoplay blocked: the poster frame stays visible.
+        });
     }, []);
 
     // Simple approach that works across all browsers
@@ -110,19 +30,22 @@ const Hero = () => {
             {/* Background video container - contained within hero section */}
             <div className="absolute inset-0 z-0">
                 <video
-                    key={isMobile ? 'mobile' : 'desktop'}
                     ref={videoRef}
                     autoPlay
                     muted
                     loop
                     playsInline
-                    preload="auto"
+                    preload="metadata"
+                    poster="/images/hero-poster-desktop.webp"
+                    aria-hidden="true"
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{
                         filter: 'brightness(0.8)',
                     }}
                 >
-                    <source src={isMobile ? "/videos/led-hero-mobile.mp4" : "/videos/led-hero-optimized.mp4"} type="video/mp4" />
+                    {/* The browser picks the first source whose media query matches. */}
+                    <source media="(max-width: 768px)" src="/videos/led-hero-mobile.mp4" type="video/mp4" />
+                    <source src="/videos/led-hero-optimized.mp4" type="video/mp4" />
                 </video>
                 {/* Optional overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-black/20"></div>
@@ -143,18 +66,13 @@ const Hero = () => {
                             {/* Navigation menu */}
                             <motion.ul
                                 className="flex items-center space-x-6 font-sans-luxury font-medium backdrop-blur-sm bg-white/10 rounded-full px-6 py-3 border border-white/20"
-                                initial={{ x: '100vw' }}
-                                animate={{ x: 0 }}
-                                transition={{ type: 'spring', stiffness: 30 }}
                             >
                                 <Menu as="li" className="relative">
                                     {({ open }) => (
                                         <>
                                             <Menu.Button
-                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button transition-all duration-300"
+                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold transition-all duration-300"
                                                 style={{
-                                                    outline: 'none',
-                                                    boxShadow: 'none',
                                                     border: 'none',
                                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                                 }}
@@ -233,10 +151,8 @@ const Hero = () => {
                                     {({ open }) => (
                                         <>
                                             <Menu.Button
-                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button transition-all duration-300"
+                                                className="flex items-center hover:text-slate-600 text-slate-800 text-lg font-semibold transition-all duration-300"
                                                 style={{
-                                                    outline: 'none',
-                                                    boxShadow: 'none',
                                                     border: 'none',
                                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                                 }}
@@ -309,22 +225,20 @@ const Hero = () => {
                         {/* Mobile menu button */}
                         <motion.div
                             className="lg:hidden mt-4"
-                            initial={{ x: '100vw' }}
-                            animate={{ x: 0 }}
-                            transition={{ type: 'spring', stiffness: 30 }}
                         >
                             <button
+                                type="button"
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="text-[#F5E6D3] focus:outline-none focus:ring-0 focus:border-none active:outline-none active:border-none no-outline-button"
+                                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                                aria-expanded={isMenuOpen}
+                                className="text-[#F5E6D3]"
                                 style={{
                                     backgroundColor: 'transparent',
-                                    outline: 'none',
-                                    boxShadow: 'none',
                                     border: 'none',
                                     WebkitTapHighlightColor: 'rgba(0,0,0,0)'
                                 }}
                             >
-                                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg aria-hidden="true" className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}></path>
                                 </svg>
                             </button>
@@ -550,16 +464,9 @@ const Hero = () => {
                     {/* Main Hero Content - Properly spaced */}
                     <motion.div
                         className="flex flex-col items-center justify-center flex-grow px-4 lg:px-0 text-center w-full pb-32 pt-8 lg:pt-16"
-                        initial={{ y: '100vh' }}
-                        animate={{ y: 0 }}
-                        transition={{ type: 'spring', stiffness: 50 }}
                     >
                         <h1
-                            className="text-[--luxury-midnight] font-serif-luxury font-bold text-4xl lg:text-7xl leading-[1.15] lg:leading-tight tracking-tighter mb-8 lg:mb-10"
-                            style={{
-                                WebkitTextStroke: isMobile ? '1px #F7E7CE' : '1.5px #F7E7CE',
-                                paintOrder: 'stroke fill',
-                            }}
+                            className="hero-title-stroke text-[--luxury-midnight] font-serif-luxury font-bold text-4xl lg:text-7xl leading-[1.15] lg:leading-tight tracking-tighter mb-8 lg:mb-10"
                         >
                             Precision Painting Contractors in Jacksonville &amp; North Florida
                         </h1>
@@ -567,14 +474,20 @@ const Hero = () => {
                             Quality You Can See, Service You Can Trust.
                         </p>
                         <div className="text-[--luxury-champagne] text-xl lg:text-2xl font-sans-luxury font-semibold mb-8 lg:mb-12 text-center" style={{textShadow: '2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 1px 2px 0px #1e293b, 0px 1px 0px #1e293b, 0px -1px 0px #1e293b, 1px 0px 0px #1e293b, -1px 0px 0px #1e293b'}}>
-                            <div className="mb-4" ref={starRatingLottieRef} />
+                            <div className="mb-4 flex justify-center gap-1" role="img" aria-label="5 out of 5 stars">
+                                {[0, 1, 2, 3, 4].map((i) => (
+                                    <svg key={i} className="w-8 h-8 lg:w-10 lg:h-10 text-amber-400 drop-shadow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                ))}
+                            </div>
                             <p>Proudly Maintaining a 5-Star Rating on Google</p>
                         </div>
                         <a
                             href="#quote" className="inline-flex h-16 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-slate-700/30
                             bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-12 lg:px-16 py-4 lg:py-6 font-serif-luxury font-semibold text-white text-xl lg:text-2xl tracking-wide
                             transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                            focus:outline-none shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm"
+                             shadow-2xl hover:shadow-slate-800/30 hover:text-white backdrop-blur-sm"
                         >
                             Get a Free Quote
                         </a>

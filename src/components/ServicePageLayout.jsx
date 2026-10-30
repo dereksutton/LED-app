@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Footer from "./Footer";
 import ServiceFAQ from "./ServiceFAQ";
-import CTABanner from "./CTABanner";
 import SectionHeader from "./SectionHeader";
 import Breadcrumbs from "./Breadcrumbs";
+import SiteHeader from "./SiteHeader";
+import Contact from "./Contact";
 
 const LearnMorePill = () => (
   <span className="inline-flex items-center gap-1.5 text-sm font-sans-luxury font-semibold text-[--luxury-midnight] bg-[--luxury-champagne] rounded-full px-5 py-2 self-start shadow-lg shadow-black/30 ring-1 ring-[--luxury-champagne]/60 transition-transform duration-300 group-hover:translate-x-0.5">
@@ -29,6 +30,8 @@ const LearnMorePill = () => (
 
 const ServicePageLayout = ({ service, relatedServices = [] }) => {
   return (
+    <>
+    <SiteHeader quoteHref="#quote" />
     <div className="overflow-x-hidden">
       {/* Hero */}
       <header className="relative h-[62vh] min-h-[560px] w-full overflow-hidden">
@@ -43,61 +46,26 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-        {/* Nav back link */}
-        <div className="absolute top-6 left-6 z-20">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-white font-sans-luxury text-sm hover:bg-white/20 transition-all no-underline"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-
         {/* Hero text */}
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 pt-24 pb-12 text-center">
           <motion.p
             className="font-sans-luxury text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-[--luxury-rose-gold] mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
           >
             {service.name}
           </motion.p>
           <motion.h1
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif-luxury font-bold text-white max-w-4xl leading-tight tracking-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
           >
             {service.tagline}
           </motion.h1>
           <motion.p
             className="mt-5 font-sans-luxury text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
           >
             Professional {service.name.toLowerCase()} in Jacksonville &amp; North Florida — licensed, insured, and backed by a 3-year warranty.
           </motion.p>
           <motion.a
-            href="/#quote"
+            href="#quote"
             className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-[--luxury-champagne] px-8 py-3.5 font-sans-luxury font-semibold text-[--luxury-midnight] text-base shadow-xl shadow-black/30 hover:shadow-2xl hover:-translate-y-0.5 transition-all no-underline"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
           >
             Get a Free Quote
             <svg
@@ -455,11 +423,12 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
         )}
 
         {/* Bottom CTA */}
-        <CTABanner />
+        <Contact />
       </main>
 
       <Footer />
     </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from 'framer-motion';
+import { claims } from '../data/site';
 
 const Guarantee = () => {
     const IconComponent = ({ iconType }) => {
@@ -50,7 +51,7 @@ const Guarantee = () => {
         },
         {
             title: "3-Year Warranty",
-            description: "Our work comes with a comprehensive transferable 3-year warranty, protecting against peeling, bubbling, cracking, or splitting.",
+            description: `Our work comes with a comprehensive transferable ${claims.warranty}, protecting against peeling, bubbling, cracking, or splitting.`,
             icon: "shield",
             highlight: "Fully Transferable"
         },
@@ -340,7 +341,7 @@ const Guarantee = () => {
                                 transition={{ duration: 0.6, delay: 0.8 }}
                                 whileHover={{ scale: 1.02, y: -2 }}
                             >
-                                <div className="font-serif-luxury text-3xl font-bold text-[#F5E6D3] mb-2">13+</div>
+                                <div className="font-serif-luxury text-3xl font-bold text-[#F5E6D3] mb-2">{claims.years}</div>
                                 <div className="font-sans-luxury text-sm font-semibold text-[#E8B4A0] mb-2">Years of Excellence</div>
                                 <div className="font-sans-luxury text-xs text-slate-400 leading-relaxed">
                                     Over a decade of trusted service in North Florida, delivering consistently exceptional results for residential and commercial clients.
@@ -385,7 +386,7 @@ const Guarantee = () => {
                             className="inline-flex h-14 lg:h-20 animate-shimmer items-center justify-center rounded-full border border-[--luxury-champagne]/30
                             bg-[linear-gradient(110deg,#1e293b,45%,#334155,55%,#1e293b)] bg-[length:200%_100%] px-6 lg:px-16 py-3 lg:py-6 font-serif-luxury font-semibold text-white text-base lg:text-2xl tracking-wide whitespace-nowrap
                             transition-all duration-500 ease-out transform hover:-translate-y-2 hover:scale-105
-                            focus:outline-none shadow-2xl hover:shadow-[--luxury-champagne]/20 hover:text-white backdrop-blur-sm group"
+                             shadow-2xl hover:shadow-[--luxury-champagne]/20 hover:text-white backdrop-blur-sm group"
                             whileHover={{ scale: 1.05, y: -2 }}
                             whileTap={{ scale: 0.98 }}
                         >
