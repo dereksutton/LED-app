@@ -354,6 +354,46 @@ describe('leads to paid invoice', () => {
         assert.equal(bad.status, 400);
     });
 
+    dbTest('sales pitches go to Spam, leads are never deleted, and spam can come back', async () => {
+        sent.length = 0;
+        await call('POST', '/send-quote', {
+            body: {
+                name: 'Growth Team', email: 'pitch@seo-agency.example', phone: '(555) 555-0100', street: '1 Market St', city: 'Jacksonville', zip: '32202',
+                projectType: 'Other', howDidYouHear: 'Google Search',
+                message: 'Hi, I noticed your website is not on the first page of Google. Our SEO team can fix that. Free audit: https://seo-agency.example/audit',
+            },
+        });
+        assert.match(sent[0].subject, /^Likely spam: /);
+        assert.match(sent[0].text, /Spam folder/);
+
+        const all = await call('GET', '/api/admin/leads?status=', { cookie });
+        assert.ok(!all.data.leads.some((l) => l.email === 'pitch@seo-agency.example'));
+        assert.equal(all.data.spamCount, 1);
+        const spam = await call('GET', '/api/admin/leads?status=spam', { cookie });
+        assert.equal(spam.data.leads.length, 1);
+        const pitch = spam.data.leads[0];
+        assert.equal(pitch.isSpam, true);
+        assert.equal(pitch.spam.by, 'auto');
+        assert.match(pitch.spam.reason, /SEO/);
+
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.ok(!summary.data.sources.some((r) => r.source === 'Google Search'));
+        assert.ok(!summary.data.recentLeads.some((l) => l.id === pitch.id));
+        assert.equal(summary.data.autoSpamLast30Days, 1);
+
+        const deleted = await call('DELETE', `/api/admin/leads/${pitch.id}`, { cookie });
+        assert.equal(deleted.status, 404);
+        const convert = await call('POST', `/api/admin/leads/${pitch.id}/convert`, { cookie, body: { createQuote: true } });
+        assert.equal(convert.status, 409);
+
+        const restored = await call('POST', `/api/admin/leads/${pitch.id}/spam`, { cookie, body: { spam: false } });
+        assert.equal(restored.data.lead.isSpam, false);
+        assert.ok((await call('GET', '/api/admin/leads?status=new', { cookie })).data.leads.some((l) => l.id === pitch.id));
+        const marked = await call('POST', `/api/admin/leads/${pitch.id}/spam`, { cookie, body: { spam: true } });
+        assert.equal(marked.data.lead.spam.by, 'Efrain');
+        assert.equal((await call('GET', '/api/admin/leads?status=spam', { cookie })).data.leads.length, 1);
+    });
+
     dbTest('older lead statuses read as won and lost', async () => {
         const old = await QuoteRequest.create({ name: 'Old', email: 'old@example.com', phone: '1', address: 'x', projectType: 'y', status: 'completed' });
         const res = await call('GET', `/api/admin/leads/${old._id}`, { cookie });
@@ -393,6 +433,9 @@ describe('leads to paid invoice', () => {
         assert.equal(quote.taxCents, Math.round(285100 * 0.075));
         assert.equal(quote.totalCents, 285100 + Math.round(285100 * 0.075));
         assert.equal(quote.depositCents, Math.round(quote.totalCents * 0.3));
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.equal(summary.data.openQuotes.count, 0);
+        assert.equal(summary.data.openQuotes.draftCount, 1);
     });
 
     dbTest('draft links do not open', async () => {
@@ -410,6 +453,14 @@ describe('leads to paid invoice', () => {
         assert.equal(sent[0].reply_to, 'owner@example.com');
         assert.ok(sent[0].text.includes(`${ORIGIN}/d/?t=${quote.publicToken}`));
         assert.equal(sent[0].attachments[0].content.subarray(0, 4).toString(), '%PDF');
+    });
+
+    dbTest('a sent quote counts toward open quotes on Home, a draft does not', async () => {
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.equal(summary.data.openQuotes.count, 1);
+        assert.equal(summary.data.openQuotes.totalCents, quote.totalCents);
+        assert.equal(summary.data.openQuotes.items[0].totalCents, quote.totalCents);
+        assert.equal(summary.data.openQuotes.draftCount, 0);
     });
 
     dbTest('the customer sees the quote but nothing internal', async () => {
@@ -446,6 +497,11 @@ describe('leads to paid invoice', () => {
         assert.equal(lead.data.lead.status, 'won');
         const edit = await call('PATCH', `/api/admin/quotes/${quote.id}`, { cookie, body: { title: 'changed' } });
         assert.equal(edit.status, 409);
+        // Accepted work moves from open quotes to ready to invoice.
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.equal(summary.data.openQuotes.count, 0);
+        assert.equal(summary.data.readyToInvoice.count, 1);
+        assert.equal(summary.data.readyToInvoice.totalCents, quote.totalCents);
     });
 
     dbTest('a contract is filled from the quote and signed online', async () => {
@@ -487,6 +543,8 @@ describe('leads to paid invoice', () => {
         assert.equal(deposit.totalCents, quote.depositCents);
         const bal = await call('POST', `/api/admin/quotes/${quote.id}/invoice`, { cookie, body: { kind: 'balance' } });
         assert.ok(Math.abs(bal.data.invoice.totalCents + deposit.totalCents - quote.totalCents) <= 1);
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.equal(summary.data.readyToInvoice.count, 0);
     });
 
     dbTest('payments recorded by hand settle the invoice', async () => {

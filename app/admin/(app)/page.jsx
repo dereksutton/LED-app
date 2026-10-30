@@ -1,13 +1,14 @@
 "use client";
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { adminApi } from '../../../src/admin/api';
 import { useAdminUser } from '../../../src/admin/AdminShell';
 import { ago, money, shortDate, sourceLabel } from '../../../src/admin/format';
 import { Button, Card, Empty, ErrorNote, Spinner, StatusBadge, Table, useLoad } from '../../../src/admin/ui';
 
-function Stat({ label, value, sub, href }) {
+function Stat({ label, value, sub, href, className = '' }) {
   return (
-    <Link href={href} className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm no-underline hover:border-slate-400">
+    <Link href={href} className={`block rounded-xl border border-slate-200 bg-white p-4 shadow-sm no-underline hover:border-slate-400 ${className}`}>
       <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</p>
       <p className="mt-1 text-2xl font-bold text-slate-900">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-slate-500">{sub}</p>}
@@ -34,7 +35,15 @@ function DocRow({ href, number, name, amount, status, date }) {
 
 export default function HomePage() {
   const user = useAdminUser();
-  const [data, error] = useLoad(() => adminApi.get('/summary'));
+  const [data, error, reload] = useLoad(() => adminApi.get('/summary'));
+
+  // Coming back to the tab shows fresh numbers.
+  useEffect(() => {
+    const onShow = () => { if (document.visibilityState === 'visible') reload(); };
+    document.addEventListener('visibilitychange', onShow);
+    return () => document.removeEventListener('visibilitychange', onShow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -52,16 +61,22 @@ export default function HomePage() {
       {!data && !error && <Spinner />}
       {data && (
         <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
             <Stat label="New leads" value={data.newLeads} sub={`${data.leadsThisMonth} this month`} href="/admin/leads/?status=new" />
-            <Stat label="Open quotes" value={money(data.openQuotes.totalCents)} sub={`${data.openQuotes.count} waiting on customers`} href="/admin/quotes/" />
+            <Stat
+              label="Open quotes"
+              value={money(data.openQuotes.totalCents)}
+              sub={`${data.openQuotes.count} sent, waiting${data.openQuotes.draftCount ? ` · ${data.openQuotes.draftCount} not sent yet` : ''}`}
+              href="/admin/quotes/"
+            />
+            <Stat label="Ready to invoice" value={money(data.readyToInvoice.totalCents)} sub={`${data.readyToInvoice.count} accepted ${data.readyToInvoice.count === 1 ? 'quote' : 'quotes'}`} href="/admin/quotes/?status=accepted" />
             <Stat
               label="Unpaid invoices"
               value={money(data.unpaidInvoices.balanceCents)}
               sub={data.unpaidInvoices.overdueCount ? `${data.unpaidInvoices.overdueCount} overdue` : `${data.unpaidInvoices.count} open`}
               href="/admin/invoices/"
             />
-            <Stat label="Paid this month" value={money(data.revenueThisMonthCents)} sub="Payments recorded" href="/admin/invoices/?status=paid" />
+            <Stat label="Paid this month" value={money(data.revenueThisMonthCents)} sub="Payments recorded" href="/admin/invoices/?status=paid" className="col-span-2 lg:col-span-1" />
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
@@ -73,6 +88,12 @@ export default function HomePage() {
                   ))}
                 </ul>
               ) : <Empty>No leads yet. Requests from the website form land here.</Empty>}
+              {data.autoSpamLast30Days > 0 && (
+                <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                  {data.autoSpamLast30Days} {data.autoSpamLast30Days === 1 ? 'message that looked like a sales pitch was' : 'messages that looked like sales pitches were'} set aside in the last 30 days.{' '}
+                  <Link href="/admin/leads/?status=spam" className="font-medium text-slate-700">Check Spam</Link>
+                </p>
+              )}
             </Card>
 
             <Card title="Waiting to be paid" actions={<Button href="/admin/invoices/" variant="ghost">All invoices</Button>}>
@@ -85,14 +106,23 @@ export default function HomePage() {
               ) : <Empty>Nothing outstanding.</Empty>}
             </Card>
 
-            <Card title="Quotes waiting on a yes" actions={<Button href="/admin/quotes/" variant="ghost">All quotes</Button>}>
-              {data.openQuotes.items.length ? (
+            <Card title="Quotes" actions={<Button href="/admin/quotes/" variant="ghost">All quotes</Button>}>
+              {data.openQuotes.items.length || data.readyToInvoice.items.length ? (
                 <ul className="divide-y divide-slate-100">
+                  {data.readyToInvoice.items.map((q) => (
+                    <DocRow key={q.id} href={`/admin/quotes/edit/?id=${q.id}`} name={q.customerName} number={q.number} date="accepted, ready to invoice" amount={money(q.remainingCents)} status={q.status} />
+                  ))}
                   {data.openQuotes.items.map((q) => (
                     <DocRow key={q.id} href={`/admin/quotes/edit/?id=${q.id}`} name={q.customerName} number={q.number} date={q.sentAt ? `sent ${ago(q.sentAt)}` : ''} amount={money(q.totalCents)} status={q.status} />
                   ))}
                 </ul>
               ) : <Empty>No quotes out right now.</Empty>}
+              {data.openQuotes.draftCount > 0 && (
+                <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                  {data.openQuotes.draftCount} {data.openQuotes.draftCount === 1 ? 'quote is a draft' : 'quotes are drafts'} and {data.openQuotes.draftCount === 1 ? "hasn't" : "haven't"} been sent.{' '}
+                  <Link href="/admin/quotes/?status=draft" className="font-medium text-slate-700">See drafts</Link>
+                </p>
+              )}
             </Card>
 
             <Card title="Contracts waiting to be signed" actions={<Button href="/admin/contracts/" variant="ghost">All contracts</Button>}>

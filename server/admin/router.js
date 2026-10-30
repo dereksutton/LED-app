@@ -91,15 +91,28 @@ const createAdminRouter = ({
     router.get('/summary', wrap(async (req, res) => {
         const monthStart = startOfMonthEastern();
         const since = new Date(Date.now() - 90 * DAY);
-        const [newLeads, leadsThisMonth, recentLeads, openQuotes, invoices, awaitingSignature, sourceLeads] = await Promise.all([
-            QuoteRequest.countDocuments({ status: 'new' }),
-            QuoteRequest.countDocuments({ createdAt: { $gte: monthStart } }),
-            QuoteRequest.find().sort({ createdAt: -1 }).limit(5),
+        const real = { isSpam: { $ne: true } };
+        const [newLeads, leadsThisMonth, recentLeads, openQuotes, draftQuotes, acceptedQuotes, invoices, awaitingSignature, sourceLeads, autoSpam] = await Promise.all([
+            QuoteRequest.countDocuments({ ...real, status: 'new' }),
+            QuoteRequest.countDocuments({ ...real, createdAt: { $gte: monthStart } }),
+            QuoteRequest.find(real).sort({ createdAt: -1 }).limit(5),
             Quote.find({ status: { $in: ['sent', 'viewed'] } }).sort({ sentAt: -1 }),
+            Quote.countDocuments({ status: 'draft' }),
+            Quote.find({ status: 'accepted' }).sort({ acceptedAt: -1 }),
             Invoice.find({ status: { $ne: 'void' } }),
             Contract.find({ status: { $in: ['sent', 'viewed'] } }).sort({ sentAt: -1 }),
-            QuoteRequest.find({ createdAt: { $gte: since } }, { howDidYouHear: 1, status: 1 }),
+            QuoteRequest.find({ ...real, createdAt: { $gte: since } }, { howDidYouHear: 1, status: 1 }),
+            QuoteRequest.countDocuments({ isSpam: true, 'spam.by': 'auto', createdAt: { $gte: new Date(Date.now() - 30 * DAY) } }),
         ]);
+        // Accepted quotes with work not invoiced yet: the quote total less
+        // what its invoices (not void) already bill.
+        const billedByQuote = {};
+        for (const inv of invoices) {
+            if (inv.quoteId) billedByQuote[String(inv.quoteId)] = (billedByQuote[String(inv.quoteId)] || 0) + computeTotals(inv).totalCents;
+        }
+        const toInvoice = acceptedQuotes
+            .map((q) => ({ quote: q, remainingCents: computeTotals(q).totalCents - (billedByQuote[String(q._id)] || 0) }))
+            .filter((r) => r.remainingCents > 0);
         // Leads and wins by how they heard about LED, last 90 days.
         const bySource = {};
         for (const lead of sourceLeads) {
@@ -113,7 +126,7 @@ const createAdminRouter = ({
         const revenueThisMonthCents = invoices.reduce((sum, inv) => sum + (inv.payments || [])
             .filter((p) => p.receivedAt >= monthStart)
             .reduce((s, p) => s + p.amountCents, 0), 0);
-        const customerIds = [...new Set([...openQuotes, ...unpaid, ...awaitingSignature].map((d) => String(d.customerId)))];
+        const customerIds = [...new Set([...openQuotes, ...toInvoice.map((r) => r.quote), ...unpaid, ...awaitingSignature].map((d) => String(d.customerId)))];
         const customers = await Customer.find({ _id: { $in: customerIds } }, { name: 1 });
         const names = Object.fromEntries(customers.map((c) => [String(c._id), c.name]));
         const brief = (d) => ({ ...d, customerName: names[String(d.customerId)] || '' });
@@ -125,6 +138,12 @@ const createAdminRouter = ({
                 count: openQuotes.length,
                 totalCents: openQuotes.reduce((s, q) => s + computeTotals(q).totalCents, 0),
                 items: openQuotes.slice(0, 5).map((q) => brief(serializeQuote(q))),
+                draftCount: draftQuotes,
+            },
+            readyToInvoice: {
+                count: toInvoice.length,
+                totalCents: toInvoice.reduce((s, r) => s + r.remainingCents, 0),
+                items: toInvoice.slice(0, 5).map((r) => ({ ...brief(serializeQuote(r.quote)), remainingCents: r.remainingCents })),
             },
             unpaidInvoices: {
                 count: unpaid.length,
@@ -138,6 +157,7 @@ const createAdminRouter = ({
             },
             recentLeads: recentLeads.map(serializeLead),
             sources,
+            autoSpamLast30Days: autoSpam,
         });
     }));
 
@@ -164,8 +184,9 @@ const createAdminRouter = ({
     };
 
     router.get('/leads', wrap(async (req, res) => {
-        const filter = {};
         const status = typeof req.query.status === 'string' ? req.query.status : '';
+        // The Spam folder shows junk of any status; every other view leaves it out.
+        const filter = { isSpam: status === 'spam' ? true : { $ne: true } };
         if (status === 'won') filter.status = { $in: ['won', 'completed'] };
         else if (status === 'lost') filter.status = { $in: ['lost', 'declined'] };
         else if (status === 'open') filter.status = { $in: ['new', 'contacted', 'quoted'] };
@@ -178,8 +199,11 @@ const createAdminRouter = ({
             const re = new RegExp(escapeRegex(q), 'i');
             filter.$or = [{ name: re }, { email: re }, { phone: re }, { address: re }, { projectType: re }, { sourceDetail: re }];
         }
-        const leads = await QuoteRequest.find(filter, { notes: 0 }).sort({ createdAt: -1 }).limit(500);
-        res.json({ leads: leads.map(serializeLead) });
+        const [leads, spamCount] = await Promise.all([
+            QuoteRequest.find(filter, { notes: 0 }).sort({ createdAt: -1 }).limit(500),
+            QuoteRequest.countDocuments({ isSpam: true }),
+        ]);
+        res.json({ leads: leads.map(serializeLead), spamCount });
     }));
 
     router.post('/leads', wrap(async (req, res) => {
@@ -206,10 +230,20 @@ const createAdminRouter = ({
         res.json({ lead: serializeLead(lead) });
     }));
 
-    router.delete('/leads/:id', wrap(async (req, res) => {
+    // Leads are never deleted. Junk goes to Spam, and can come back out.
+    router.post('/leads/:id/spam', wrap(async (req, res) => {
         const lead = await findOr404(QuoteRequest, req.params.id, 'lead');
-        await QuoteRequest.deleteOne({ _id: lead._id });
-        res.json({ ok: true });
+        if (typeof req.body.spam !== 'boolean') throw new InputError('Say whether this is spam.');
+        if (req.body.spam) {
+            lead.isSpam = true;
+            lead.spam = { markedAt: new Date(), by: req.admin.name, reason: str(req.body.reason, 300) || 'Marked as spam' };
+        } else {
+            lead.isSpam = false;
+            lead.spam = undefined;
+        }
+        lead.updatedAt = new Date();
+        await lead.save();
+        res.json({ lead: serializeLead(lead) });
     }));
 
     router.post('/leads/:id/notes', wrap(async (req, res) => {
@@ -248,6 +282,7 @@ const createAdminRouter = ({
 
     router.post('/leads/:id/convert', wrap(async (req, res) => {
         const lead = await findOr404(QuoteRequest, req.params.id, 'lead');
+        if (lead.isSpam) throw new InputError('This lead is in Spam. Choose Not spam first.', 409);
         const customer = await customerFromLead(lead);
         let quote = null;
         if (req.body.createQuote) {
