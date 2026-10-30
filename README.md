@@ -46,10 +46,11 @@ It asks for a password (12+ characters). `--phone` is optional. Codes last 10 mi
 Texting codes is off until `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_FROM_NUMBER` are set on the API. Running locally without `RESEND_API_KEY`, codes print in the API's terminal instead of being emailed.
 
 What's in it:
-- Leads from the website form (and ones added by hand), with statuses and notes
+- Leads from the website form (and ones added by hand), with statuses and notes. Leads can't be deleted; junk goes to a Spam folder and can be moved back. Form messages that read like sales pitches (SEO, web design, loans, several links) go there on their own, are still emailed with "Likely spam" in the subject, and get no text alert or auto-reply. Spam stays out of Home and the source numbers
+- Home shows open quotes (sent, not answered), accepted quotes not yet invoiced, unpaid invoices and payments this month
 - Where each lead heard about LED (required on the form), plus ad clicks and UTM tags the site picks up on its own, with leads and wins by source on Home
 - Customers, each with their quotes, invoices and contracts
-- Quotes with line items, tax, discount and deposit. Emailed with a link and PDF; the customer accepts online
+- Quotes with line items, tax, discount and deposit. Emailed with a link and PDF; the customer accepts online. The PDFs carry the logo (a dark-ink copy in `server/admin/assets/` so it prints on white)
 - Invoices from a quote (deposit, final) or from scratch, with payments recorded by hand
 - Contracts filled from a template in Settings and signed online (typed name, drawn signature, time, IP and a SHA-256 fingerprint of the text)
 - Email to the owner when a customer accepts, signs or pays

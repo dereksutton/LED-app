@@ -6,7 +6,7 @@ import { adminApi } from '../../../../src/admin/api';
 import { LEAD_SOURCES, ago, sourceLabel } from '../../../../src/admin/format';
 import { Button, Card, Empty, ErrorNote, Field, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
 
-const TABS = [['open', 'Open'], ['new', 'New'], ['contacted', 'Contacted'], ['quoted', 'Quoted'], ['won', 'Won'], ['lost', 'Lost'], ['', 'All']];
+const TABS = [['open', 'Open'], ['new', 'New'], ['contacted', 'Contacted'], ['quoted', 'Quoted'], ['won', 'Won'], ['lost', 'Lost'], ['', 'All'], ['spam', 'Spam']];
 
 function NewLead({ onClose }) {
   const router = useRouter();
@@ -69,7 +69,13 @@ function Leads() {
 
   return (
     <>
-      <PageHeader title="Leads" subtitle="Quote requests from the website, plus any you add." actions={<Button onClick={() => setAdding(true)}>Add a lead</Button>} />
+      <PageHeader
+        title={status === 'spam' ? 'Spam' : 'Leads'}
+        subtitle={status === 'spam'
+          ? 'Sales pitches and junk from the quote form. They stay out of your leads and numbers. Open one and choose Not spam to move it back.'
+          : 'Quote requests from the website, plus any you add.'}
+        actions={<Button onClick={() => setAdding(true)}>Add a lead</Button>}
+      />
       {adding && <NewLead onClose={() => { setAdding(false); router.replace(`/admin/leads/?status=${status}`); }} />}
       <Card>
         <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -81,6 +87,7 @@ function Leads() {
                 className={`rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap no-underline ${status === value ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
               >
                 {label}
+                {value === 'spam' && data && data.spamCount > 0 && <span className="ml-1 text-xs opacity-70">{data.spamCount}</span>}
               </Link>
             ))}
           </div>
@@ -101,7 +108,7 @@ function Leads() {
               <tr key={l.id} className="cursor-pointer hover:bg-slate-50" onClick={() => router.push(`/admin/leads/view/?id=${l.id}`)}>
                 <td className="px-4 py-3">
                   <Link href={`/admin/leads/view/?id=${l.id}`} className="font-medium text-slate-900 no-underline" onClick={(e) => e.stopPropagation()}>{l.name}</Link>
-                  <span className="block text-xs text-slate-500">{l.phone}</span>
+                  <span className="block text-xs text-slate-500">{status === 'spam' && l.spam ? (l.spam.by === 'auto' ? l.spam.reason : `Marked by ${l.spam.by}`) : l.phone}</span>
                 </td>
                 <td className="hidden px-4 py-3 text-slate-700 sm:table-cell">{l.projectType}</td>
                 <td className="hidden px-4 py-3 text-slate-700 md:table-cell">
@@ -113,7 +120,7 @@ function Leads() {
               </tr>
             ))}
           </Table>
-        ) : <Empty>No leads here.</Empty>)}
+        ) : <Empty>{status === 'spam' ? 'No spam. Anything that looks like a sales pitch lands here.' : 'No leads here.'}</Empty>)}
       </Card>
     </>
   );

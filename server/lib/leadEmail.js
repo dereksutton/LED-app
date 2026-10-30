@@ -39,6 +39,9 @@ const buildLeadEmail = (lead, { to, from }) => {
     } = lead;
     const heard = [howDidYouHear, sourceDetail].filter(Boolean).join(': ');
     const tracked = describeAttribution(attribution);
+    const spamNote = lead.isSpam
+        ? 'This looks like a sales pitch, so it went to the Spam folder in the dashboard. If it is a real customer, open it there and choose Not spam.'
+        : '';
 
     const submittedDate = new Date().toLocaleString('en-US', {
         timeZone: 'America/New_York',
@@ -64,6 +67,7 @@ const buildLeadEmail = (lead, { to, from }) => {
         </div>
 
         <div style="background: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none;">
+          ${spamNote ? `<p style="background: #FEF3C7; color: #92400E; padding: 12px 15px; border-radius: 5px; margin: 0 0 20px 0;">${spamNote}</p>` : ''}
           <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Contact Information</h2>
           <table style="width: 100%; margin-bottom: 20px;">
             ${row('Name', name)}
@@ -117,14 +121,14 @@ const buildLeadEmail = (lead, { to, from }) => {
         .map(([label, value]) => `${label}: ${value}\n`)
         .join('');
 
-    const text = `New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\n${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
+    const text = `${spamNote ? `${spamNote}\n\n` : ''}New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\n${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
 
     return {
         from,
         to,
         reply_to: email,
         // Strip line breaks so a name can't smuggle extra headers into the subject.
-        subject: `Quote Request from ${name.replace(/[\r\n]+/g, ' ')}`,
+        subject: `${spamNote ? 'Likely spam: ' : ''}Quote Request from ${name.replace(/[\r\n]+/g, ' ')}`,
         html,
         text,
     };

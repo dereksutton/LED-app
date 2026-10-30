@@ -81,13 +81,10 @@ function Lead() {
     const res = await adminApi.post(`/leads/${id}/convert`, {});
     router.push(`/admin/customers/view/?id=${res.customer.id}`);
   });
-  const remove = () => {
-    if (!window.confirm(`Delete the lead from ${lead.name}? This can't be undone.`)) return;
-    run(async () => {
-      await adminApi.del(`/leads/${id}`);
-      router.push('/admin/leads/');
-    });
-  };
+  const setSpam = (spam) => run(async () => {
+    const res = await adminApi.post(`/leads/${id}/spam`, { spam });
+    setData({ ...data, lead: res.lead });
+  });
 
   return (
     <>
@@ -95,7 +92,9 @@ function Lead() {
         back={{ href: '/admin/leads/', label: 'Leads' }}
         title={lead.name}
         subtitle={`Received ${dateTime(lead.createdAt)}${lead.source === 'manual' ? ' · added by hand' : ' · website form'}`}
-        actions={(
+        actions={lead.isSpam ? (
+          <Button onClick={() => setSpam(false)} disabled={busy}>Not spam</Button>
+        ) : (
           <>
             {lead.customerId
               ? <Button variant="secondary" href={`/admin/customers/view/?id=${lead.customerId}`}>View customer</Button>
@@ -105,6 +104,15 @@ function Lead() {
         )}
       />
       <ErrorNote error={actionError} />
+      {lead.isSpam && (
+        <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">In Spam{lead.spam && lead.spam.by !== 'auto' ? `, marked by ${lead.spam.by}` : ''}{lead.spam && lead.spam.markedAt ? ` on ${dateTime(lead.spam.markedAt)}` : ''}.</p>
+          <p className="mt-0.5">
+            {lead.spam && lead.spam.by === 'auto' ? `${lead.spam.reason}. ` : ''}
+            It stays out of your leads, Home and source numbers. If this is a real customer, choose Not spam.
+          </p>
+        </div>
+      )}
       <div className="mt-4 grid gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
           <Card title="Request">
@@ -177,7 +185,12 @@ function Lead() {
               </ul>
             ) : <p className="text-sm text-slate-500">No quotes yet.</p>}
           </Card>
-          <Button variant="danger" onClick={remove} disabled={busy} className="w-full">Delete lead</Button>
+          {!lead.isSpam && (
+            <div className="text-center">
+              <Button variant="ghost" onClick={() => setSpam(true)} disabled={busy}>Mark as spam</Button>
+              <p className="mt-1 text-xs text-slate-500">For sales pitches and junk. It moves to the Spam folder, where you can bring it back.</p>
+            </div>
+          )}
         </div>
       </div>
     </>

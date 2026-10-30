@@ -94,10 +94,19 @@ const quoteRequestSchema = new mongoose.Schema({
     default: 'new'
   },
   notes: [noteSchema],
+  // Sales pitches and other junk. Kept, never deleted, but left out of the
+  // leads list, Home and source numbers. by is 'auto' or the owner's name.
+  isSpam: { type: Boolean, default: false },
+  spam: {
+    markedAt: Date,
+    by: String,
+    reason: String
+  },
   customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' }
 });
 
 quoteRequestSchema.index({ createdAt: -1 });
+quoteRequestSchema.index({ isSpam: 1, createdAt: -1 });
 
 module.exports = mongoose.model('QuoteRequest', quoteRequestSchema);
 module.exports.LEAD_STATUSES = LEAD_STATUSES;

@@ -6,6 +6,7 @@ const { buildCustomerReply, buildOwnerSms } = require('./lib/followUps');
 const { mountAdmin } = require('./admin');
 
 const { normalizeSource, parseAttribution } = require('./lib/leadSources');
+const { checkForSpam } = require('./lib/spamCheck');
 
 const REQUIRED_FIELDS = ['name', 'email', 'phone', 'street', 'city', 'zip', 'projectType', 'howDidYouHear'];
 const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'sourceDetail'];
@@ -96,6 +97,14 @@ const createApp = ({
             return res.status(400).json({ success: false, message: error });
         }
 
+        // A sales pitch is kept and still emailed, but goes to the dashboard's
+        // Spam folder and gets no text alert or auto-reply.
+        const spamReason = checkForSpam(lead);
+        if (spamReason) {
+            lead.isSpam = true;
+            lead.spam = { markedAt: new Date(), by: 'auto', reason: spamReason };
+        }
+
         // Save and notify independently, so one failing never blocks the other.
         const [saved, emailed] = await Promise.allSettled([
             saveLead(lead),
@@ -120,10 +129,10 @@ const createApp = ({
 
         // Extras never change the visitor's result; failures are only logged.
         const followUps = [];
-        if (sendSms) {
+        if (sendSms && !spamReason) {
             followUps.push(['SMS', sendSms(buildOwnerSms(lead))]);
         }
-        if (customerReply) {
+        if (customerReply && !spamReason) {
             followUps.push(['AUTOREPLY', sendEmail(buildCustomerReply({
                 to: lead.email, from: notifyFrom, replyTo: notifyTo, phone: customerReply.phone,
             }))]);

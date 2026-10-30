@@ -65,6 +65,22 @@ test('owner gets a text and the visitor gets a confirmation when turned on', asy
     });
 });
 
+test('a sales pitch gets no text alert and no confirmation', async () => {
+    const sent = [];
+    const texts = [];
+    await withApp({
+        sendEmail: async (m) => { sent.push(m); },
+        sendSms: async (body) => { texts.push(body); },
+        customerReply: { phone: '(904) 385-0426' },
+    }, async (post) => {
+        const res = await post({ ...lead, message: 'Our SEO agency can get your business on the first page of Google. https://seo.example' });
+        assert.equal(res.status, 200);
+        assert.equal(texts.length, 0);
+        assert.equal(sent.length, 1);
+        assert.match(sent[0].subject, /^Likely spam: /);
+    });
+});
+
 test('confirmation email carries none of the visitor input', () => {
     const msg = buildCustomerReply({ to: 'a@b.co', from: 'q@x.co', replyTo: 'o@x.co', phone: '(904) 385-0426' });
     assert.doesNotMatch(msg.text + msg.html + msg.subject, /spam|Jane/);
