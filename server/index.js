@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
 const { createApp } = require('./app');
 const { createTwilioSms } = require('./lib/followUps');
+const { createStripe } = require('./admin/stripe');
 
 const PORT = process.env.PORT || 3001;
 
@@ -20,7 +21,7 @@ const sendEmail = async (message) => {
     for (let attempt = 1; attempt <= 2; attempt++) {
         const { data, error } = await resend.emails.send(message);
         if (!error) {
-            console.log('Lead email sent:', data.id);
+            console.log('Email sent:', data.id);
             return data;
         }
         lastError = new Error(error.message || 'Resend error');
@@ -51,6 +52,12 @@ const sendSms = createTwilioSms({
     to: process.env.LEAD_NOTIFY_SMS,
 });
 
+// Optional card payments on invoices: off until both Stripe settings are present.
+const stripe = createStripe({
+    secretKey: process.env.STRIPE_SECRET_KEY,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+});
+
 const app = createApp({
     sendEmail,
     saveLead,
@@ -59,7 +66,13 @@ const app = createApp({
     notifyTo: process.env.LEAD_NOTIFY_EMAIL || 'ledcustompainting@gmail.com',
     notifyFrom: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
     corsOrigins,
+    admin: {
+        siteUrl: process.env.SITE_URL || 'https://ledcustompainting.com',
+        secureCookie: process.env.NODE_ENV === 'production',
+        stripe,
+    },
 });
+console.log(`Card payments ${stripe ? 'on' : 'off'}.`);
 console.log(`Owner text alerts ${sendSms ? 'on' : 'off'}; customer auto-reply ${process.env.CUSTOMER_AUTOREPLY === 'true' ? 'on' : 'off'}.`);
 
 const server = app.listen(PORT, '0.0.0.0', () => {

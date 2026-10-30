@@ -1,0 +1,438 @@
+// Dashboard API tests. They need a MongoDB: set TEST_MONGO_URI, or run one
+// locally on the default port (docker run -p 27017:27017 mongo:7). Without
+// one they're skipped, except in CI where they fail.
+const { test, before, after, describe } = require('node:test');
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const mongoose = require('mongoose');
+const { createApp } = require('./app');
+const { AdminUser, QuoteRequest, Invoice, Contract } = require('./admin/models');
+const { hashPassword, hotp, totpStep } = require('./admin/crypto');
+const { createStripe } = require('./admin/stripe');
+
+const MONGO = process.env.TEST_MONGO_URI || 'mongodb://127.0.0.1:27017';
+const DB_NAME = `led_admin_test_${crypto.randomBytes(4).toString('hex')}`;
+const ORIGIN = 'https://ledcustompainting.com';
+const PASSWORD = 'correct horse battery staple';
+const WEBHOOK_SECRET = 'whsec_test';
+
+let connected = false;
+let server;
+let baseUrl;
+let clock = Date.now();
+const sent = [];
+const stripeCalls = [];
+
+before(async () => {
+    try {
+        await mongoose.connect(MONGO, { dbName: DB_NAME, serverSelectionTimeoutMS: 2000 });
+        connected = true;
+    } catch (err) {
+        if (process.env.CI) throw err;
+        console.warn(`Skipping dashboard tests: no MongoDB at ${MONGO}`);
+        return;
+    }
+    await mongoose.connection.syncIndexes();
+    const stripe = createStripe({
+        secretKey: 'sk_test_x',
+        webhookSecret: WEBHOOK_SECRET,
+        fetchImpl: async (url, opts) => {
+            stripeCalls.push({ url, body: new URLSearchParams(opts.body) });
+            return { ok: true, json: async () => ({ id: 'cs_test_1', url: 'https://checkout.stripe.com/c/pay/cs_test_1' }) };
+        },
+    });
+    const app = createApp({
+        sendEmail: async (msg) => { sent.push(msg); return { id: 'e1' }; },
+        saveLead: async (lead) => (await QuoteRequest.create(lead))._id,
+        notifyTo: 'owner@example.com',
+        notifyFrom: 'quotes@example.com',
+        rateLimitMax: 1000,
+        admin: {
+            siteUrl: ORIGIN, secureCookie: true, stripe, now: () => clock,
+            loginRateLimitMax: 1000, publicRateLimitMax: 1000,
+        },
+    });
+    await new Promise((resolve) => { server = app.listen(0, resolve); });
+    baseUrl = `http://127.0.0.1:${server.address().port}`;
+});
+
+after(async () => {
+    if (server) server.close();
+    if (connected) {
+        await mongoose.connection.dropDatabase();
+        await mongoose.disconnect();
+    }
+});
+
+const call = async (method, path, { body, cookie, origin = ORIGIN, csrf = true, raw, headers = {} } = {}) => {
+    const h = { ...headers };
+    if (origin) h.Origin = origin;
+    if (csrf) h['X-Requested-With'] = 'led-admin';
+    if (cookie) h.Cookie = cookie;
+    if (body !== undefined && !raw) h['Content-Type'] = 'application/json';
+    const res = await fetch(`${baseUrl}${path}`, { method, headers: h, body: raw || (body === undefined ? undefined : JSON.stringify(body)) });
+    const type = res.headers.get('content-type') || '';
+    const data = type.includes('json') ? await res.json() : Buffer.from(await res.arrayBuffer());
+    return { status: res.status, data, headers: res.headers };
+};
+
+const codeFor = (secret, offset = 0) => hotp(secret, totpStep(clock) + offset);
+
+// Creates a login with the authenticator already set up, signs in, and
+// returns the session cookie.
+const signIn = async (email = 'efrain@example.com') => {
+    const secret = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+    await AdminUser.deleteOne({ email });
+    await AdminUser.create({ email, name: 'Efrain', passwordHash: await hashPassword(PASSWORD), totpSecret: secret, totpEnabled: true });
+    clock += 60_000;
+    const res = await call('POST', '/api/admin/login', { body: { email, password: PASSWORD, code: codeFor(secret) } });
+    assert.equal(res.status, 200, JSON.stringify(res.data));
+    const cookie = res.headers.getSetCookie()[0].split(';')[0];
+    return { cookie, secret };
+};
+
+// The connection is made in before(), after tests are declared, so check it
+// when each test runs.
+const dbTest = (name, fn) => test(name, async (t) => {
+    if (!connected) return t.skip('no MongoDB');
+    await fn(t);
+});
+
+describe('dashboard sign-in', () => {
+    test('totp matches the RFC 6238 test vector', () => {
+        // RFC 6238 appendix B, SHA-1 secret "12345678901234567890", T=59s -> 94287082 (8 digits)
+        const { base32Encode } = require('./admin/crypto');
+        const secret = base32Encode(Buffer.from('12345678901234567890'));
+        assert.equal(hotp(secret, 1, 8), '94287082');
+        assert.equal(hotp(secret, Math.floor(1111111109 / 30), 8), '07081804');
+    });
+
+    dbTest('every dashboard route needs a session', async () => {
+        for (const [m, p] of [['GET', '/api/admin/me'], ['GET', '/api/admin/leads'], ['GET', '/api/admin/summary'],
+            ['GET', '/api/admin/quotes'], ['GET', '/api/admin/invoices'], ['GET', '/api/admin/contracts'],
+            ['GET', '/api/admin/customers'], ['GET', '/api/admin/settings'], ['POST', '/api/admin/customers']]) {
+            const res = await call(m, p, { body: m === 'POST' ? { name: 'x' } : undefined });
+            assert.equal(res.status, 401, `${m} ${p}`);
+        }
+    });
+
+    dbTest('first sign-in enrolls the authenticator app, then asks for codes', async () => {
+        await AdminUser.create({ email: 'new@example.com', name: 'New', passwordHash: await hashPassword(PASSWORD) });
+        const first = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD } });
+        assert.equal(first.data.step, 'enroll');
+        assert.match(first.data.qr, /^data:image\/png;base64,/);
+        assert.equal(first.headers.getSetCookie().length, 0);
+
+        const wrong = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD, code: '000000' } });
+        assert.equal(wrong.status, 401);
+
+        const ok = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD, code: codeFor(first.data.secret) } });
+        assert.equal(ok.status, 200);
+        const cookie = ok.headers.getSetCookie()[0];
+        assert.match(cookie, /HttpOnly/);
+        assert.match(cookie, /SameSite=Strict/);
+        assert.match(cookie, /Secure/);
+
+        clock += 60_000;
+        const next = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD } });
+        assert.equal(next.data.step, 'code');
+        assert.equal(next.data.secret, undefined);
+    });
+
+    dbTest('wrong password and unknown email get the same answer', async () => {
+        await signIn('same@example.com');
+        const a = await call('POST', '/api/admin/login', { body: { email: 'same@example.com', password: 'wrong password!!' } });
+        const b = await call('POST', '/api/admin/login', { body: { email: 'nobody@example.com', password: 'wrong password!!' } });
+        assert.equal(a.status, 401);
+        assert.deepEqual(a.data, b.data);
+    });
+
+    dbTest('five wrong tries lock the account for 15 minutes', async () => {
+        const { secret } = await signIn('lock@example.com');
+        for (let i = 0; i < 5; i++) {
+            await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: 'wrong password!!' } });
+        }
+        const locked = await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: PASSWORD, code: codeFor(secret) } });
+        assert.equal(locked.status, 429);
+        clock += 16 * 60_000;
+        const after = await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: PASSWORD, code: codeFor(secret) } });
+        assert.equal(after.status, 200);
+    });
+
+    dbTest('a code cannot be used twice', async () => {
+        const { secret } = await signIn('replay@example.com');
+        const again = await call('POST', '/api/admin/login', { body: { email: 'replay@example.com', password: PASSWORD, code: codeFor(secret) } });
+        assert.equal(again.status, 401);
+    });
+
+    dbTest('sessions end on sign-out and after 12 idle hours', async () => {
+        const { cookie } = await signIn('session@example.com');
+        assert.equal((await call('GET', '/api/admin/me', { cookie })).status, 200);
+        await call('POST', '/api/admin/logout', { cookie });
+        assert.equal((await call('GET', '/api/admin/me', { cookie })).status, 401);
+
+        const second = await signIn('session@example.com');
+        clock += 13 * 60 * 60_000;
+        assert.equal((await call('GET', '/api/admin/me', { cookie: second.cookie })).status, 401);
+    });
+
+    dbTest('changes from another site are refused', async () => {
+        const { cookie } = await signIn();
+        const foreign = await call('POST', '/api/admin/customers', { cookie, body: { name: 'X' }, origin: 'https://evil.example' });
+        assert.equal(foreign.status, 403);
+        const noHeader = await call('POST', '/api/admin/customers', { cookie, body: { name: 'X' }, csrf: false });
+        assert.equal(noHeader.status, 403);
+        const ok = await call('POST', '/api/admin/customers', { cookie, body: { name: 'X' } });
+        assert.equal(ok.status, 201);
+    });
+
+    dbTest('changing the password signs out other devices', async () => {
+        const a = await signIn('pw@example.com');
+        clock += 60_000;
+        const b = await call('POST', '/api/admin/login', { body: { email: 'pw@example.com', password: PASSWORD, code: codeFor(a.secret) } });
+        const cookieB = b.headers.getSetCookie()[0].split(';')[0];
+        const weak = await call('POST', '/api/admin/account/password', { cookie: a.cookie, body: { currentPassword: PASSWORD, newPassword: 'short' } });
+        assert.equal(weak.status, 400);
+        const res = await call('POST', '/api/admin/account/password', { cookie: a.cookie, body: { currentPassword: PASSWORD, newPassword: 'a much longer new password' } });
+        assert.equal(res.status, 200);
+        assert.equal((await call('GET', '/api/admin/me', { cookie: a.cookie })).status, 200);
+        assert.equal((await call('GET', '/api/admin/me', { cookie: cookieB })).status, 401);
+    });
+});
+
+describe('leads to paid invoice', () => {
+    let cookie;
+    let leadId;
+    let customerId;
+    let quote;
+    let contract;
+    let deposit;
+
+    before(async () => { if (connected) ({ cookie } = await signIn('flow@example.com')); });
+
+    dbTest('website leads show up with notes and statuses', async () => {
+        await call('POST', '/send-quote', {
+            body: { name: 'Jane Doe', email: 'jane@example.com', phone: '(904) 555-0100', address: '123 Main St', projectType: 'Exterior Painting' },
+        });
+        const list = await call('GET', '/api/admin/leads?status=new', { cookie });
+        const lead = list.data.leads.find((l) => l.email === 'jane@example.com');
+        assert.ok(lead);
+        leadId = lead.id;
+
+        const search = await call('GET', '/api/admin/leads?q=main%20st', { cookie });
+        assert.ok(search.data.leads.some((l) => l.id === leadId));
+
+        const noted = await call('POST', `/api/admin/leads/${leadId}/notes`, { cookie, body: { text: 'Called, wants it before Thanksgiving' } });
+        assert.equal(noted.data.lead.notes[0].by, 'Efrain');
+
+        const updated = await call('PATCH', `/api/admin/leads/${leadId}`, { cookie, body: { status: 'contacted' } });
+        assert.equal(updated.data.lead.status, 'contacted');
+        const bad = await call('PATCH', `/api/admin/leads/${leadId}`, { cookie, body: { status: 'nonsense' } });
+        assert.equal(bad.status, 400);
+    });
+
+    dbTest('older lead statuses read as won and lost', async () => {
+        const old = await QuoteRequest.create({ name: 'Old', email: 'old@example.com', phone: '1', address: 'x', projectType: 'y', status: 'completed' });
+        const res = await call('GET', `/api/admin/leads/${old._id}`, { cookie });
+        assert.equal(res.data.lead.status, 'won');
+        const won = await call('GET', '/api/admin/leads?status=won', { cookie });
+        assert.ok(won.data.leads.some((l) => l.id === String(old._id)));
+    });
+
+    dbTest('a lead becomes a customer and a draft quote', async () => {
+        const res = await call('POST', `/api/admin/leads/${leadId}/convert`, { cookie, body: { createQuote: true } });
+        assert.equal(res.status, 200);
+        customerId = res.data.customer.id;
+        assert.equal(res.data.customer.email, 'jane@example.com');
+        assert.match(res.data.quote.number, /^Q-\d+$/);
+        quote = res.data.quote;
+        const again = await call('POST', `/api/admin/leads/${leadId}/convert`, { cookie, body: {} });
+        assert.equal(again.data.customer.id, customerId);
+    });
+
+    dbTest('quote totals are worked out on the server', async () => {
+        const res = await call('PATCH', `/api/admin/quotes/${quote.id}`, {
+            cookie,
+            body: {
+                title: 'Exterior repaint',
+                items: [
+                    { description: 'Prep and pressure wash', quantity: 1, unitPriceCents: 45000 },
+                    { description: 'Two coats, body and trim', quantity: 2, unitPriceCents: 125050 },
+                ],
+                taxRate: 7.5,
+                discountCents: 10000,
+                depositPercent: 30,
+            },
+        });
+        assert.equal(res.status, 200);
+        quote = res.data.quote;
+        assert.equal(quote.subtotalCents, 295100);
+        assert.equal(quote.taxCents, Math.round(285100 * 0.075));
+        assert.equal(quote.totalCents, 285100 + Math.round(285100 * 0.075));
+        assert.equal(quote.depositCents, Math.round(quote.totalCents * 0.3));
+    });
+
+    dbTest('draft links do not open', async () => {
+        const res = await call('GET', `/api/public/doc/${quote.publicToken}`);
+        assert.equal(res.status, 404);
+    });
+
+    dbTest('sending emails the customer a link and a PDF', async () => {
+        sent.length = 0;
+        const res = await call('POST', `/api/admin/quotes/${quote.id}/send`, { cookie, body: { message: 'Thanks for having us out.' } });
+        assert.equal(res.status, 200);
+        assert.equal(res.data.quote.status, 'sent');
+        assert.equal(sent.length, 1);
+        assert.equal(sent[0].to, 'jane@example.com');
+        assert.equal(sent[0].reply_to, 'owner@example.com');
+        assert.ok(sent[0].text.includes(`${ORIGIN}/d/?t=${quote.publicToken}`));
+        assert.equal(sent[0].attachments[0].content.subarray(0, 4).toString(), '%PDF');
+    });
+
+    dbTest('the customer sees the quote but nothing internal', async () => {
+        const res = await call('GET', `/api/public/doc/${quote.publicToken}`);
+        assert.equal(res.status, 200);
+        assert.equal(res.data.kind, 'quote');
+        assert.equal(res.data.totalCents, quote.totalCents);
+        assert.equal(res.data.status, 'viewed');
+        const text = JSON.stringify(res.data);
+        for (const secret of ['history', 'customerId', 'leadId', 'publicToken', 'jane@example.com', '555-0100']) {
+            assert.ok(!text.includes(secret), `leaked ${secret}`);
+        }
+        const pdf = await call('GET', `/api/public/doc/${quote.publicToken}/pdf`);
+        assert.equal(pdf.data.subarray(0, 4).toString(), '%PDF');
+    });
+
+    dbTest('made-up tokens get nothing', async () => {
+        assert.equal((await call('GET', `/api/public/doc/${'a'.repeat(32)}`)).status, 404);
+        assert.equal((await call('GET', '/api/public/doc/short')).status, 404);
+        assert.equal((await call('GET', '/api/public/doc/%7B%22%24ne%22%3A1%7D')).status, 404);
+    });
+
+    dbTest('the customer accepts online and the owner hears about it', async () => {
+        sent.length = 0;
+        const missing = await call('POST', `/api/public/doc/${quote.publicToken}/accept`, { body: { name: 'Jane Doe' } });
+        assert.equal(missing.status, 400);
+        const res = await call('POST', `/api/public/doc/${quote.publicToken}/accept`, { body: { name: 'Jane Doe', agree: true } });
+        assert.equal(res.status, 200);
+        assert.equal(sent[0].to, 'owner@example.com');
+        assert.match(sent[0].subject, /accepted/);
+        const twice = await call('POST', `/api/public/doc/${quote.publicToken}/accept`, { body: { name: 'Jane Doe', agree: true } });
+        assert.equal(twice.status, 409);
+        const lead = await call('GET', `/api/admin/leads/${leadId}`, { cookie });
+        assert.equal(lead.data.lead.status, 'won');
+        const edit = await call('PATCH', `/api/admin/quotes/${quote.id}`, { cookie, body: { title: 'changed' } });
+        assert.equal(edit.status, 409);
+    });
+
+    dbTest('a contract is filled from the quote and signed online', async () => {
+        const made = await call('POST', `/api/admin/quotes/${quote.id}/contract`, { cookie, body: {} });
+        assert.equal(made.status, 201);
+        contract = made.data.contract;
+        assert.ok(contract.body.includes('Jane Doe'));
+        assert.ok(contract.body.includes('Two coats, body and trim'));
+        assert.ok(!contract.body.includes('{{'));
+
+        const edited = await call('PATCH', `/api/admin/contracts/${contract.id}`, { cookie, body: { body: `${contract.body}\n\n10. Extra clause.` } });
+        assert.equal(edited.status, 200);
+
+        await call('POST', `/api/admin/contracts/${contract.id}/send`, { cookie, body: {} });
+        const locked = await call('PATCH', `/api/admin/contracts/${contract.id}`, { cookie, body: { body: 'sneaky change' } });
+        assert.equal(locked.status, 409);
+
+        const view = await call('GET', `/api/public/doc/${contract.publicToken}`);
+        assert.ok(view.data.body.includes('Extra clause'));
+        const png = `data:image/png;base64,${Buffer.from('fake png').toString('base64')}`;
+
+        const stale = await call('POST', `/api/public/doc/${contract.publicToken}/sign`, { body: { name: 'Jane Doe', agree: true, signature: png, bodyHash: 'old' } });
+        assert.equal(stale.status, 409);
+        const noSig = await call('POST', `/api/public/doc/${contract.publicToken}/sign`, { body: { name: 'Jane Doe', agree: true, signature: 'javascript:alert(1)', bodyHash: view.data.bodyHash } });
+        assert.equal(noSig.status, 400);
+
+        const signed = await call('POST', `/api/public/doc/${contract.publicToken}/sign`, { body: { name: 'Jane Doe', agree: true, signature: png, bodyHash: view.data.bodyHash } });
+        assert.equal(signed.status, 200);
+        const stored = await Contract.findById(contract.id);
+        assert.equal(stored.signature.name, 'Jane Doe');
+        assert.equal(stored.signature.bodyHash, crypto.createHash('sha256').update(stored.body).digest('hex'));
+        const pdf = await call('GET', `/api/admin/contracts/${contract.id}/pdf`, { cookie });
+        assert.equal(pdf.data.subarray(0, 4).toString(), '%PDF');
+    });
+
+    dbTest('deposit and balance invoices add up to the quote', async () => {
+        const dep = await call('POST', `/api/admin/quotes/${quote.id}/invoice`, { cookie, body: { kind: 'deposit' } });
+        deposit = dep.data.invoice;
+        assert.equal(deposit.totalCents, quote.depositCents);
+        const bal = await call('POST', `/api/admin/quotes/${quote.id}/invoice`, { cookie, body: { kind: 'balance' } });
+        assert.ok(Math.abs(bal.data.invoice.totalCents + deposit.totalCents - quote.totalCents) <= 1);
+    });
+
+    dbTest('payments recorded by hand settle the invoice', async () => {
+        await call('POST', `/api/admin/invoices/${deposit.id}/send`, { cookie, body: {} });
+        const part = await call('POST', `/api/admin/invoices/${deposit.id}/payments`, { cookie, body: { amountCents: 10000, method: 'zelle' } });
+        assert.equal(part.data.invoice.displayStatus, 'partial');
+        const rest = await call('POST', `/api/admin/invoices/${deposit.id}/payments`, { cookie, body: { amountCents: deposit.totalCents - 10000, method: 'check' } });
+        assert.equal(rest.data.invoice.displayStatus, 'paid');
+        assert.equal(rest.data.invoice.balanceCents, 0);
+        const voided = await call('POST', `/api/admin/invoices/${deposit.id}/void`, { cookie, body: {} });
+        assert.equal(voided.status, 409);
+    });
+
+    dbTest('overdue invoices are flagged on the home screen', async () => {
+        const inv = await call('POST', '/api/admin/invoices', {
+            cookie, body: { customerId, items: [{ description: 'Touch-ups', quantity: 1, unitPriceCents: 20000 }], dueDate: '2020-01-01' },
+        });
+        await call('POST', `/api/admin/invoices/${inv.data.invoice.id}/mark-sent`, { cookie, body: {} });
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.equal(summary.status, 200);
+        assert.ok(summary.data.unpaidInvoices.overdueCount >= 1);
+        assert.equal(summary.data.unpaidInvoices.items[0].customerName, 'Jane Doe');
+        assert.ok(summary.data.revenueThisMonthCents >= deposit.totalCents);
+    });
+
+    dbTest('card payments go through Stripe Checkout and are recorded once', async () => {
+        const inv = await call('POST', '/api/admin/invoices', {
+            cookie, body: { customerId, items: [{ description: 'Cabinets', quantity: 1, unitPriceCents: 150000 }] },
+        });
+        const invoice = inv.data.invoice;
+        await call('POST', `/api/admin/invoices/${invoice.id}/mark-sent`, { cookie, body: {} });
+        const view = await call('GET', `/api/public/doc/${invoice.publicToken}`);
+        assert.equal(view.data.canPayOnline, true);
+        const checkout = await call('POST', `/api/public/doc/${invoice.publicToken}/checkout`, { body: {} });
+        assert.match(checkout.data.url, /^https:\/\/checkout\.stripe\.com\//);
+        assert.equal(stripeCalls.at(-1).body.get('line_items[0][price_data][unit_amount]'), '150000');
+
+        const event = JSON.stringify({
+            type: 'checkout.session.completed',
+            data: { object: { id: 'cs_test_1', payment_status: 'paid', amount_total: 150000, metadata: { invoiceId: invoice.id } } },
+        });
+        const t = Math.floor(Date.now() / 1000);
+        const sig = crypto.createHmac('sha256', WEBHOOK_SECRET).update(`${t}.${event}`).digest('hex');
+        const forged = await call('POST', '/api/stripe/webhook', { raw: event, origin: null, csrf: false, headers: { 'Stripe-Signature': `t=${t},v1=${'0'.repeat(64)}`, 'Content-Type': 'application/json' } });
+        assert.equal(forged.status, 400);
+        for (let i = 0; i < 2; i++) {
+            const ok = await call('POST', '/api/stripe/webhook', { raw: event, origin: null, csrf: false, headers: { 'Stripe-Signature': `t=${t},v1=${sig}`, 'Content-Type': 'application/json' } });
+            assert.equal(ok.status, 200);
+        }
+        const stored = await Invoice.findById(invoice.id);
+        assert.equal(stored.payments.length, 1);
+        assert.equal(stored.payments[0].method, 'stripe');
+    });
+
+    dbTest('customers list their documents and can only be deleted when empty', async () => {
+        const res = await call('GET', `/api/admin/customers/${customerId}`, { cookie });
+        assert.ok(res.data.quotes.length >= 1);
+        assert.ok(res.data.invoices.length >= 1);
+        assert.ok(res.data.contracts.length >= 1);
+        assert.equal((await call('DELETE', `/api/admin/customers/${customerId}`, { cookie })).status, 409);
+        assert.equal((await call('GET', '/api/admin/customers/not-an-id', { cookie })).status, 404);
+    });
+
+    dbTest('settings are saved and used for new quotes', async () => {
+        const res = await call('PUT', '/api/admin/settings', { cookie, body: { defaultDepositPercent: 50, license: 'CBC123' } });
+        assert.equal(res.data.settings.defaultDepositPercent, 50);
+        const q = await call('POST', '/api/admin/quotes', { cookie, body: { customerId, items: [{ description: 'Walls', quantity: 1, unitPriceCents: 1000 }] } });
+        assert.equal(q.data.quote.depositPercent, 50);
+        assert.equal((await call('DELETE', `/api/admin/quotes/${q.data.quote.id}`, { cookie })).status, 200);
+        assert.equal((await call('DELETE', `/api/admin/quotes/${quote.id}`, { cookie })).status, 409);
+    });
+});

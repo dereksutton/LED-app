@@ -3,6 +3,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { buildLeadEmail } = require('./lib/leadEmail');
 const { buildCustomerReply, buildOwnerSms } = require('./lib/followUps');
+const { mountAdmin } = require('./admin');
 
 const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType'];
 const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
@@ -35,15 +36,22 @@ const parseQuoteRequest = (body = {}) => {
  *   saveLead(lead)     -> Promise<id>, rejects on failure
  *   sendSms(body)      -> optional; texts the owner about each lead
  *   customerReply      -> optional { phone }; emails the visitor a confirmation
+ *   admin              -> optional; turns on /api/admin and /api/public (see admin/index.js)
  */
 const createApp = ({
     sendEmail, saveLead, notifyTo, notifyFrom, sendSms = null, customerReply = null,
-    corsOrigins = [], rateLimitMax = 5,
+    corsOrigins = [], rateLimitMax = 5, admin = null,
 }) => {
     const app = express();
 
     // Trust the first proxy (Render's reverse proxy) so express-rate-limit reads the real client IP
     app.set('trust proxy', 1);
+
+    // The dashboard API sets up its own body limits, CORS and error handling,
+    // so it goes before the form's middleware.
+    if (admin) {
+        mountAdmin(app, { sendEmail, emailFrom: notifyFrom, emailReplyTo: notifyTo, ownerEmail: notifyTo, corsOrigins, ...admin });
+    }
 
     app.use(express.json({ limit: '20kb' }));
     app.use(express.urlencoded({ extended: true, limit: '20kb' }));
