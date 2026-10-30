@@ -74,7 +74,7 @@ The dashboard tests need a MongoDB at `TEST_MONGO_URI` (default `mongodb://127.0
 
 ## Deploying
 
-Both Render services have auto-deploy off. After merging into `master`, open each service in Render and choose Manual Deploy: `led-app-api` first when the API changed, then `led-app-frontend`.
+Both Render services have auto-deploy off. After merging into `master`, open each service in Render and choose Manual Deploy: `led-app-frontend` first, then `led-app-api`. The new quote form still sends the one-line `address` the older API needs, but the newer API needs the split address and lead source that only the new form sends, so the site goes first.
 
 ## Settings
 
