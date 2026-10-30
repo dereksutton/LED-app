@@ -46,7 +46,7 @@ export default function AdminShell({ children }) {
         <div className="bg-slate-900">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2">
             <Link href="/admin/" className="flex items-center gap-2 no-underline" aria-label="LED Custom Painting dashboard home">
-              <img src="/images/LED-logo-trim-96.webp" srcSet="/images/LED-logo-trim-96.webp 1x, /images/LED-logo-trim-192.webp 2x" alt="LED Custom Painting & More" width="79" height="48" className="h-12 w-auto" />
+              <img src="/images/LED-logo-trim-96.webp" srcSet="/images/LED-logo-trim-96.webp 1x, /images/LED-logo-trim-192.webp 2x" alt="LED Custom Painting & More" width="105" height="64" className="h-14 w-auto sm:h-16" />
               <span className="text-sm font-medium text-slate-300">Business</span>
             </Link>
             <div className="flex items-center gap-3 text-sm">

@@ -1,4 +1,5 @@
 // PDFs for quotes, invoices and contracts.
+const path = require('path');
 const PDFDocument = require('pdfkit');
 const { computeTotals, invoiceState, lineTotal, formatMoney } = require('./money');
 
@@ -28,18 +29,25 @@ const toBuffer = (build) => new Promise((resolve, reject) => {
     }
 });
 
+// The logo with its white lettering turned dark navy, so it prints on white paper.
+const LOGO = path.join(__dirname, 'assets', 'logo-print.png');
+const LOGO_WIDTH = 150;
+const LOGO_HEIGHT = 88;
+
 const header = (doc, settings, title, number, lines) => {
-    doc.fillColor(INK).font('Helvetica-Bold').fontSize(18).text(settings.businessName || 'LED Custom Painting & More', 54, 54);
+    doc.image(LOGO, 54, 50, { fit: [LOGO_WIDTH, LOGO_HEIGHT], align: 'left', valign: 'top' });
     doc.font('Helvetica').fontSize(9).fillColor(MUTED);
+    doc.text('', 54, 50 + LOGO_HEIGHT + 8);
     [settings.address, settings.phone, settings.email, settings.license ? `License ${settings.license}` : '']
-        .filter(Boolean).forEach((l) => doc.text(l));
+        .filter(Boolean).forEach((l) => doc.text(l, { width: 240 }));
+    const leftBottom = doc.y;
     doc.font('Helvetica-Bold').fontSize(20).fillColor(INK).text(title, 300, 54, { width: 258, align: 'right' });
     doc.font('Helvetica').fontSize(10).fillColor(MUTED).text(number, 300, doc.y, { width: 258, align: 'right' });
     lines.filter(([, v]) => v).forEach(([label, value]) => {
         doc.text(`${label}: ${value}`, 300, doc.y, { width: 258, align: 'right' });
     });
     doc.moveDown(2);
-    const y = Math.max(doc.y, 140);
+    const y = Math.max(doc.y, leftBottom + 12, 140);
     doc.moveTo(54, y).lineTo(558, y).strokeColor(RULE).stroke();
     doc.y = y + 14;
 };

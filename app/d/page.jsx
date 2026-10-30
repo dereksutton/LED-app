@@ -196,8 +196,8 @@ function Document() {
       <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
         <header className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:justify-between">
           <div>
-            <p className="text-lg font-bold text-slate-900">{b.businessName}</p>
-            <p className="text-sm text-slate-500">{[b.address, b.phone, b.license && `License ${b.license}`].filter(Boolean).join(' · ')}</p>
+            <img src="/images/LED-logo-ink-240.webp" alt={b.businessName} width="109" height="64" className="h-16 w-auto" />
+            <p className="mt-2 text-sm text-slate-500">{[b.address, b.phone, b.license && `License ${b.license}`].filter(Boolean).join(' · ')}</p>
           </div>
           <div className="sm:text-right">
             <p className="text-2xl font-bold text-slate-900">{TITLES[doc.kind]}</p>
