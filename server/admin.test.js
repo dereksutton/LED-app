@@ -7,7 +7,7 @@ const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const { createApp } = require('./app');
 const { AdminUser, QuoteRequest, Invoice, Contract } = require('./admin/models');
-const { hashPassword, hotp, totpStep } = require('./admin/crypto');
+const { hashPassword } = require('./admin/crypto');
 const { createStripe } = require('./admin/stripe');
 
 const MONGO = process.env.TEST_MONGO_URI || 'mongodb://127.0.0.1:27017';
@@ -21,7 +21,9 @@ let server;
 let baseUrl;
 let clock = Date.now();
 const sent = [];
+const texts = [];
 const stripeCalls = [];
+let failEmail = false;
 
 before(async () => {
     try {
@@ -42,13 +44,18 @@ before(async () => {
         },
     });
     const app = createApp({
-        sendEmail: async (msg) => { sent.push(msg); return { id: 'e1' }; },
+        sendEmail: async (msg) => {
+            if (failEmail) throw new Error('resend down');
+            sent.push(msg);
+            return { id: 'e1' };
+        },
         saveLead: async (lead) => (await QuoteRequest.create(lead))._id,
         notifyTo: 'owner@example.com',
         notifyFrom: 'quotes@example.com',
         rateLimitMax: 1000,
         admin: {
             siteUrl: ORIGIN, secureCookie: true, stripe, now: () => clock,
+            textMessage: async (to, body) => { texts.push({ to, body }); },
             loginRateLimitMax: 1000, publicRateLimitMax: 1000,
         },
     });
@@ -76,19 +83,29 @@ const call = async (method, path, { body, cookie, origin = ORIGIN, csrf = true, 
     return { status: res.status, data, headers: res.headers };
 };
 
-const codeFor = (secret, offset = 0) => hotp(secret, totpStep(clock) + offset);
+// The newest sign-in code sent to this login, by email or text.
+const emailedCode = (email) => {
+    const msg = [...sent].reverse().find((m) => m.to === email && /sign-in code/.test(m.subject));
+    return msg && msg.subject.slice(0, 6);
+};
+const textedCode = (phone) => {
+    const msg = [...texts].reverse().find((m) => m.to === phone);
+    return msg && msg.body.slice(0, 6);
+};
 
-// Creates a login with the authenticator already set up, signs in, and
-// returns the session cookie.
-const signIn = async (email = 'efrain@example.com') => {
-    const secret = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+const askForCode = (email, extra = {}) => call('POST', '/api/admin/login', { body: { email, password: PASSWORD, ...extra } });
+const enterCode = (email, code) => call('POST', '/api/admin/login', { body: { email, password: PASSWORD, code } });
+
+// Creates a login, signs in with an emailed code and returns the cookie.
+const signIn = async (email = 'efrain@example.com', fields = {}) => {
     await AdminUser.deleteOne({ email });
-    await AdminUser.create({ email, name: 'Efrain', passwordHash: await hashPassword(PASSWORD), totpSecret: secret, totpEnabled: true });
+    await AdminUser.create({ email, name: 'Efrain', passwordHash: await hashPassword(PASSWORD), ...fields });
     clock += 60_000;
-    const res = await call('POST', '/api/admin/login', { body: { email, password: PASSWORD, code: codeFor(secret) } });
+    const asked = await askForCode(email);
+    assert.equal(asked.status, 200, JSON.stringify(asked.data));
+    const res = await enterCode(email, emailedCode(email));
     assert.equal(res.status, 200, JSON.stringify(res.data));
-    const cookie = res.headers.getSetCookie()[0].split(';')[0];
-    return { cookie, secret };
+    return { cookie: res.headers.getSetCookie()[0].split(';')[0] };
 };
 
 // The connection is made in before(), after tests are declared, so check it
@@ -99,14 +116,6 @@ const dbTest = (name, fn) => test(name, async (t) => {
 });
 
 describe('dashboard sign-in', () => {
-    test('totp matches the RFC 6238 test vector', () => {
-        // RFC 6238 appendix B, SHA-1 secret "12345678901234567890", T=59s -> 94287082 (8 digits)
-        const { base32Encode } = require('./admin/crypto');
-        const secret = base32Encode(Buffer.from('12345678901234567890'));
-        assert.equal(hotp(secret, 1, 8), '94287082');
-        assert.equal(hotp(secret, Math.floor(1111111109 / 30), 8), '07081804');
-    });
-
     dbTest('every dashboard route needs a session', async () => {
         for (const [m, p] of [['GET', '/api/admin/me'], ['GET', '/api/admin/leads'], ['GET', '/api/admin/summary'],
             ['GET', '/api/admin/quotes'], ['GET', '/api/admin/invoices'], ['GET', '/api/admin/contracts'],
@@ -116,27 +125,59 @@ describe('dashboard sign-in', () => {
         }
     });
 
-    dbTest('first sign-in enrolls the authenticator app, then asks for codes', async () => {
+    dbTest('the password sends a code by email, and the code signs in', async () => {
         await AdminUser.create({ email: 'new@example.com', name: 'New', passwordHash: await hashPassword(PASSWORD) });
-        const first = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD } });
-        assert.equal(first.data.step, 'enroll');
-        assert.match(first.data.qr, /^data:image\/png;base64,/);
+        const first = await askForCode('new@example.com');
+        assert.equal(first.status, 200);
+        assert.deepEqual(first.data, { step: 'code', channel: 'email', to: 'n•••@example.com', canText: false });
         assert.equal(first.headers.getSetCookie().length, 0);
+        const code = emailedCode('new@example.com');
+        assert.match(code, /^\d{6}$/);
+        const stored = await AdminUser.findOne({ email: 'new@example.com' });
+        assert.notEqual(stored.loginCode.hash, code);
 
-        const wrong = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD, code: '000000' } });
+        // Asking again while the code is still good doesn't send another.
+        const before = sent.length;
+        await askForCode('new@example.com');
+        assert.equal(sent.length, before);
+
+        const wrong = await enterCode('new@example.com', code === '000000' ? '111111' : '000000');
         assert.equal(wrong.status, 401);
+        assert.equal(wrong.data.step, 'code');
 
-        const ok = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD, code: codeFor(first.data.secret) } });
+        const ok = await enterCode('new@example.com', code);
         assert.equal(ok.status, 200);
         const cookie = ok.headers.getSetCookie()[0];
         assert.match(cookie, /HttpOnly/);
         assert.match(cookie, /SameSite=Strict/);
         assert.match(cookie, /Secure/);
+    });
+
+    dbTest('with a phone on file the code can be texted, and texting is remembered', async () => {
+        await signIn('texter@example.com', { phone: '+19045550123' });
+        clock += 60_000;
+        const asked = await askForCode('texter@example.com', { channel: 'sms' });
+        assert.deepEqual(asked.data, { step: 'code', channel: 'sms', to: '•••0123', canText: true });
+        const code = textedCode('+19045550123');
+        assert.match(texts[texts.length - 1].body, /@ledcustompainting\.com #\d{6}$/);
+        assert.equal((await enterCode('texter@example.com', code)).status, 200);
 
         clock += 60_000;
-        const next = await call('POST', '/api/admin/login', { body: { email: 'new@example.com', password: PASSWORD } });
-        assert.equal(next.data.step, 'code');
-        assert.equal(next.data.secret, undefined);
+        const next = await askForCode('texter@example.com');
+        assert.equal(next.data.channel, 'sms');
+        // Switching back to email sends a new code there.
+        clock += 60_000;
+        const email = await askForCode('texter@example.com', { channel: 'email', resend: true });
+        assert.equal(email.data.channel, 'email');
+        assert.equal((await enterCode('texter@example.com', emailedCode('texter@example.com'))).status, 200);
+    });
+
+    dbTest('without a phone, asking for a text still emails the code', async () => {
+        await signIn('nophone@example.com');
+        clock += 60_000;
+        const asked = await askForCode('nophone@example.com', { channel: 'sms' });
+        assert.equal(asked.data.channel, 'email');
+        assert.equal(asked.data.canText, false);
     });
 
     dbTest('wrong password and unknown email get the same answer', async () => {
@@ -148,21 +189,88 @@ describe('dashboard sign-in', () => {
     });
 
     dbTest('five wrong tries lock the account for 15 minutes', async () => {
-        const { secret } = await signIn('lock@example.com');
+        await signIn('lock@example.com');
+        clock += 60_000;
+        await askForCode('lock@example.com');
+        const code = emailedCode('lock@example.com');
         for (let i = 0; i < 5; i++) {
             await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: 'wrong password!!' } });
         }
-        const locked = await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: PASSWORD, code: codeFor(secret) } });
+        const locked = await enterCode('lock@example.com', code);
         assert.equal(locked.status, 429);
         clock += 16 * 60_000;
-        const after = await call('POST', '/api/admin/login', { body: { email: 'lock@example.com', password: PASSWORD, code: codeFor(secret) } });
-        assert.equal(after.status, 200);
+        // The code that was waiting was thrown away by the lock.
+        assert.equal((await enterCode('lock@example.com', code)).status, 401);
+        await askForCode('lock@example.com');
+        assert.equal((await enterCode('lock@example.com', emailedCode('lock@example.com'))).status, 200);
     });
 
-    dbTest('a code cannot be used twice', async () => {
-        const { secret } = await signIn('replay@example.com');
-        const again = await call('POST', '/api/admin/login', { body: { email: 'replay@example.com', password: PASSWORD, code: codeFor(secret) } });
-        assert.equal(again.status, 401);
+    dbTest('a code works once and expires after 10 minutes', async () => {
+        await signIn('replay@example.com');
+        const used = emailedCode('replay@example.com');
+        assert.equal((await enterCode('replay@example.com', used)).status, 401);
+
+        clock += 60_000;
+        await askForCode('replay@example.com');
+        const late = emailedCode('replay@example.com');
+        clock += 11 * 60_000;
+        const res = await enterCode('replay@example.com', late);
+        assert.equal(res.status, 401);
+        assert.match(res.data.message, /expired/);
+    });
+
+    dbTest('five wrong codes throw the code away', async () => {
+        await signIn('guess@example.com');
+        clock += 60_000;
+        await askForCode('guess@example.com');
+        const code = emailedCode('guess@example.com');
+        const wrong = code === '123456' ? '654321' : '123456';
+        for (let i = 0; i < 4; i++) await enterCode('guess@example.com', wrong);
+        await AdminUser.updateOne({ email: 'guess@example.com' }, { failedAttempts: 0 }); // keep the account lock out of this test
+        const fifth = await enterCode('guess@example.com', wrong);
+        assert.match(fifth.data.message, /Too many wrong codes/);
+        assert.equal((await enterCode('guess@example.com', code)).status, 401);
+    });
+
+    dbTest('new codes are limited to one per 30 seconds and five an hour', async () => {
+        await signIn('resend@example.com');
+        assert.equal((await askForCode('resend@example.com', { resend: true })).status, 429);
+        for (let i = 0; i < 4; i++) {
+            clock += 31_000;
+            assert.equal((await askForCode('resend@example.com', { resend: true })).status, 200, `send ${i + 2}`);
+        }
+        clock += 31_000;
+        const sixth = await askForCode('resend@example.com', { resend: true });
+        assert.equal(sixth.status, 429);
+        assert.match(sixth.data.message, /Too many codes/);
+    });
+
+    dbTest('a code that fails to send says so', async () => {
+        await AdminUser.create({ email: 'down@example.com', name: 'Down', passwordHash: await hashPassword(PASSWORD) });
+        failEmail = true;
+        try {
+            const res = await askForCode('down@example.com');
+            assert.equal(res.status, 502);
+            assert.match(res.data.message, /couldn't email the code/);
+        } finally {
+            failEmail = false;
+        }
+        clock += 60_000;
+        assert.equal((await askForCode('down@example.com')).status, 200);
+    });
+
+    dbTest('the texting phone needs the password to change', async () => {
+        const { cookie } = await signIn('phone@example.com');
+        const me = await call('GET', '/api/admin/me', { cookie });
+        assert.equal(me.data.smsAvailable, true);
+        assert.equal((await call('POST', '/api/admin/account/phone', { cookie, body: { currentPassword: 'nope nope nope', phone: '9045550123' } })).status, 401);
+        assert.equal((await call('POST', '/api/admin/account/phone', { cookie, body: { currentPassword: PASSWORD, phone: '555' } })).status, 400);
+        const ok = await call('POST', '/api/admin/account/phone', { cookie, body: { currentPassword: PASSWORD, phone: '(904) 555-0123' } });
+        assert.equal(ok.data.user.phone, '+19045550123');
+        await AdminUser.updateOne({ email: 'phone@example.com' }, { codeChannel: 'sms' });
+        const cleared = await call('POST', '/api/admin/account/phone', { cookie, body: { currentPassword: PASSWORD, phone: '' } });
+        assert.equal(cleared.data.user.phone, '');
+        assert.equal(cleared.data.user.codeChannel, 'email');
     });
 
     dbTest('sessions end on sign-out and after 12 idle hours', async () => {
@@ -189,7 +297,8 @@ describe('dashboard sign-in', () => {
     dbTest('changing the password signs out other devices', async () => {
         const a = await signIn('pw@example.com');
         clock += 60_000;
-        const b = await call('POST', '/api/admin/login', { body: { email: 'pw@example.com', password: PASSWORD, code: codeFor(a.secret) } });
+        await askForCode('pw@example.com');
+        const b = await enterCode('pw@example.com', emailedCode('pw@example.com'));
         const cookieB = b.headers.getSetCookie()[0].split(';')[0];
         const weak = await call('POST', '/api/admin/account/password', { cookie: a.cookie, body: { currentPassword: PASSWORD, newPassword: 'short' } });
         assert.equal(weak.status, 400);
@@ -212,12 +321,26 @@ describe('leads to paid invoice', () => {
 
     dbTest('website leads show up with notes and statuses', async () => {
         await call('POST', '/send-quote', {
-            body: { name: 'Jane Doe', email: 'jane@example.com', phone: '(904) 555-0100', address: '123 Main St', projectType: 'Exterior Painting' },
+            body: {
+                name: 'Jane Doe', email: 'jane@example.com', phone: '(904) 555-0100', street: '123 Main St', city: 'Orange Park', zip: '32073',
+                projectType: 'Exterior Painting', howDidYouHear: 'Referral', sourceDetail: 'Pat Smith', attribution: { utmSource: 'nextdoor' },
+            },
         });
         const list = await call('GET', '/api/admin/leads?status=new', { cookie });
         const lead = list.data.leads.find((l) => l.email === 'jane@example.com');
         assert.ok(lead);
+        assert.equal(lead.address, '123 Main St, Orange Park, FL 32073');
+        assert.equal(lead.howDidYouHear, 'Referral');
+        assert.equal(lead.trackedSource, 'nextdoor');
         leadId = lead.id;
+
+        const bySource = await call('GET', '/api/admin/leads?source=referral', { cookie });
+        assert.ok(bySource.data.leads.some((l) => l.id === leadId));
+        assert.equal((await call('GET', '/api/admin/leads?source=Facebook', { cookie })).data.leads.length, 0);
+        const summary = await call('GET', '/api/admin/summary', { cookie });
+        assert.deepEqual(summary.data.sources.find((r) => r.source === 'Referral'), { source: 'Referral', leads: 1, won: 0 });
+        const badSource = await call('PATCH', `/api/admin/leads/${leadId}`, { cookie, body: { howDidYouHear: 'Billboard' } });
+        assert.equal(badSource.status, 400);
 
         const search = await call('GET', '/api/admin/leads?q=main%20st', { cookie });
         assert.ok(search.data.leads.some((l) => l.id === leadId));

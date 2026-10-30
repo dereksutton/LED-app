@@ -1,15 +1,17 @@
 // Creates a dashboard login, or resets one.
 //
-//   npm run create-admin -- --email owner@example.com --name "Efrain"
+//   npm run create-admin -- --email owner@example.com --name "Efrain" [--phone "(904) 555-0123"]
 //   npm run create-admin -- --email owner@example.com --reset
 //
-// Asks for the password without showing it. --reset also clears the
-// authenticator app, so the next sign-in sets it up again.
+// Asks for the password without showing it. Each sign-in then emails a
+// code (or texts it, when a phone is set and Twilio is configured).
+// --reset sets a new password, unlocks the login and signs out everywhere.
 require('dotenv').config({ path: `${__dirname}/../.env`, override: true });
 const readline = require('readline');
 const mongoose = require('mongoose');
 const { AdminUser, AdminSession } = require('../admin/models');
 const { hashPassword, checkPasswordStrength } = require('../admin/crypto');
+const { normalizePhone } = require('../admin/router');
 
 const args = process.argv.slice(2);
 const flag = (name) => {
@@ -33,8 +35,13 @@ const main = async () => {
     const email = typeof flag('email') === 'string' ? flag('email').trim().toLowerCase() : '';
     const name = typeof flag('name') === 'string' ? flag('name').trim() : '';
     const reset = Boolean(flag('reset'));
+    const phone = typeof flag('phone') === 'string' ? normalizePhone(flag('phone')) : undefined;
+    if (phone === null) {
+        console.error('That phone number doesn\'t look right. Use a US cell like "(904) 555-0123".');
+        process.exit(1);
+    }
     if (!email || (!reset && !name)) {
-        console.log('Usage: npm run create-admin -- --email you@example.com --name "Your Name" [--reset]');
+        console.log('Usage: npm run create-admin -- --email you@example.com --name "Your Name" [--phone "(904) 555-0123"] [--reset]');
         process.exit(1);
     }
     if (!process.env.MONGO_URI) {
@@ -57,20 +64,21 @@ const main = async () => {
     const passwordHash = await hashPassword(password);
     const existing = await AdminUser.findOne({ email });
     if (existing && !reset) {
-        console.error('That login already exists. Add --reset to reset its password and authenticator app.');
+        console.error('That login already exists. Add --reset to give it a new password.');
     } else if (existing) {
         await AdminUser.updateOne({ _id: existing._id }, {
-            passwordHash, totpEnabled: false, failedAttempts: 0,
-            $unset: { totpSecret: 1, pendingTotpSecret: 1, lockedUntil: 1 },
+            passwordHash, failedAttempts: 0, codeSentAt: [],
+            $unset: { loginCode: 1, lockedUntil: 1, totpSecret: 1, totpEnabled: 1, pendingTotpSecret: 1, lastTotpStep: 1 },
             ...(name ? { name } : {}),
+            ...(phone ? { phone } : {}),
         });
         await AdminSession.deleteMany({ userId: existing._id });
-        console.log(`Reset ${email}. They'll set up the authenticator app again at their next sign-in.`);
+        console.log(`Reset ${email}. It's unlocked and signed out everywhere.`);
     } else if (reset) {
         console.error('There is no login with that email.');
     } else {
-        await AdminUser.create({ email, name, passwordHash });
-        console.log(`Created ${email}. At the first sign-in at /admin they'll scan a QR code with an authenticator app.`);
+        await AdminUser.create({ email, name, passwordHash, ...(phone ? { phone } : {}) });
+        console.log(`Created ${email}. Each sign-in at /admin emails a code${phone ? ' (or texts it, once texting is set up)' : ''}.`);
     }
     await mongoose.disconnect();
 };

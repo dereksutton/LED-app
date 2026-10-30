@@ -33,18 +33,21 @@ Set `NEXT_PUBLIC_API_URL=http://localhost:3001` in `.env.local` so the local sit
 
 ## Business dashboard (`/admin`)
 
-The owner signs in at `/admin` with email, password and a 6-digit code from an authenticator app. It needs `MONGO_URI` on the API.
+The owner signs in at `/admin` with email and password, then a 6-digit code that's emailed (or texted, once Twilio is set up and they've added a cell in Settings). It needs `MONGO_URI` on the API, and `RESEND_API_KEY` to email the codes.
 
 Create a login (on Render: the led-app-api Shell tab; locally: in `server/`):
 
 ```
-npm run create-admin -- --email owner@example.com --name "Efrain"
+npm run create-admin -- --email owner@example.com --name "Efrain" --phone "(904) 555-0123"
 ```
 
-It asks for a password (12+ characters). At the first sign-in the dashboard shows a QR code to scan with Google Authenticator, Microsoft Authenticator or 1Password. To reset a forgotten password or a lost phone, run the same command with `--reset`.
+It asks for a password (12+ characters). `--phone` is optional. Codes last 10 minutes, five wrong codes throw one away, and five wrong tries lock the login for 15 minutes. To reset a forgotten password or unlock a login, run the same command with `--reset`.
+
+Texting codes is off until `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` and `TWILIO_FROM_NUMBER` are set on the API. Running locally without `RESEND_API_KEY`, codes print in the API's terminal instead of being emailed.
 
 What's in it:
 - Leads from the website form (and ones added by hand), with statuses and notes
+- Where each lead heard about LED (required on the form), plus ad clicks and UTM tags the site picks up on its own, with leads and wins by source on Home
 - Customers, each with their quotes, invoices and contracts
 - Quotes with line items, tax, discount and deposit. Emailed with a link and PDF; the customer accepts online
 - Invoices from a quote (deposit, final) or from scratch, with payments recorded by hand

@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { createAuth } = require('./auth');
 const { createAdminRouter } = require('./router');
 const { createPublicRouter, createStripeWebhook } = require('./publicRouter');
+const { buildSignInCodeEmail } = require('./emails');
 
 const CSRF_HEADER = 'x-requested-with';
 const CSRF_VALUE = 'led-admin';
@@ -14,6 +15,8 @@ const mountAdmin = (app, {
     siteUrl = 'https://ledcustompainting.com',
     secureCookie = true,
     stripe = null,
+    textMessage = null,     // (to, body) -> Promise; sends a text, null when Twilio isn't set up
+    logSignInCodes = false, // local runs without email: print codes to the console instead
     isDbReady = () => mongoose.connection.readyState === 1,
     loginRateLimitMax,
     publicRateLimitMax,
@@ -63,7 +66,18 @@ const mountAdmin = (app, {
         allowedHeaders: ['Content-Type', 'X-Requested-With'],
     });
 
-    const auth = createAuth({ secureCookie, ...(now ? { now } : {}) });
+    const sendCode = async ({ user, code, channel }) => {
+        if (logSignInCodes) {
+            console.log(`[DEV] Sign-in code for ${user.email}: ${code}`);
+            return;
+        }
+        if (channel === 'sms') {
+            // The last line lets phones offer the code above the keyboard.
+            return textMessage(user.phone, `${code} is your LED Business sign-in code. It expires in 10 minutes.\n\n@${site.hostname} #${code}`);
+        }
+        return sendEmail(buildSignInCodeEmail({ to: user.email, from: emailFrom, name: user.name, code }));
+    };
+    const auth = createAuth({ secureCookie, sendCode, smsAvailable: Boolean(textMessage), ...(now ? { now } : {}) });
     app.use('/api/admin', noStore, apiCors, express.json({ limit: '200kb' }), sameSiteOnly, needsDb,
         createAdminRouter({ auth, sendEmail, emailFrom, emailReplyTo, siteUrl: site.origin, loginRateLimitMax }));
     app.use('/api/public', noStore, apiCors, express.json({ limit: '400kb' }), sameSiteOnly, needsDb,
@@ -79,7 +93,7 @@ const mountAdmin = (app, {
         if (err.name === 'ValidationError' || err.name === 'CastError') {
             return res.status(400).json({ message: 'Some of the details aren\'t valid.' });
         }
-        if (err.status && err.status < 500) return res.status(err.status).json({ message: err.message });
+        if (err.status && (err.status < 500 || err.expose)) return res.status(err.status).json({ message: err.message });
         console.error('[ADMIN_ERROR]', req.method, req.path, err);
         res.status(500).json({ message: 'Something went wrong. Try again.' });
     });

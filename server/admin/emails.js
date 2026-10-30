@@ -1,5 +1,5 @@
-// Emails the dashboard sends: a document to a customer, and a heads-up to
-// the owner when a customer accepts, signs or pays.
+// Emails the dashboard sends: a document to a customer, a heads-up to the
+// owner when a customer accepts, signs or pays, and sign-in codes.
 const { escapeHtml } = require('../lib/leadEmail');
 const { formatMoney } = require('./money');
 
@@ -47,4 +47,18 @@ const buildOwnerAlert = ({ subject, lines, link, to, from }) => ({
     html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">${lines.map((l) => `<p>${escapeHtml(l)}</p>`).join('')}<p><a href="${escapeHtml(link)}">Open the dashboard</a></p></div>`,
 });
 
-module.exports = { buildDocumentEmail, buildOwnerAlert };
+// The code is in the subject so it shows in the phone's notification.
+const buildSignInCodeEmail = ({ to, from, name, code }) => ({
+    from,
+    to,
+    subject: `${code} is your LED Business sign-in code`,
+    text: `Hi ${oneLine(name).split(' ')[0] || 'there'},\n\nYour sign-in code is ${code}. It expires in 10 minutes.\n\nIf you didn't just try to sign in, someone may know your password. Change it in Settings.`,
+    html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 560px;">
+<p>Hi ${escapeHtml(oneLine(name).split(' ')[0] || 'there')},</p>
+<p>Your sign-in code is</p>
+<p style="font-size: 28px; font-weight: bold; letter-spacing: 6px;">${escapeHtml(code)}</p>
+<p>It expires in 10 minutes. If you didn't just try to sign in, someone may know your password. Change it in Settings.</p>
+</div>`,
+});
+
+module.exports = { buildDocumentEmail, buildOwnerAlert, buildSignInCodeEmail };

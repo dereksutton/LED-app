@@ -31,6 +31,47 @@ function PasswordForm() {
   );
 }
 
+// Where sign-in codes go: always email, and a cell phone for texts once
+// texting is set up on the server.
+function PhoneForm() {
+  const [me, loadError, , setMe] = useLoad(() => adminApi.get('/me'));
+  const [phone, setPhone] = useState(null);
+  const [current, setCurrent] = useState('');
+  const [done, setDone] = useState('');
+  const { busy, error, run } = useAction();
+  if (loadError) return <ErrorNote error={loadError} />;
+  if (!me) return <Spinner />;
+  const value = phone === null ? me.user.phone : phone;
+  const save = (e) => {
+    e.preventDefault();
+    setDone('');
+    run(async () => {
+      const data = await adminApi.post('/account/phone', { currentPassword: current, phone: value });
+      setMe({ ...me, user: data.user });
+      setPhone(null);
+      setCurrent('');
+      setDone(data.user.phone ? 'Saved. You can have codes texted here.' : 'Phone removed. Codes will come by email.');
+    });
+  };
+  return (
+    <form onSubmit={save} className="space-y-3">
+      <p className="text-sm text-slate-700">
+        Each sign-in sends a code to <strong>{me.user.email}</strong>.
+        {me.smsAvailable
+          ? ' Add your cell to have it texted instead.'
+          : ' Texting codes isn\'t turned on yet. Your web person turns it on with a Twilio account; until then, codes come by email.'}
+      </p>
+      <Field label="Cell phone for texted codes" hint="Leave empty to use email only.">
+        <Input type="tel" autoComplete="tel" value={value} onChange={(e) => setPhone(e.target.value)} placeholder="(904) 555-0123" />
+      </Field>
+      <Field label="Current password"><Input type="password" autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} /></Field>
+      <ErrorNote error={error} />
+      <Notice>{done}</Notice>
+      <Button type="submit" variant="secondary" disabled={busy}>Save phone</Button>
+    </form>
+  );
+}
+
 export default function SettingsPage() {
   const [data, error] = useLoad(() => adminApi.get('/settings'));
   if (error) return <ErrorNote error={error} />;
@@ -112,6 +153,7 @@ function SettingsForm({ data }) {
       </form>
       <div className="mt-5 grid gap-5 lg:grid-cols-2">
         <Card title="Your password"><PasswordForm /></Card>
+        <Card title="Sign-in codes"><PhoneForm /></Card>
         <Card title="Online card payments">
           {data.stripeEnabled
             ? <p className="text-sm text-slate-700">On. Customers see a Pay by card button on their invoices, and payments are recorded here automatically.</p>

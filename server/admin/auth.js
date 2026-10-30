@@ -1,10 +1,7 @@
-// Owner login: email + password + authenticator code, sessions in MongoDB
-// behind an HttpOnly cookie.
-const QRCode = require('qrcode');
+// Owner login: email + password, then a one-time code sent by email or
+// text. Sessions live in MongoDB behind an HttpOnly cookie.
 const { AdminUser, AdminSession } = require('./models');
-const {
-    verifyPassword, verifyTotp, generateTotpSecret, totpUri, randomToken, sha256,
-} = require('./crypto');
+const { verifyPassword, randomCode, hashCode, codeMatches, randomToken, sha256 } = require('./crypto');
 
 const COOKIE_NAME = 'led_admin_session';
 const SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // signed out after a week regardless
@@ -12,7 +9,10 @@ const SESSION_IDLE_MS = 12 * 60 * 60 * 1000;        // or after 12 hours unused
 const TOUCH_EVERY_MS = 5 * 60 * 1000;
 const MAX_FAILED = 5;
 const LOCK_MS = 15 * 60 * 1000;
-const ISSUER = 'LED Custom Painting';
+const CODE_TTL_MS = 10 * 60 * 1000;
+const CODE_MAX_TRIES = 5;           // wrong guesses before a code is thrown away
+const RESEND_GAP_MS = 30 * 1000;
+const SENDS_PER_HOUR = 5;
 
 const parseCookies = (header = '') =>
     Object.fromEntries(header.split(';').map((part) => {
@@ -35,10 +35,24 @@ const cookieHeader = (value, { secure, maxAgeMs }) => [
 ].filter(Boolean).join('; ');
 
 const publicUser = (user) => ({
-    id: String(user._id), email: user.email, name: user.name, totpEnabled: user.totpEnabled,
+    id: String(user._id),
+    email: user.email,
+    name: user.name,
+    phone: user.phone || '',
+    codeChannel: user.codeChannel || 'email',
 });
 
-const createAuth = ({ secureCookie = true, now = () => Date.now() } = {}) => {
+const maskEmail = (email) => {
+    const [local, domain] = String(email).split('@');
+    return `${local.slice(0, 1)}•••@${domain}`;
+};
+const maskPhone = (phone) => `•••${String(phone).slice(-4)}`;
+
+const httpError = (status, message) => Object.assign(new Error(message), { status, expose: true });
+
+// sendCode({ user, code, channel }) delivers a code; smsAvailable says
+// whether texting is set up on this server.
+const createAuth = ({ secureCookie = true, now = () => Date.now(), sendCode, smsAvailable = false } = {}) => {
     const startSession = async (res, user, req) => {
         const token = randomToken(32);
         const at = new Date(now());
@@ -94,18 +108,55 @@ const createAuth = ({ secureCookie = true, now = () => Date.now() } = {}) => {
         if (failed >= MAX_FAILED) {
             update.lockedUntil = new Date(now() + LOCK_MS);
             update.failedAttempts = 0;
+            update.$unset = { loginCode: 1 };
         }
         await AdminUser.updateOne({ _id: user._id }, update);
     };
 
-    // One endpoint, three outcomes: { step: 'code' } asks for the
-    // authenticator code, { step: 'enroll' } shows the QR code to set one up
-    // on first sign-in, and { user } means signed in.
+    const canText = (user) => Boolean(smsAvailable && user.phone);
+    const codeStep = (user, channel) => ({
+        step: 'code',
+        channel,
+        to: channel === 'sms' ? maskPhone(user.phone) : maskEmail(user.email),
+        canText: canText(user),
+    });
+
+    // Makes a fresh code, stores only its hash and sends it. "Send a new
+    // code" waits 30 seconds between sends; every send counts toward 5 an hour.
+    const issueCode = async (user, channel, { resend = false } = {}) => {
+        const t = now();
+        const recent = (user.codeSentAt || []).filter((d) => d.getTime() > t - 60 * 60 * 1000);
+        if (resend && recent.length && recent[recent.length - 1].getTime() > t - RESEND_GAP_MS) {
+            throw httpError(429, 'Wait a few seconds before asking for another code.');
+        }
+        if (recent.length >= SENDS_PER_HOUR) {
+            throw httpError(429, 'Too many codes sent. Wait an hour, or reset this login from the server.');
+        }
+        const code = randomCode();
+        await AdminUser.updateOne({ _id: user._id }, {
+            loginCode: { hash: hashCode(user._id, code), channel, expiresAt: new Date(t + CODE_TTL_MS), attempts: 0 },
+            codeSentAt: [...recent, new Date(t)],
+            codeChannel: channel,
+        });
+        try {
+            await sendCode({ user, code, channel });
+        } catch (err) {
+            console.error('[SIGN_IN_CODE_FAILED]', channel, err.message);
+            await AdminUser.updateOne({ _id: user._id }, { $unset: { loginCode: 1 } });
+            throw httpError(502, channel === 'sms'
+                ? 'We couldn\'t text the code. Try again, or have it emailed instead.'
+                : 'We couldn\'t email the code. Try again in a minute.');
+        }
+    };
+
+    // One endpoint, two steps: email + password sends a code and answers
+    // { step: 'code' }; the same plus the code signs in and answers { user }.
+    // { resend: true, channel: 'email' | 'sms' } sends a new code.
     const login = async (req, res, next) => {
         try {
             const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
             const password = typeof req.body.password === 'string' ? req.body.password : '';
-            const code = typeof req.body.code === 'string' ? req.body.code.trim() : '';
+            const code = typeof req.body.code === 'string' ? req.body.code.replace(/\s/g, '') : '';
             if (!email || !password || email.length > 200 || password.length > 200) {
                 return res.status(400).json({ message: 'Enter your email and password.' });
             }
@@ -121,49 +172,43 @@ const createAuth = ({ secureCookie = true, now = () => Date.now() } = {}) => {
                 return res.status(401).json({ message: GENERIC });
             }
 
-            if (user.totpEnabled) {
-                if (!code) return res.json({ step: 'code' });
-                const step = verifyTotp(user.totpSecret, code, { now: now() });
-                if (step === null || step <= (user.lastTotpStep || 0)) {
+            const pending = user.loginCode && user.loginCode.hash ? user.loginCode : null;
+            const live = Boolean(pending && pending.expiresAt && pending.expiresAt.getTime() > now());
+
+            if (code && !req.body.resend) {
+                if (!live) {
+                    return res.status(401).json({
+                        ...codeStep(user, (pending && pending.channel) || user.codeChannel || 'email'),
+                        message: 'That code has expired. Send a new one.',
+                    });
+                }
+                if (!codeMatches(user._id, code, pending.hash)) {
+                    const attempts = (pending.attempts || 0) + 1;
+                    await AdminUser.updateOne({ _id: user._id }, attempts >= CODE_MAX_TRIES
+                        ? { $unset: { loginCode: 1 } }
+                        : { 'loginCode.attempts': attempts });
                     await recordFailure(user);
-                    return res.status(401).json({ step: 'code', message: 'That code didn\'t work. Try the newest one.' });
+                    return res.status(401).json({
+                        ...codeStep(user, pending.channel),
+                        message: attempts >= CODE_MAX_TRIES
+                            ? 'Too many wrong codes. Send a new one.'
+                            : 'That code didn\'t work. Check it and try again.',
+                    });
                 }
                 await AdminUser.updateOne({ _id: user._id }, {
-                    lastTotpStep: step, failedAttempts: 0, $unset: { lockedUntil: 1 }, lastLoginAt: new Date(now()),
+                    failedAttempts: 0, lastLoginAt: new Date(now()), $unset: { loginCode: 1, lockedUntil: 1 },
                 });
                 await startSession(res, user, req);
                 return res.json({ user: publicUser(user) });
             }
 
-            // First sign-in: set up the authenticator app before anything else.
-            if (!code || !user.pendingTotpSecret) {
-                const secret = user.pendingTotpSecret || generateTotpSecret();
-                if (!user.pendingTotpSecret) {
-                    await AdminUser.updateOne({ _id: user._id }, { pendingTotpSecret: secret });
-                }
-                const uri = totpUri({ secret, account: user.email, issuer: ISSUER });
-                return res.json({
-                    step: 'enroll',
-                    secret,
-                    qr: await QRCode.toDataURL(uri, { margin: 1, width: 240 }),
-                });
+            const wanted = ['email', 'sms'].includes(req.body.channel) ? req.body.channel : user.codeChannel;
+            const channel = wanted === 'sms' && canText(user) ? 'sms' : 'email';
+            // A code already on its way is reused unless they asked for another.
+            if (!live || req.body.resend || pending.channel !== channel) {
+                await issueCode(user, channel, { resend: Boolean(req.body.resend) });
             }
-            const step = verifyTotp(user.pendingTotpSecret, code, { now: now() });
-            if (step === null) {
-                await recordFailure(user);
-                return res.status(401).json({ step: 'enroll', message: 'That code didn\'t work. Check the app and try the newest one.' });
-            }
-            await AdminUser.updateOne({ _id: user._id }, {
-                totpSecret: user.pendingTotpSecret,
-                totpEnabled: true,
-                $unset: { pendingTotpSecret: 1, lockedUntil: 1 },
-                lastTotpStep: step,
-                failedAttempts: 0,
-                lastLoginAt: new Date(now()),
-            });
-            user.totpEnabled = true;
-            await startSession(res, user, req);
-            return res.json({ user: publicUser(user) });
+            return res.json(codeStep(user, channel));
         } catch (err) {
             next(err);
         }
@@ -180,7 +225,9 @@ const createAuth = ({ secureCookie = true, now = () => Date.now() } = {}) => {
         }
     };
 
-    return { login, logout, requireAuth, loadSession, publicUser };
+    return { login, logout, requireAuth, loadSession, publicUser, smsAvailable };
 };
 
-module.exports = { createAuth, parseCookies, COOKIE_NAME, MAX_FAILED, SESSION_IDLE_MS, SESSION_MAX_AGE_MS };
+module.exports = {
+    createAuth, parseCookies, COOKIE_NAME, MAX_FAILED, SESSION_IDLE_MS, SESSION_MAX_AGE_MS, CODE_TTL_MS, CODE_MAX_TRIES,
+};

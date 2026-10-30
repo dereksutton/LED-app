@@ -5,7 +5,7 @@ const { Resend } = require('resend');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
 const { createApp } = require('./app');
-const { createTwilioSms } = require('./lib/followUps');
+const { createTwilioSms, createTwilioSender } = require('./lib/followUps');
 const { createStripe } = require('./admin/stripe');
 
 const PORT = process.env.PORT || 3001;
@@ -52,6 +52,13 @@ const sendSms = createTwilioSms({
     to: process.env.LEAD_NOTIFY_SMS,
 });
 
+// Sign-in codes by text: on when the Twilio account and number are set.
+const textMessage = createTwilioSender({
+    accountSid: process.env.TWILIO_ACCOUNT_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+    from: process.env.TWILIO_FROM_NUMBER,
+});
+
 // Optional card payments on invoices: off until both Stripe settings are present.
 const stripe = createStripe({
     secretKey: process.env.STRIPE_SECRET_KEY,
@@ -70,9 +77,12 @@ const app = createApp({
         siteUrl: process.env.SITE_URL || 'https://ledcustompainting.com',
         secureCookie: process.env.NODE_ENV === 'production',
         stripe,
+        textMessage,
+        // Without an email key locally, sign-in codes print here instead.
+        logSignInCodes: process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY,
     },
 });
-console.log(`Card payments ${stripe ? 'on' : 'off'}.`);
+console.log(`Card payments ${stripe ? 'on' : 'off'}; sign-in codes by text ${textMessage ? 'on' : 'off'}.`);
 console.log(`Owner text alerts ${sendSms ? 'on' : 'off'}; customer auto-reply ${process.env.CUSTOMER_AUTOREPLY === 'true' ? 'on' : 'off'}.`);
 
 const server = app.listen(PORT, '0.0.0.0', () => {

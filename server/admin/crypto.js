@@ -1,4 +1,4 @@
-// Password hashing, authenticator codes (TOTP) and random tokens, all on
+// Password hashing, one-time sign-in codes and random tokens, all on
 // Node's built-in crypto so there are no extra dependencies to trust.
 const crypto = require('crypto');
 
@@ -42,70 +42,16 @@ const checkPasswordStrength = (password) => {
     return null;
 };
 
-// --- TOTP (RFC 6238), as used by Google Authenticator, Authy, 1Password ---
-const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-
-const base32Encode = (buf) => {
-    let bits = 0;
-    let value = 0;
-    let out = '';
-    for (const byte of buf) {
-        value = (value << 8) | byte;
-        bits += 8;
-        while (bits >= 5) {
-            out += B32[(value >>> (bits - 5)) & 31];
-            bits -= 5;
-        }
-    }
-    if (bits > 0) out += B32[(value << (5 - bits)) & 31];
-    return out;
+// --- One-time sign-in codes, sent by email or text ---
+const randomCode = () => String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+// Bound to the account so a stored hash can't be reused for another login.
+const hashCode = (userId, code) => crypto.createHash('sha256').update(`${userId}:${code}`).digest('hex');
+const codeMatches = (userId, code, storedHash) => {
+    if (!storedHash || !/^\d{6}$/.test(code)) return false;
+    const a = Buffer.from(hashCode(userId, code), 'hex');
+    const b = Buffer.from(String(storedHash), 'hex');
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
 };
-
-const base32Decode = (str) => {
-    const clean = String(str).toUpperCase().replace(/[^A-Z2-7]/g, '');
-    let bits = 0;
-    let value = 0;
-    const out = [];
-    for (const ch of clean) {
-        value = (value << 5) | B32.indexOf(ch);
-        bits += 5;
-        if (bits >= 8) {
-            out.push((value >>> (bits - 8)) & 255);
-            bits -= 8;
-        }
-    }
-    return Buffer.from(out);
-};
-
-const generateTotpSecret = () => base32Encode(crypto.randomBytes(20));
-
-const hotp = (secret, counter, digits = 6) => {
-    const buf = Buffer.alloc(8);
-    buf.writeBigUInt64BE(BigInt(counter));
-    const hmac = crypto.createHmac('sha1', base32Decode(secret)).update(buf).digest();
-    const offset = hmac[hmac.length - 1] & 0xf;
-    const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 10 ** digits;
-    return String(code).padStart(digits, '0');
-};
-
-const STEP_SECONDS = 30;
-const totpStep = (now = Date.now()) => Math.floor(now / 1000 / STEP_SECONDS);
-
-// Returns the matched time step, or null. Allows one step of clock drift
-// either way. The caller rejects steps it has already accepted (replay).
-const verifyTotp = (secret, code, { now = Date.now(), window = 1 } = {}) => {
-    const clean = String(code || '').replace(/\s/g, '');
-    if (!/^\d{6}$/.test(clean) || !secret) return null;
-    const current = totpStep(now);
-    for (let i = -window; i <= window; i++) {
-        const candidate = hotp(secret, current + i);
-        if (crypto.timingSafeEqual(Buffer.from(candidate), Buffer.from(clean))) return current + i;
-    }
-    return null;
-};
-
-const totpUri = ({ secret, account, issuer }) =>
-    `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(account)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 
 // --- Tokens ---
 const randomToken = (bytes = 32) => crypto.randomBytes(bytes).toString('base64url');
@@ -113,6 +59,6 @@ const sha256 = (value) => crypto.createHash('sha256').update(String(value)).dige
 
 module.exports = {
     hashPassword, verifyPassword, checkPasswordStrength, PASSWORD_MIN,
-    base32Encode, base32Decode, generateTotpSecret, hotp, verifyTotp, totpStep, totpUri,
+    randomCode, hashCode, codeMatches,
     randomToken, sha256,
 };

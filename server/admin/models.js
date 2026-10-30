@@ -9,10 +9,16 @@ const adminUserSchema = new Schema({
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true },
-    totpSecret: String,
-    totpEnabled: { type: Boolean, default: false },
-    pendingTotpSecret: String,
-    lastTotpStep: { type: Number, default: 0 },
+    phone: { type: String, trim: true },               // E.164, e.g. +19045550123, for texted codes
+    codeChannel: { type: String, enum: ['email', 'sms'], default: 'email' },
+    // The one sign-in code waiting to be typed, stored only as a hash.
+    loginCode: {
+        hash: String,
+        channel: String,
+        expiresAt: Date,
+        attempts: { type: Number, default: 0 },
+    },
+    codeSentAt: [Date],                                 // recent sends, for the resend limit
     failedAttempts: { type: Number, default: 0 },
     lockedUntil: Date,
     lastLoginAt: Date,

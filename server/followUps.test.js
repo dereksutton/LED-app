@@ -1,14 +1,17 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { createApp } = require('./app');
-const { createTwilioSms, buildCustomerReply } = require('./lib/followUps');
+const { createTwilioSms, createTwilioSender, buildCustomerReply } = require('./lib/followUps');
 
 const lead = {
     name: 'Jane Doe',
     email: 'jane@example.com',
     phone: '(904) 555-0100',
-    address: '32003',
+    street: '1 Oak Ln',
+    city: 'Fleming Island',
+    zip: '32003',
     projectType: 'Interior Painting',
+    howDidYouHear: 'Nextdoor',
     message: 'Visit https://spam.example now',
 };
 
@@ -76,6 +79,14 @@ test('a failed text or confirmation never fails the request', async () => {
         const res = await post(lead);
         assert.equal(res.status, 200);
     });
+});
+
+test('the generic Twilio sender texts any number', async () => {
+    const calls = [];
+    const send = createTwilioSender({ accountSid: 'AC1', authToken: 't', from: '+19045550000', fetchImpl: async (url, opts) => { calls.push(opts.body); return { ok: true, json: async () => ({}) }; } });
+    await send('+19045551234', 'hi');
+    assert.match(calls[0], /To=%2B19045551234/);
+    assert.equal(createTwilioSender({ accountSid: 'AC1', authToken: 't' }), null);
 });
 
 test('Twilio sender is off without all its settings', () => {

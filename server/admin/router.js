@@ -5,6 +5,7 @@ const {
     AdminUser, AdminSession, QuoteRequest, Customer, Quote, Invoice, Contract, Settings,
 } = require('./models');
 const { LEAD_STATUSES } = require('../models/QuoteRequest');
+const { normalizeSource } = require('../lib/leadSources');
 const { hashPassword, verifyPassword, checkPasswordStrength, sha256 } = require('./crypto');
 const { computeTotals, invoiceState, paidCents, formatMoney, DAY } = require('./money');
 const { fillTemplate } = require('./defaults');
@@ -26,6 +27,17 @@ const findOr404 = async (Model, rawId, label) => {
     return doc;
 };
 
+// '' clears the number; null means it isn't a phone number we can text.
+const normalizePhone = (value) => {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (!raw) return '';
+    const digits = raw.replace(/\D/g, '');
+    if (raw.startsWith('+') && digits.length >= 8 && digits.length <= 15) return `+${digits}`;
+    if (digits.length === 10) return `+1${digits}`;
+    if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+    return null;
+};
+
 const createAdminRouter = ({
     auth, sendEmail, emailFrom, emailReplyTo, siteUrl, loginRateLimitMax = 10,
 }) => {
@@ -43,7 +55,23 @@ const createAdminRouter = ({
 
     router.use(auth.requireAuth);
 
-    router.get('/me', (req, res) => res.json({ user: auth.publicUser(req.admin) }));
+    router.get('/me', (req, res) => res.json({ user: auth.publicUser(req.admin), smsAvailable: auth.smsAvailable }));
+
+    // The phone that sign-in codes can be texted to. Changing how you sign
+    // in asks for the password again.
+    router.post('/account/phone', wrap(async (req, res) => {
+        const current = typeof req.body.currentPassword === 'string' ? req.body.currentPassword : '';
+        if (!(await verifyPassword(current, req.admin.passwordHash))) {
+            throw new InputError('Your current password is wrong.', 401);
+        }
+        const phone = normalizePhone(req.body.phone);
+        if (phone === null) throw new InputError('Enter a US cell number like (904) 555-0123.');
+        await AdminUser.updateOne({ _id: req.admin._id }, phone
+            ? { phone }
+            : { $unset: { phone: 1 }, codeChannel: 'email' });
+        const user = await AdminUser.findById(req.admin._id);
+        res.json({ user: auth.publicUser(user) });
+    }));
 
     router.post('/account/password', wrap(async (req, res) => {
         const current = typeof req.body.currentPassword === 'string' ? req.body.currentPassword : '';
@@ -62,14 +90,25 @@ const createAdminRouter = ({
     // ----- Home -----
     router.get('/summary', wrap(async (req, res) => {
         const monthStart = startOfMonthEastern();
-        const [newLeads, leadsThisMonth, recentLeads, openQuotes, invoices, awaitingSignature] = await Promise.all([
+        const since = new Date(Date.now() - 90 * DAY);
+        const [newLeads, leadsThisMonth, recentLeads, openQuotes, invoices, awaitingSignature, sourceLeads] = await Promise.all([
             QuoteRequest.countDocuments({ status: 'new' }),
             QuoteRequest.countDocuments({ createdAt: { $gte: monthStart } }),
             QuoteRequest.find().sort({ createdAt: -1 }).limit(5),
             Quote.find({ status: { $in: ['sent', 'viewed'] } }).sort({ sentAt: -1 }),
             Invoice.find({ status: { $ne: 'void' } }),
             Contract.find({ status: { $in: ['sent', 'viewed'] } }).sort({ sentAt: -1 }),
+            QuoteRequest.find({ createdAt: { $gte: since } }, { howDidYouHear: 1, status: 1 }),
         ]);
+        // Leads and wins by how they heard about LED, last 90 days.
+        const bySource = {};
+        for (const lead of sourceLeads) {
+            const key = normalizeSource(lead.howDidYouHear) || 'Not recorded';
+            const row = bySource[key] || (bySource[key] = { source: key, leads: 0, won: 0 });
+            row.leads += 1;
+            if (lead.status === 'won' || lead.status === 'completed') row.won += 1;
+        }
+        const sources = Object.values(bySource).sort((a, b) => b.leads - a.leads || b.won - a.won);
         const unpaid = invoices.map(serializeInvoice).filter((i) => i.status !== 'draft' && i.balanceCents > 0);
         const revenueThisMonthCents = invoices.reduce((sum, inv) => sum + (inv.payments || [])
             .filter((p) => p.receivedAt >= monthStart)
@@ -98,17 +137,22 @@ const createAdminRouter = ({
                 items: awaitingSignature.slice(0, 5).map((c) => brief(serializeContract(c))),
             },
             recentLeads: recentLeads.map(serializeLead),
+            sources,
         });
     }));
 
     // ----- Leads -----
     const LEAD_FIELDS = ['name', 'email', 'phone', 'address', 'projectType', 'propertyType', 'timeline',
-        'budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
+        'budgetRange', 'paintingArea', 'message', 'howDidYouHear', 'sourceDetail'];
     const parseLeadFields = (body) => {
         const out = {};
         for (const f of LEAD_FIELDS) {
             const v = str(body[f], f === 'message' ? 5000 : 300);
             if (v !== undefined) out[f] = v;
+        }
+        if (out.howDidYouHear) {
+            out.howDidYouHear = normalizeSource(out.howDidYouHear);
+            if (!out.howDidYouHear) throw new InputError('Pick how they heard about you from the list.');
         }
         return out;
     };
@@ -126,10 +170,13 @@ const createAdminRouter = ({
         else if (status === 'lost') filter.status = { $in: ['lost', 'declined'] };
         else if (status === 'open') filter.status = { $in: ['new', 'contacted', 'quoted'] };
         else if (LEAD_STATUSES.includes(status)) filter.status = status;
+        const source = typeof req.query.source === 'string' ? req.query.source : '';
+        if (source === 'none') filter.howDidYouHear = { $in: [null, ''] };
+        else if (source) filter.howDidYouHear = new RegExp(`^${escapeRegex(source)}$`, 'i');
         const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
         if (q) {
             const re = new RegExp(escapeRegex(q), 'i');
-            filter.$or = [{ name: re }, { email: re }, { phone: re }, { address: re }, { projectType: re }];
+            filter.$or = [{ name: re }, { email: re }, { phone: re }, { address: re }, { projectType: re }, { sourceDetail: re }];
         }
         const leads = await QuoteRequest.find(filter, { notes: 0 }).sort({ createdAt: -1 }).limit(500);
         res.json({ leads: leads.map(serializeLead) });
@@ -741,4 +788,4 @@ const createAdminRouter = ({
     return router;
 };
 
-module.exports = { createAdminRouter };
+module.exports = { createAdminRouter, normalizePhone };
