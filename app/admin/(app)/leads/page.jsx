@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../src/admin/api';
 import { LEAD_SOURCES, ago, sourceLabel } from '../../../../src/admin/format';
-import { Button, Card, Empty, ErrorNote, Field, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
+import { Button, Card, Empty, ErrorNote, Field, FilterTabs, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
 
 const TABS = [['open', 'Open'], ['new', 'New'], ['contacted', 'Contacted'], ['quoted', 'Quoted'], ['won', 'Won'], ['lost', 'Lost'], ['', 'All'], ['spam', 'Spam']];
 
@@ -78,26 +78,22 @@ function Leads() {
       />
       {adding && <NewLead onClose={() => { setAdding(false); router.replace(`/admin/leads/?status=${status}`); }} />}
       <Card>
-        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="-mx-1 flex gap-1 overflow-x-auto">
-            {TABS.map(([value, label]) => (
-              <Link
-                key={value}
-                href={`/admin/leads/?status=${value}${source ? `&source=${encodeURIComponent(source)}` : ''}`}
-                className={`rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap no-underline ${status === value ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
-              >
-                {label}
-                {value === 'spam' && data && data.spamCount > 0 && <span className="ml-1 text-xs opacity-70">{data.spamCount}</span>}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
+        {/* Phones: status and source dropdowns side by side, search under them. */}
+        <div className="mb-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+          <FilterTabs
+            tabs={TABS.map(([value, label]) => [value, label, value === 'spam' && data ? data.spamCount : 0])}
+            value={status}
+            hrefFor={(value) => `/admin/leads/?status=${value}${source ? `&source=${encodeURIComponent(source)}` : ''}`}
+            label="Show leads"
+            className="sm:-mx-1"
+          />
+          <div className="contents sm:flex sm:gap-2">
             <Select value={source} onChange={(e) => router.replace(`/admin/leads/?status=${status}${e.target.value ? `&source=${encodeURIComponent(e.target.value)}` : ''}`)} aria-label="Filter by source" className="sm:w-44">
               <option value="">Every source</option>
               {LEAD_SOURCES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               <option value="none">Not recorded</option>
             </Select>
-            <Input type="search" placeholder="Search name, phone, address…" value={q} onChange={(e) => setQ(e.target.value)} className="sm:max-w-xs" aria-label="Search leads" />
+            <Input type="search" placeholder="Search name, phone, address…" value={q} onChange={(e) => setQ(e.target.value)} className="col-span-2 sm:max-w-xs" aria-label="Search leads" />
           </div>
         </div>
         <ErrorNote error={error} />

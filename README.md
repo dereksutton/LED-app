@@ -54,6 +54,7 @@ What's in it:
 - Invoices from a quote (deposit, final) or from scratch, with payments recorded by hand
 - Contracts filled from a template in Settings and signed online (typed name, drawn signature, time, IP and a SHA-256 fingerprint of the text)
 - Email to the owner when a customer accepts, signs or pays
+- Built for phones too: a bottom menu (Home, Leads, Quotes, Invoices, More) and dropdown filters, so nothing scrolls sideways
 
 Card payments are off until `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are set. The webhook goes to `https://led-app-api.onrender.com/api/stripe/webhook` and listens for `checkout.session.completed`.
 

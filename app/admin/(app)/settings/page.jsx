@@ -145,7 +145,7 @@ function SettingsForm({ data }) {
           </p>
           <Textarea rows={22} value={form.contractTemplate || ''} onChange={set('contractTemplate')} className="font-mono text-sm leading-relaxed" aria-label="Contract template" />
         </Card>
-        <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t border-slate-200 bg-slate-50/95 px-4 py-3 sm:flex-row sm:items-center">
+        <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] -mx-4 sm:bottom-0 flex flex-col gap-2 border-t border-slate-200 bg-slate-50/95 px-4 py-3 sm:flex-row sm:items-center">
           <Button type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save settings'}</Button>
           <ErrorNote error={saveError} />
           <Notice>{saved}</Notice>

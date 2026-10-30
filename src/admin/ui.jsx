@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { STATUS } from './format';
 
 const cx = (...c) => c.filter(Boolean).join(' ');
@@ -86,6 +87,33 @@ export function Textarea({ className, rows = 4, ...props }) {
 
 export function Select({ className, children, ...props }) {
   return <select className={cx(INPUT, className)} {...props}>{children}</select>;
+}
+
+// Status filters for a list. Phones get one dropdown; wider screens get a
+// row of chips that wraps instead of scrolling sideways. tabs holds
+// [value, label, count?].
+export function FilterTabs({ tabs, value, hrefFor, label = 'Show', className }) {
+  const router = useRouter();
+  return (
+    <div className={className}>
+      <Select value={value} onChange={(e) => router.push(hrefFor(e.target.value))} aria-label={label} className="sm:hidden">
+        {tabs.map(([v, l, count]) => <option key={v} value={v}>{count ? `${l} (${count})` : l}</option>)}
+      </Select>
+      <div className="hidden flex-wrap gap-1 sm:flex">
+        {tabs.map(([v, l, count]) => (
+          <Link
+            key={v}
+            href={hrefFor(v)}
+            aria-current={value === v ? 'page' : undefined}
+            className={cx('rounded-full px-3 py-1.5 text-sm font-medium whitespace-nowrap no-underline', value === v ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100')}
+          >
+            {l}
+            {count > 0 && <span className="ml-1 text-xs opacity-70">{count}</span>}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function ErrorNote({ error }) {

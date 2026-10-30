@@ -138,15 +138,18 @@ export default function HomePage() {
 
           <Card title="Where leads came from" actions={<span className="text-xs text-slate-500">Last 90 days</span>}>
             {data.sources.length ? (
-              <Table head={['Source', { label: 'Leads', className: 'text-right' }, { label: 'Won', className: 'text-right' }, { label: 'Win rate', className: 'text-right' }]}>
+              <Table head={['Source', { label: 'Leads', className: 'text-right' }, { label: 'Won', className: 'text-right' }, { label: 'Win rate', className: 'hidden text-right sm:table-cell' }]}>
                 {data.sources.map((r) => (
                   <tr key={r.source}>
                     <td className="px-4 py-2.5">
                       <Link href={`/admin/leads/?status=&source=${encodeURIComponent(r.source === 'Not recorded' ? 'none' : r.source)}`} className="font-medium text-slate-900 no-underline hover:underline">{sourceLabel(r.source)}</Link>
                     </td>
                     <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{r.leads}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{r.won}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-500">{Math.round((r.won / r.leads) * 100)}%</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">
+                      {r.won}
+                      <span className="block text-xs text-slate-500 sm:hidden">{Math.round((r.won / r.leads) * 100)}%</span>
+                    </td>
+                    <td className="hidden px-4 py-2.5 text-right tabular-nums text-slate-500 sm:table-cell">{Math.round((r.won / r.leads) * 100)}%</td>
                   </tr>
                 ))}
               </Table>
