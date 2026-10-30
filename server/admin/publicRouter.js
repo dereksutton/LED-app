@@ -82,7 +82,7 @@ const publicView = ({ kind, doc, customer, settings, stripeEnabled }) => {
     };
 };
 
-const createPublicRouter = ({ sendEmail, emailFrom, ownerEmail, siteUrl, stripe, rateLimitMax = 60 }) => {
+const createPublicRouter = ({ sendEmail, emailFrom, ownerEmail, siteUrl, stripe, rateLimitMax = 300 }) => {
     const router = express.Router();
     router.use(rateLimit({
         windowMs: 15 * 60 * 1000,

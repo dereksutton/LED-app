@@ -14,7 +14,12 @@ const BUTTON = {
 
 export function Button({ variant = 'primary', className, href, children, ...props }) {
   const classes = cx('inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed no-underline', BUTTON[variant], className);
-  if (href) return <Link href={href} className={classes} {...props}>{children}</Link>;
+  // Page links go through Next; PDFs, phone and email links are plain anchors
+  // so Next doesn't try to prefetch them.
+  if (href && href.startsWith('/') && !href.startsWith('/api') && !props.target) {
+    return <Link href={href} className={classes} {...props}>{children}</Link>;
+  }
+  if (href) return <a href={href} className={classes} {...props}>{children}</a>;
   return <button type="button" className={classes} {...props}>{children}</button>;
 }
 

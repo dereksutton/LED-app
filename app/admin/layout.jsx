@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function AdminLayout({ children }) {
-  return <div className="text-left font-sans-luxury text-slate-900">{children}</div>;
+  return <div className="admin-root text-left font-sans-luxury text-slate-900">{children}</div>;
 }
