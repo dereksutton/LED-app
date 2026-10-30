@@ -23,7 +23,7 @@ export default function LineItems({ items, onChange, disabled }) {
             disabled={disabled}
             onChange={(e) => update(i, { description: e.target.value })}
             placeholder="e.g. Paint living room walls, 2 coats"
-            className="col-span-3 block w-full resize-y rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:col-span-1 sm:text-sm"
+            className="col-span-3 block min-h-[4.5rem] w-full resize-y rounded-lg border border-slate-300 px-3 py-2.5 text-base sm:col-span-1 sm:min-h-0 sm:text-sm"
           />
           <Input
             aria-label={`Line ${i + 1} quantity`}

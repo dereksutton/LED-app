@@ -36,7 +36,7 @@ export default function DocList({ kind, title, subtitle, tabs, newLabel, dateCol
                 <td className="px-4 py-3 font-medium whitespace-nowrap">
                   <Link href={`/admin/${kind}s/edit/?id=${d.id}`} className="text-slate-900 no-underline" onClick={(e) => e.stopPropagation()}>{d.number}</Link>
                   {/* Phones fold the customer under the number. */}
-                  <span className="block max-w-[11rem] truncate text-xs font-normal text-slate-500 sm:hidden">{d.customerName}</span>
+                  <span className="block max-w-[8rem] truncate min-[375px]:max-w-[11rem] text-xs font-normal text-slate-500 sm:hidden">{d.customerName}</span>
                 </td>
                 <td className="hidden px-4 py-3 text-slate-700 sm:table-cell">{d.customerName}</td>
                 <td className="hidden px-4 py-3 text-slate-700 md:table-cell">{d.title}</td>

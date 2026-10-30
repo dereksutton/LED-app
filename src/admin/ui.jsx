@@ -173,7 +173,7 @@ export function useAction() {
 
 export function Table({ head, children }) {
   return (
-    <div className="-mx-4 overflow-x-auto sm:mx-0">
+    <div className="-mx-4 overflow-x-auto overscroll-x-contain sm:mx-0 [&_td]:px-3 [&_th]:px-3 sm:[&_td]:px-4 sm:[&_th]:px-4">
       <table className="min-w-full divide-y divide-slate-200 text-sm">
         <thead>
           <tr>{head.map((h, i) => <th key={i} className={cx('px-4 py-2 text-left font-medium text-slate-500 whitespace-nowrap', h.className)}>{h.label ?? h}</th>)}</tr>
