@@ -17,12 +17,12 @@ const buildOwnerSms = (lead) => {
     return `New quote request: ${parts.join(' | ')}`.replace(/[\r\n]+/g, ' ').slice(0, 300);
 };
 
-// Sends one SMS through Twilio's REST API. Returns null when not configured.
-const createTwilioSms = ({ accountSid, authToken, from, to, fetchImpl = fetch }) => {
-    if (!accountSid || !authToken || !from || !to) return null;
+// Sends a text through Twilio's REST API: (to, body). Null when not configured.
+const createTwilioSender = ({ accountSid, authToken, from, fetchImpl = fetch }) => {
+    if (!accountSid || !authToken || !from) return null;
     const url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(accountSid)}/Messages.json`;
     const auth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-    return async (body) => {
+    return async (to, body) => {
         const res = await fetchImpl(url, {
             method: 'POST',
             headers: {
@@ -36,4 +36,10 @@ const createTwilioSms = ({ accountSid, authToken, from, to, fetchImpl = fetch })
     };
 };
 
-module.exports = { buildCustomerReply, buildOwnerSms, createTwilioSms };
+// Texts the owner's number about each lead. Null unless all four settings are set.
+const createTwilioSms = ({ to, ...settings }) => {
+    const send = createTwilioSender(settings);
+    return send && to ? (body) => send(to, body) : null;
+};
+
+module.exports = { buildCustomerReply, buildOwnerSms, createTwilioSms, createTwilioSender };

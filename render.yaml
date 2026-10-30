@@ -14,6 +14,23 @@ services:
         value: production
       - key: RESEND_FROM_EMAIL
         value: quotes@ledcustompainting.com
+      - key: SITE_URL
+        value: https://ledcustompainting.com
+      # Required for the /admin dashboard
+      - key: MONGO_URI
+        sync: false
+      # Optional: text dashboard sign-in codes (and owner lead alerts with LEAD_NOTIFY_SMS)
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      # Optional: card payments on invoices, from the owner's own Stripe account
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
     healthCheckPath: /health
     autoDeploy: false
 
@@ -30,10 +47,35 @@ services:
       - path: /_next/static/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
+      # Dashboard and customer document pages: never framed, indexed or
+      # leaking their link through the Referer header.
+      - path: /admin/*
+        name: X-Frame-Options
+        value: DENY
+      - path: /admin/*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /admin/*
+        name: X-Robots-Tag
+        value: noindex, nofollow
+      - path: /d/*
+        name: X-Frame-Options
+        value: DENY
+      - path: /d/*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /d/*
+        name: X-Robots-Tag
+        value: noindex, nofollow
     routes:
       - type: rewrite
         source: /send-quote
         destination: https://led-app-api.onrender.com/send-quote
+      # Dashboard and customer pages call the API on the same address, so the
+      # sign-in cookie stays first-party.
+      - type: rewrite
+        source: /api/*
+        destination: https://led-app-api.onrender.com/api/*
       - type: rewrite
         source: /health
         destination: https://led-app-api.onrender.com/health

@@ -1,9 +1,7 @@
 import './globals.css';
-import Script from 'next/script';
 import { Inter, Playfair_Display } from 'next/font/google';
-import Analytics from '../src/components/Analytics';
-import MobileActionBar from '../src/components/MobileActionBar';
 import MotionProvider from '../src/components/MotionProvider';
+import SiteChrome from '../src/components/SiteChrome';
 import { claims, site } from '../src/data/site';
 
 export const metadata = {
@@ -194,16 +192,7 @@ export default function RootLayout({ children }) {
       </head>
       <body style={{ margin: '0 auto', textAlign: 'center' }}>
         <MotionProvider>{children}</MotionProvider>
-        <MobileActionBar />
-
-        <Analytics />
-
-        {/* DotLottie Player Web Component */}
-        <Script
-          src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
-          type="module"
-          strategy="afterInteractive"
-        />
+        <SiteChrome />
       </body>
     </html>
   );

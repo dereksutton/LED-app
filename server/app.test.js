@@ -6,8 +6,11 @@ const validLead = {
     name: 'Jane Doe',
     email: 'jane@example.com',
     phone: '(904) 555-0100',
-    address: '123 Main St, Fleming Island, FL',
+    street: '123 Main St',
+    city: 'Fleming Island',
+    zip: '32003',
     projectType: 'Exterior Painting',
+    howDidYouHear: 'Google Search',
     propertyType: 'Single Family Home',
     timeline: 'Within 1 month',
 };
@@ -64,6 +67,50 @@ test('valid lead is saved and emailed', async () => {
     assert.equal(sent.length, 1);
     assert.equal(sent[0].to, 'owner@example.com');
     assert.equal(sent[0].reply_to, 'jane@example.com');
+});
+
+test('the lead keeps the full address, source and tracking', async () => {
+    reset();
+    const res = await post({
+        ...validLead,
+        howDidYouHear: 'referral',
+        sourceDetail: 'Pat from church',
+        attribution: { clickId: 'google', utmSource: 'google', utmMedium: 'cpc', landingPage: '/', evil: 'x', firstSeenAt: '2026-10-01T12:00:00Z' },
+    });
+    assert.equal(res.status, 200);
+    const lead = saved[0];
+    assert.equal(lead.address, '123 Main St, Fleming Island, FL 32003');
+    assert.equal(lead.howDidYouHear, 'Referral');
+    assert.equal(lead.sourceDetail, 'Pat from church');
+    assert.deepEqual(Object.keys(lead.attribution).sort(), ['clickId', 'firstSeenAt', 'landingPage', 'utmMedium', 'utmSource']);
+    assert.match(sent[0].text, /How They Heard About Us: Referral: Pat from church/);
+    assert.match(sent[0].text, /Tracked Source: Google Ads click/);
+});
+
+test('ordinary street addresses are accepted', async () => {
+    for (const street of ['1520 Oak Ln', '12-B N Main St', '4300 SW 12th Ave', '9 E Bay St Apt 4']) {
+        reset();
+        assert.equal((await post({ ...validLead, street })).status, 200, street);
+    }
+});
+
+test('a ZIP alone or a street without a number is refused', async () => {
+    reset();
+    for (const street of ['32003', 'Main Street', '']) {
+        const res = await post({ ...validLead, street });
+        assert.equal(res.status, 400, street);
+    }
+    const badZip = await post({ ...validLead, zip: '3200' });
+    assert.equal(badZip.status, 400);
+    assert.equal(saved.length, 0);
+});
+
+test('how they heard is required and must be from the list', async () => {
+    reset();
+    assert.equal((await post({ ...validLead, howDidYouHear: '' })).status, 400);
+    assert.equal((await post({ ...validLead, howDidYouHear: 'Billboard' })).status, 400);
+    assert.equal((await post({ ...validLead, howDidYouHear: 'Other' })).status, 400);
+    assert.equal((await post({ ...validLead, howDidYouHear: 'Other', sourceDetail: 'Home show' })).status, 200);
 });
 
 test('lead is still emailed when the database is down', async () => {
