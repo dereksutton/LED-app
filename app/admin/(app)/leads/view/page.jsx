@@ -3,13 +3,47 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../../src/admin/api';
-import { dateTime, money } from '../../../../../src/admin/format';
-import { Button, Card, ErrorNote, PageHeader, Select, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
+import { LEAD_SOURCES, dateTime, money } from '../../../../../src/admin/format';
+import { Button, Card, ErrorNote, Field, Input, PageHeader, Select, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
 
 const DETAILS = [
   ['Phone', 'phone'], ['Email', 'email'], ['Address', 'address'], ['Project', 'projectType'], ['Property', 'propertyType'],
-  ['Timeline', 'timeline'], ['Budget', 'budgetRange'], ['Area to paint', 'paintingArea'], ['Heard about us', 'howDidYouHear'],
+  ['Timeline', 'timeline'], ['Budget', 'budgetRange'], ['Area to paint', 'paintingArea'],
 ];
+
+// How the lead found LED: what they picked on the form (editable for calls
+// and corrections) and what the site tracked on its own.
+function SourceCard({ lead, onSaved }) {
+  const [source, setSource] = useState(lead.howDidYouHear || '');
+  const [detail, setDetail] = useState(lead.sourceDetail || '');
+  const { busy, error, run } = useAction();
+  const changed = source !== (lead.howDidYouHear || '') || detail !== (lead.sourceDetail || '');
+  const save = (e) => {
+    e.preventDefault();
+    run(async () => onSaved((await adminApi.patch(`/leads/${lead.id}`, { howDidYouHear: source, sourceDetail: detail })).lead));
+  };
+  return (
+    <Card title="Lead source">
+      <form onSubmit={save} className="space-y-3">
+        <Field label="How they heard about you">
+          <Select value={source} onChange={(e) => setSource(e.target.value)}>
+            <option value="">Not recorded</option>
+            {LEAD_SOURCES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </Select>
+        </Field>
+        <Field label="Referred by, or where"><Input value={detail} onChange={(e) => setDetail(e.target.value)} /></Field>
+        {lead.trackedSource && (
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Tracked by the website</p>
+            <p className="mt-0.5 text-sm text-slate-900">{lead.trackedSource}</p>
+          </div>
+        )}
+        <ErrorNote error={error} />
+        {changed && <Button type="submit" variant="secondary" disabled={busy}>Save source</Button>}
+      </form>
+    </Card>
+  );
+}
 
 function Lead() {
   const id = useSearchParams().get('id');
@@ -114,6 +148,7 @@ function Lead() {
         </div>
 
         <div className="space-y-5">
+          <SourceCard key={`${lead.howDidYouHear}|${lead.sourceDetail}`} lead={lead} onSaved={(saved) => setData({ ...data, lead: saved })} />
           <Card title="Status">
             <Select value={lead.status} onChange={(e) => setStatus(e.target.value)} disabled={busy} aria-label="Lead status">
               <option value="new">New</option>

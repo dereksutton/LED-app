@@ -65,3 +65,20 @@ export const totals = ({ items = [], taxRate = 0, discountCents = 0, depositPerc
   const totalCents = subtotalCents - discount + taxCents;
   return { subtotalCents, discountCents: discount, taxCents, totalCents, depositCents: Math.round((totalCents * Number(depositPercent || 0)) / 100) };
 };
+
+// How a lead heard about LED. Values match the website form and the API.
+export const LEAD_SOURCES = [
+  ['Google Search', 'Google search'],
+  ['Google Maps', 'Google Maps'],
+  ['Facebook', 'Facebook'],
+  ['Instagram', 'Instagram'],
+  ['Nextdoor', 'Nextdoor'],
+  ['Referral', 'Referral'],
+  ['Previous Customer', 'Previous customer'],
+  ['Truck or Yard Sign', 'Truck or yard sign'],
+  ['Other', 'Other'],
+];
+export const sourceLabel = (value) => {
+  const found = LEAD_SOURCES.find(([v]) => v.toLowerCase() === String(value || '').toLowerCase());
+  return found ? found[1] : value || 'Not recorded';
+};

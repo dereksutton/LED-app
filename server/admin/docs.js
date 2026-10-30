@@ -5,6 +5,7 @@ const { Settings, Counter } = require('./models');
 const { computeTotals, invoiceState } = require('./money');
 const defaults = require('./defaults');
 const { randomToken } = require('./crypto');
+const { describeAttribution } = require('../lib/leadEmail');
 
 class InputError extends Error {
     constructor(message, status = 400) {
@@ -103,6 +104,7 @@ const serializeLead = (lead) => {
     // Show older status names the way the dashboard names them.
     if (o.status === 'completed') o.status = 'won';
     if (o.status === 'declined') o.status = 'lost';
+    o.trackedSource = describeAttribution(lead.attribution);
     return o;
 };
 

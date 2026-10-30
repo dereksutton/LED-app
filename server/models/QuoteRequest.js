@@ -27,10 +27,15 @@ const quoteRequestSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  // Full address for display; the form also keeps its parts.
   address: {
     type: String,
     trim: true
   },
+  street: { type: String, trim: true },
+  city: { type: String, trim: true },
+  state: { type: String, trim: true },
+  zip: { type: String, trim: true },
   projectType: {
     type: String,
     trim: true
@@ -58,6 +63,20 @@ const quoteRequestSchema = new mongoose.Schema({
   howDidYouHear: {
     type: String,
     trim: true
+  },
+  // Who referred them, or where "Other" was.
+  sourceDetail: { type: String, trim: true },
+  // What the site picked up on its own: ad click, UTM tags, referring site.
+  attribution: {
+    utmSource: String,
+    utmMedium: String,
+    utmCampaign: String,
+    utmTerm: String,
+    utmContent: String,
+    clickId: String,
+    referrer: String,
+    landingPage: String,
+    firstSeenAt: Date
   },
   source: {
     type: String,

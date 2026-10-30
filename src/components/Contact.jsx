@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { trackLead } from '../lib/analytics';
+import { readAttribution } from '../lib/attribution';
 import { claims } from '../data/site';
 
 const IconComponent = ({ iconType }) => {
@@ -43,12 +44,27 @@ const IconComponent = ({ iconType }) => {
     }
 };
 
+// Values match the API's list; labels are what visitors see.
+const leadSources = [
+    ['Google Search', 'Google search'],
+    ['Google Maps', 'Google Maps'],
+    ['Facebook', 'Facebook'],
+    ['Instagram', 'Instagram'],
+    ['Nextdoor', 'Nextdoor'],
+    ['Referral', 'Friend or family referral'],
+    ['Previous Customer', "I'm a previous customer"],
+    ['Truck or Yard Sign', 'Saw your truck or yard sign'],
+    ['Other', 'Other'],
+];
+
 const Contact = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
-        address: '',
+        street: '',
+        city: '',
+        zip: '',
         projectType: '',
         propertyType: '',
         timeline: '',
@@ -56,6 +72,7 @@ const Contact = () => {
         paintingArea: '',
         message: '',
         howDidYouHear: '',
+        sourceDetail: '',
         website: ''
     });
     const [status, setStatus] = useState({
@@ -66,7 +83,8 @@ const Contact = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        // A referrer's name shouldn't ride along after switching to another source.
+        setFormData({ ...formData, [name]: value, ...(name === 'howDidYouHear' ? { sourceDetail: '' } : {}) });
     };
 
     const handleSubmit = async (e) => {
@@ -80,7 +98,11 @@ const Contact = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    address: `${formData.street.trim()}, ${formData.city.trim()}, FL ${formData.zip.trim()}`,
+                    attribution: readAttribution() || undefined,
+                })
             });
 
             const data = await response.json();
@@ -95,7 +117,9 @@ const Contact = () => {
                     name: '',
                     email: '',
                     phone: '',
-                    address: '',
+                    street: '',
+                    city: '',
+                    zip: '',
                     projectType: '',
                     propertyType: '',
                     timeline: '',
@@ -103,6 +127,7 @@ const Contact = () => {
                     paintingArea: '',
                     message: '',
                     howDidYouHear: '',
+                    sourceDetail: '',
                     website: ''
                 });
             } else {
@@ -342,9 +367,38 @@ const Contact = () => {
                                         </select>
                                     </div>
                                     <div className="md:col-span-2">
-                                        <label htmlFor="address" className={labelClass}>Property address or ZIP *</label>
-                                        <input type="text" id="address" name="address" autoComplete="street-address" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Street address, or just your ZIP" disabled={isSubmitting} />
+                                        <label htmlFor="street" className={labelClass}>Property street address *</label>
+                                        <input type="text" id="street" name="street" autoComplete="address-line1" value={formData.street} onChange={handleChange} required pattern="\s*\d+[A-Za-z]?(-[A-Za-z0-9]+)?\s+.*[A-Za-z]{2,}.*" title="Include the house number and street, like 1520 Oak Ln" className={inputClass} placeholder="1520 Oak Ln" disabled={isSubmitting} />
                                     </div>
+                                    <div>
+                                        <label htmlFor="city" className={labelClass}>City *</label>
+                                        <input type="text" id="city" name="city" autoComplete="address-level2" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="Jacksonville" disabled={isSubmitting} />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="zip" className={labelClass}>ZIP *</label>
+                                        <input type="text" id="zip" name="zip" autoComplete="postal-code" inputMode="numeric" value={formData.zip} onChange={handleChange} required pattern="\s*\d{5}(-\d{4})?\s*" title="5-digit ZIP code" maxLength={10} className={inputClass} placeholder="32207" disabled={isSubmitting} />
+                                    </div>
+                                    <div className={formData.howDidYouHear === 'Referral' || formData.howDidYouHear === 'Other' ? '' : 'md:col-span-2'}>
+                                        <label htmlFor="howDidYouHear" className={labelClass}>How did you hear about us? *</label>
+                                        <select id="howDidYouHear" name="howDidYouHear" value={formData.howDidYouHear} onChange={handleChange} required className={inputClass} disabled={isSubmitting}>
+                                            <option value="">Select one</option>
+                                            {leadSources.map(([value, label]) => (
+                                                <option key={value} value={value}>{label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {formData.howDidYouHear === 'Referral' && (
+                                        <div>
+                                            <label htmlFor="sourceDetail" className={labelClass}>Who referred you?</label>
+                                            <input type="text" id="sourceDetail" name="sourceDetail" value={formData.sourceDetail} onChange={handleChange} className={inputClass} placeholder="Their name, so we can thank them" disabled={isSubmitting} />
+                                        </div>
+                                    )}
+                                    {formData.howDidYouHear === 'Other' && (
+                                        <div>
+                                            <label htmlFor="sourceDetail" className={labelClass}>Where? *</label>
+                                            <input type="text" id="sourceDetail" name="sourceDetail" value={formData.sourceDetail} onChange={handleChange} required className={inputClass} placeholder="e.g. home show, flyer" disabled={isSubmitting} />
+                                        </div>
+                                    )}
                                 </div>
 
                                 <details className="group rounded-xl border border-slate-600/60 bg-slate-800/30 open:bg-slate-800/40">
@@ -384,18 +438,6 @@ const Contact = () => {
                                                 {budgetRanges.map((range) => (
                                                     <option key={range} value={range}>{range}</option>
                                                 ))}
-                                            </select>
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label htmlFor="howDidYouHear" className={labelClass}>How did you hear about us?</label>
-                                            <select id="howDidYouHear" name="howDidYouHear" value={formData.howDidYouHear} onChange={handleChange} className={inputClass} disabled={isSubmitting}>
-                                                <option value="">Select one</option>
-                                                <option value="Google Search">Google Search</option>
-                                                <option value="Facebook">Facebook</option>
-                                                <option value="Referral">Friend/Family Referral</option>
-                                                <option value="Nextdoor">Nextdoor App</option>
-                                                <option value="Previous Customer">Previous Customer</option>
-                                                <option value="Other">Other</option>
                                             </select>
                                         </div>
                                         <div className="md:col-span-2">

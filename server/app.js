@@ -5,10 +5,15 @@ const { buildLeadEmail } = require('./lib/leadEmail');
 const { buildCustomerReply, buildOwnerSms } = require('./lib/followUps');
 const { mountAdmin } = require('./admin');
 
-const REQUIRED_FIELDS = ['name', 'email', 'phone', 'address', 'projectType'];
-const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'howDidYouHear'];
+const { normalizeSource, parseAttribution } = require('./lib/leadSources');
+
+const REQUIRED_FIELDS = ['name', 'email', 'phone', 'street', 'city', 'zip', 'projectType', 'howDidYouHear'];
+const OPTIONAL_FIELDS = ['propertyType', 'timeline', 'budgetRange', 'paintingArea', 'message', 'sourceDetail'];
 const MAX_LENGTH = { message: 5000, default: 300 };
 const EMAIL_RE = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
+// A house number and a street name, e.g. "1520 Oak Ln" or "12-B N Main St".
+const STREET_RE = /^\d+[A-Za-z]?(?:-[A-Za-z0-9]+)?\s+.*[A-Za-z]{2,}/;
+const ZIP_RE = /^\d{5}(-\d{4})?$/;
 
 // Pull only known fields off the body, trimmed and length-checked.
 const parseQuoteRequest = (body = {}) => {
@@ -21,11 +26,28 @@ const parseQuoteRequest = (body = {}) => {
         if (value) lead[field] = value;
     }
     if (REQUIRED_FIELDS.some((field) => !lead[field])) {
-        return { error: 'Missing required fields' };
+        return { error: 'Please fill in every required field.' };
     }
     if (!EMAIL_RE.test(lead.email)) {
         return { error: 'Invalid email format' };
     }
+    if (!STREET_RE.test(lead.street)) {
+        return { error: 'Please enter the full street address, with the house number.' };
+    }
+    if (!ZIP_RE.test(lead.zip)) {
+        return { error: 'Please enter a 5-digit ZIP code.' };
+    }
+    lead.howDidYouHear = normalizeSource(lead.howDidYouHear);
+    if (!lead.howDidYouHear) {
+        return { error: 'Please tell us how you heard about us.' };
+    }
+    if (lead.howDidYouHear === 'Other' && !lead.sourceDetail) {
+        return { error: 'Please tell us where you heard about us.' };
+    }
+    lead.state = 'FL';
+    lead.address = `${lead.street}, ${lead.city}, FL ${lead.zip}`;
+    const attribution = parseAttribution(body.attribution);
+    if (attribution) lead.attribution = attribution;
     return { lead };
 };
 

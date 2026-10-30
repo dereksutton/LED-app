@@ -2,8 +2,8 @@
 import Link from 'next/link';
 import { adminApi } from '../../../src/admin/api';
 import { useAdminUser } from '../../../src/admin/AdminShell';
-import { ago, money, shortDate } from '../../../src/admin/format';
-import { Button, Card, Empty, ErrorNote, Spinner, StatusBadge, useLoad } from '../../../src/admin/ui';
+import { ago, money, shortDate, sourceLabel } from '../../../src/admin/format';
+import { Button, Card, Empty, ErrorNote, Spinner, StatusBadge, Table, useLoad } from '../../../src/admin/ui';
 
 function Stat({ label, value, sub, href }) {
   return (
@@ -105,6 +105,23 @@ export default function HomePage() {
               ) : <Empty>No contracts out for signature.</Empty>}
             </Card>
           </div>
+
+          <Card title="Where leads came from" actions={<span className="text-xs text-slate-500">Last 90 days</span>}>
+            {data.sources.length ? (
+              <Table head={['Source', { label: 'Leads', className: 'text-right' }, { label: 'Won', className: 'text-right' }, { label: 'Win rate', className: 'text-right' }]}>
+                {data.sources.map((r) => (
+                  <tr key={r.source}>
+                    <td className="px-4 py-2.5">
+                      <Link href={`/admin/leads/?status=&source=${encodeURIComponent(r.source === 'Not recorded' ? 'none' : r.source)}`} className="font-medium text-slate-900 no-underline hover:underline">{sourceLabel(r.source)}</Link>
+                    </td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{r.leads}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-700">{r.won}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-500">{Math.round((r.won / r.leads) * 100)}%</td>
+                  </tr>
+                ))}
+              </Table>
+            ) : <Empty>Once leads come in, this shows which sources bring them and which ones turn into jobs.</Empty>}
+          </Card>
         </div>
       )}
     </>

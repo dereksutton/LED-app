@@ -1,6 +1,8 @@
 "use client";
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { captureAttribution } from '../lib/attribution';
 import Analytics from './Analytics';
 import MobileActionBar from './MobileActionBar';
 
@@ -11,7 +13,11 @@ const PRIVATE = ['/admin', '/d'];
 
 export default function SiteChrome() {
   const pathname = usePathname() || '';
-  if (PRIVATE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return null;
+  const isPrivate = PRIVATE.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  useEffect(() => {
+    if (!isPrivate) captureAttribution();
+  }, [isPrivate, pathname]);
+  if (isPrivate) return null;
   return (
     <>
       <MobileActionBar />
