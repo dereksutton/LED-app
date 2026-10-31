@@ -130,7 +130,8 @@ export default function AdminShell({ children }) {
           </div>
         </div>
       )}
-      <nav aria-label="Dashboard" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] sm:hidden">
+      {/* Navy like the header, with a gold bar over the current tab. */}
+      <nav aria-label="Dashboard" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-800 bg-slate-900 pb-[env(safe-area-inset-bottom)] sm:hidden">
         <ul className="grid h-16 grid-cols-5">
           {PHONE_TABS.map((href) => {
             const item = NAV.find((n) => n.href === href);
@@ -140,8 +141,9 @@ export default function AdminShell({ children }) {
                 <Link
                   href={href}
                   aria-current={on ? 'page' : undefined}
-                  className={`flex h-full flex-col items-center justify-center gap-0.5 text-xs font-medium no-underline ${on ? 'text-slate-900' : 'text-slate-500'}`}
+                  className={`relative flex h-full flex-col items-center justify-center gap-0.5 text-xs font-medium no-underline ${on ? 'text-white' : 'text-slate-400'}`}
                 >
+                  {on && <span aria-hidden="true" className="absolute inset-x-4 top-0 h-0.5 rounded-b bg-amber-400" />}
                   <Icon name={href} />
                   {item.label}
                 </Link>
@@ -154,8 +156,9 @@ export default function AdminShell({ children }) {
               onClick={() => setMoreOn(moreOpen ? null : pathname)}
               aria-expanded={moreOpen}
               aria-controls="more-menu"
-              className={`flex h-full w-full flex-col items-center justify-center gap-0.5 text-xs font-medium ${moreOpen || inMore ? 'text-slate-900' : 'text-slate-500'}`}
+              className={`relative flex h-full w-full flex-col items-center justify-center gap-0.5 text-xs font-medium ${moreOpen || inMore ? 'text-white' : 'text-slate-400'}`}
             >
+              {(moreOpen || inMore) && <span aria-hidden="true" className="absolute inset-x-4 top-0 h-0.5 rounded-b bg-amber-400" />}
               <Icon name="more" />
               More
             </button>
