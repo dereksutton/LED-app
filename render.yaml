@@ -68,6 +68,14 @@ services:
         name: X-Robots-Tag
         value: noindex, nofollow
     routes:
+      # Pages are served with a trailing slash; send the bare dashboard
+      # addresses there before any catch-all rule set in Render sends them home.
+      - type: redirect
+        source: /admin
+        destination: /admin/
+      - type: redirect
+        source: /admin/login
+        destination: /admin/login/
       - type: rewrite
         source: /send-quote
         destination: https://led-app-api.onrender.com/send-quote

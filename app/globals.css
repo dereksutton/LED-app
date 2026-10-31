@@ -66,6 +66,29 @@ button {
   border-radius: 0;
 }
 
+/* Dashboard and customer document pages never move sideways on a phone.
+   iPhones still let you drag the page left and right when only body clips
+   (the rule above), so html clips too. clip, unlike hidden, makes no scroll
+   container, so there's no second scrollbar and sticky bars keep working.
+   Long emails, addresses and links wrap instead of widening the page. */
+html:has(.admin-root),
+html:has(.admin-root) body {
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+.admin-root {
+  overflow-wrap: anywhere;
+}
+
+/* Safari sizes a grid column to its longest unbreakable line (an email, a
+   link) and form fields to a default width, either of which can be wider than
+   the phone. Let both shrink to the column instead. */
+.admin-root :where(.grid) > *,
+.admin-root :where(input, select, textarea) {
+  min-width: 0;
+}
+
 .custom-list {
   list-style-type: disc;
   list-style-position: inside;
