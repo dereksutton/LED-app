@@ -3,13 +3,54 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../../src/admin/api';
-import { LEAD_SOURCES, dateTime, money } from '../../../../../src/admin/format';
-import { Button, Card, ErrorNote, Field, Input, PageHeader, Select, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
+import { LEAD_SOURCES, ORGANIC, STATUS, ZONES, centsToInput, channelLabel, dateTime, money, shortDate, toCents } from '../../../../../src/admin/format';
+import { Badge, Button, Card, ErrorNote, Field, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
 
 const DETAILS = [
-  ['Phone', 'phone'], ['Email', 'email'], ['Address', 'address'], ['Project', 'projectType'], ['Property', 'propertyType'],
-  ['Timeline', 'timeline'], ['Budget', 'budgetRange'], ['Area to paint', 'paintingArea'],
+  ['Phone', 'phone'], ['Email', 'email'], ['Address', 'address'], ['ZIP', 'zip'], ['Project', 'projectType'], ['Property', 'propertyType'],
+  ['Timeline', 'timeline'], ['Budget', 'budgetRange'], ['Area to paint', 'paintingArea'], ['Best time to call', 'bestTime'],
 ];
+
+const digits = (phone) => phone.replace(/[^\d+]/g, '');
+
+// History values: statuses by their dashboard names, blanks as "none".
+const show = (h, v) => (h.field === 'Status' && STATUS[v] ? STATUS[v].label : v || 'none');
+
+// A text from the owner's own phone, ready to send.
+const textHref = (lead) => {
+  const first = (lead.name || '').trim().split(/\s+/)[0];
+  const project = lead.projectType && lead.projectType !== 'Callback request' ? ` about ${lead.projectType.toLowerCase()}` : '';
+  const body = `Hi${first ? ` ${first}` : ''}, this is Efrain with LED Custom Painting. Thanks for reaching out${project}! When's a good time to talk, or to come take a look?`;
+  // "?&body=" works on both iPhone and Android.
+  return `sms:${digits(lead.phone)}?&body=${encodeURIComponent(body)}`;
+};
+
+// Asks for the job amount when a lead is marked won, filled in from the
+// accepted quote.
+function MarkWon({ lead, quotes, onClose, onSaved }) {
+  const accepted = quotes.find((q) => q.status === 'accepted');
+  const start = typeof lead.jobAmountCents === 'number' ? lead.jobAmountCents : accepted ? accepted.totalCents : 0;
+  const [amount, setAmount] = useState(centsToInput(start));
+  const { busy, error, run } = useAction();
+  const save = (e) => {
+    e.preventDefault();
+    run(async () => {
+      const res = await adminApi.patch(`/leads/${lead.id}`, { status: 'won', jobAmountCents: amount.trim() ? toCents(amount) : null });
+      onSaved(res.lead);
+    });
+  };
+  return (
+    <Modal title="Mark won" onClose={onClose}>
+      <form onSubmit={save} className="space-y-3">
+        <Field label="Job amount" hint={accepted ? `Filled in from ${accepted.number}. Change it if the final price was different.` : 'What the customer agreed to pay for the job.'}>
+          <Input inputMode="decimal" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
+        </Field>
+        <ErrorNote error={error} />
+        <Button type="submit" disabled={busy} className="w-full">{busy ? 'Saving…' : 'Mark won'}</Button>
+      </form>
+    </Modal>
+  );
+}
 
 // How the lead found LED: what they picked on the form (editable for calls
 // and corrections) and what the site tracked on its own.
@@ -22,6 +63,8 @@ function SourceCard({ lead, onSaved }) {
     e.preventDefault();
     run(async () => onSaved((await adminApi.patch(`/leads/${lead.id}`, { howDidYouHear: source, sourceDetail: detail })).lead));
   };
+  const setOrganic = (organic) => run(async () => onSaved((await adminApi.patch(`/leads/${lead.id}`, { organic })).lead));
+  const zone = ZONES[lead.serviceZone];
   return (
     <Card title="Lead source">
       <form onSubmit={save} className="space-y-3">
@@ -38,6 +81,20 @@ function SourceCard({ lead, onSaved }) {
             <p className="mt-0.5 text-sm text-slate-900">{lead.trackedSource}</p>
           </div>
         )}
+        <Field label="Found on Google" hint={lead.organicReason || 'Worked out from the website visit and how they said they heard.'}>
+          <Select value={lead.organicManual ? lead.organic : 'auto'} onChange={(e) => setOrganic(e.target.value)} disabled={busy}>
+            <option value="auto">{`Automatic: ${ORGANIC[lead.organic] ? ORGANIC[lead.organic].label : 'Not organic Google'}`}</option>
+            <option value="search">Google Search</option>
+            <option value="gbp">Google Business Profile (Maps)</option>
+            <option value="none">Not from Google</option>
+          </Select>
+        </Field>
+        {(lead.refCode || zone) && (
+          <div className="flex flex-wrap gap-1.5">
+            {lead.refCode && <Badge>Ref {lead.refCode}</Badge>}
+            {zone && <Badge tone={zone.tone}>{zone.label}</Badge>}
+          </div>
+        )}
         <ErrorNote error={error} />
         {changed && <Button type="submit" variant="secondary" disabled={busy}>Save source</Button>}
       </form>
@@ -50,16 +107,20 @@ function Lead() {
   const router = useRouter();
   const [data, error, , setData] = useLoad(() => adminApi.get(`/leads/${id}`), [id]);
   const [note, setNote] = useState('');
+  const [markingWon, setMarkingWon] = useState(false);
   const { busy, error: actionError, run } = useAction();
 
   if (error) return <ErrorNote error={error} />;
   if (!data) return <Spinner />;
   const { lead, quotes } = data;
 
-  const setStatus = (status) => run(async () => {
-    const res = await adminApi.patch(`/leads/${id}`, { status });
-    setData({ ...data, lead: res.lead });
-  });
+  const setStatus = (status) => {
+    if (status === 'won') return setMarkingWon(true);
+    return run(async () => {
+      const res = await adminApi.patch(`/leads/${id}`, { status });
+      setData({ ...data, lead: res.lead });
+    });
+  };
   const addNote = (e) => {
     e.preventDefault();
     run(async () => {
@@ -91,7 +152,7 @@ function Lead() {
       <PageHeader
         back={{ href: '/admin/leads/', label: 'Leads' }}
         title={lead.name}
-        subtitle={`Received ${dateTime(lead.createdAt)}${lead.source === 'manual' ? ' · added by hand' : ' · website form'}`}
+        subtitle={`Received ${dateTime(lead.createdAt)} · ${channelLabel(lead.channel) || (lead.source === 'manual' ? 'Added by hand' : 'Quote form')}`}
         actions={lead.isSpam ? (
           <Button onClick={() => setSpam(false)} disabled={busy}>Not spam</Button>
         ) : (
@@ -104,6 +165,19 @@ function Lead() {
         )}
       />
       <ErrorNote error={actionError} />
+      {markingWon && (
+        <MarkWon
+          lead={lead}
+          quotes={quotes}
+          onClose={() => setMarkingWon(false)}
+          onSaved={(saved) => { setMarkingWon(false); setData({ ...data, lead: saved }); }}
+        />
+      )}
+      {lead.serviceZone === 'out' && !lead.isSpam && (
+        <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Outside Clay County, Mandarin and St. Johns. They were told you&apos;d let them know within a day if you can take the project.
+        </div>
+      )}
       {lead.isSpam && (
         <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p className="font-medium">In Spam{lead.spam && lead.spam.by !== 'auto' ? `, marked by ${lead.spam.by}` : ''}{lead.spam && lead.spam.markedAt ? ` on ${dateTime(lead.spam.markedAt)}` : ''}.</p>
@@ -165,9 +239,18 @@ function Lead() {
               <option value="won">Won</option>
               <option value="lost">Lost</option>
             </Select>
+            {lead.status === 'won' && (
+              <div className="mt-3 flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+                <span>
+                  {typeof lead.jobAmountCents === 'number' ? `Job amount ${money(lead.jobAmountCents)}` : 'No job amount yet'}
+                  {lead.wonAt && <span className="block text-xs text-emerald-800">Won {shortDate(lead.wonAt)}</span>}
+                </span>
+                <button type="button" className="text-sm font-medium underline" onClick={() => setMarkingWon(true)}>{typeof lead.jobAmountCents === 'number' ? 'Edit' : 'Add'}</button>
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap gap-2">
               {lead.phone && <Button variant="secondary" href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}>Call</Button>}
-              {lead.phone && <Button variant="secondary" href={`sms:${lead.phone.replace(/[^\d+]/g, '')}`}>Text</Button>}
+              {lead.phone && <Button variant="secondary" href={textHref(lead)}>Text</Button>}
               {lead.email && <Button variant="secondary" href={`mailto:${lead.email}`}>Email</Button>}
             </div>
           </Card>
@@ -185,6 +268,20 @@ function Lead() {
               </ul>
             ) : <p className="text-sm text-slate-500">No quotes yet.</p>}
           </Card>
+          {lead.history.length > 0 && (
+            <Card title="Change history">
+              <ul className="space-y-2">
+                {[...lead.history].reverse().map((h, i) => (
+                  <li key={i} className="text-sm">
+                    <p className="text-slate-900">
+                      {h.field === 'Added' ? `Added as ${h.to.toLowerCase()}` : `${h.field}: ${show(h, h.from)} → ${show(h, h.to)}`}
+                    </p>
+                    <p className="text-xs text-slate-500">{h.by} · {dateTime(h.at)}</p>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
           {!lead.isSpam && (
             <div className="text-center">
               <Button variant="ghost" onClick={() => setSpam(true)} disabled={busy}>Mark as spam</Button>

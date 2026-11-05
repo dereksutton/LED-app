@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node --test",
     "start": "node index.js",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "commission-report": "node scripts/commission-report.js"
   },
   "author": "",
   "license": "ISC",

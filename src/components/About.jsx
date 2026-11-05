@@ -105,7 +105,7 @@ const About = () => {
                             </h3>
                             <p className="font-sans-luxury text-xl text-slate-300 leading-relaxed">
                                 Here at <span className="text-[--luxury-champagne] font-semibold">LED Custom Painting</span>, we believe the experience you have is equally as important as the final results.
-                                Our commitment to excellence has made us North Florida&apos;s trusted painting professionals since {claims.foundedYear}.
+                                Our commitment to excellence has made us Clay County&apos;s trusted painting professionals since {claims.foundedYear}.
                             </p>
                         </motion.div>
 

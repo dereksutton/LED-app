@@ -24,14 +24,14 @@ const breadcrumbSchema = {
 
 export const metadata = {
   title: 'Get a Free Painting Quote | LED Custom Painting Jacksonville FL',
-  description: 'Request a free, no-obligation painting quote from LED Custom Painting. Professional interior, exterior, and commercial painting services in Jacksonville & North Florida. Call (904) 385-0426.',
+  description: 'Request a free, no-obligation painting quote from LED Custom Painting. Interior, exterior, and commercial painting in Orange Park, Fleming Island and all of Clay County, plus Mandarin & St. Johns. Call (904) 385-0426.',
   alternates: {
     canonical: '/contact/',
   },
   openGraph: {
     type: 'website',
     title: 'Get a Free Painting Quote | LED Custom Painting Jacksonville FL',
-    description: 'Request a free, no-obligation painting quote. Professional painting services in Jacksonville & North Florida. Licensed, insured, 3-year warranty.',
+    description: 'Request a free, no-obligation painting quote. Painting services in Clay County, Mandarin & St. Johns. Licensed, insured, 3-year warranty.',
     url: 'https://ledcustompainting.com/contact/',
     images: [
       {
@@ -47,7 +47,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Get a Free Painting Quote | LED Custom Painting Jacksonville FL',
-    description: 'Request a free, no-obligation painting quote. Professional painting services in Jacksonville & North Florida.',
+    description: 'Request a free, no-obligation painting quote. Painting services in Clay County, Mandarin & St. Johns.',
     images: [
       {
         url: '/og-image.jpg',
@@ -85,7 +85,7 @@ export default function ContactPage() {
             </p>
             <div className="mx-auto mt-3 h-px w-12 bg-slate-300" />
             <h2 className="mt-5 font-serif-luxury font-bold text-3xl md:text-4xl text-slate-900 tracking-tight">
-              Serving Jacksonville &amp; North Florida
+              Serving Clay County, Mandarin &amp; St. Johns
             </h2>
           </div>
 
@@ -93,8 +93,8 @@ export default function ContactPage() {
             {/* Map */}
             <div className="lg:col-span-3 overflow-hidden rounded-2xl border border-slate-200 shadow-lg min-h-[340px]">
               <iframe
-                title="Map of the LED Custom Painting service area in Jacksonville, North Florida"
-                src="https://www.google.com/maps?q=Jacksonville,FL&z=10&output=embed"
+                title="Map of the LED Custom Painting service area in Clay County, FL"
+                src="https://www.google.com/maps?q=Clay+County,FL&z=10&output=embed"
                 className="w-full h-full min-h-[340px]"
                 style={{ border: 0 }}
                 loading="lazy"
@@ -140,8 +140,8 @@ export default function ContactPage() {
               </div>
 
               <p className="mt-7 pt-6 border-t border-slate-700/50 font-sans-luxury text-sm text-slate-400 leading-relaxed">
-                Proudly serving Jacksonville, Fleming Island, Orange Park, Middleburg,
-                Green Cove Springs, and communities across Clay &amp; Duval counties.
+                Proudly serving Orange Park, Fleming Island, Green Cove Springs,
+                Middleburg, Oakleaf and the rest of Clay County, plus Mandarin and St. Johns.
               </p>
             </div>
           </div>

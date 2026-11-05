@@ -3,14 +3,41 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../src/admin/api';
-import { LEAD_SOURCES, ago, sourceLabel } from '../../../../src/admin/format';
-import { Button, Card, Empty, ErrorNote, Field, FilterTabs, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
+import { LEAD_SOURCES, ORGANIC, ZONES, ago, channelLabel, sourceLabel } from '../../../../src/admin/format';
+import { Badge, Button, Card, Empty, ErrorNote, Field, FilterTabs, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
 
 const TABS = [['open', 'Open'], ['new', 'New'], ['contacted', 'Contacted'], ['quoted', 'Quoted'], ['won', 'Won'], ['lost', 'Lost'], ['', 'All'], ['spam', 'Spam']];
 
+const time = (d) => new Date(d).toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour: 'numeric', minute: '2-digit' });
+
+// Call and Text taps on the site in the last 15 minutes, so a call or text
+// that just came in can be tied to the visit it came from.
+function RecentTaps({ kind, value, onChange }) {
+  const [data] = useLoad(() => adminApi.get(`/contact-intents?kind=${kind}&minutes=15`), [kind]);
+  if (!data || !data.intents.length) return null;
+  return (
+    <fieldset className="rounded-lg border border-slate-200 p-3">
+      <legend className="px-1 text-sm font-medium text-slate-700">{kind === 'call' ? 'Call' : 'Text'} taps on the website in the last 15 minutes</legend>
+      <p className="mb-2 text-xs text-slate-500">If one of these is this person, pick it so the lead keeps where they found you.</p>
+      <div className="space-y-1.5">
+        {data.intents.map((i) => (
+          <label key={i.id} className="flex items-center gap-2 text-sm text-slate-800">
+            <input type="radio" name="intent" checked={value === i.id} onChange={() => onChange(i.id)} />
+            <span>{time(i.createdAt)}{i.page ? ` on ${i.page}` : ''}{i.refCode ? ` · Ref ${i.refCode}` : ''}{i.organic !== 'none' ? ` · ${ORGANIC[i.organic].label}` : ''}</span>
+          </label>
+        ))}
+        <label className="flex items-center gap-2 text-sm text-slate-800">
+          <input type="radio" name="intent" checked={!value} onChange={() => onChange('')} />
+          <span>None of these</span>
+        </label>
+      </div>
+    </fieldset>
+  );
+}
+
 function NewLead({ onClose }) {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', phone: '', email: '', address: '', projectType: '', howDidYouHear: '', sourceDetail: '', message: '' });
+  const [form, setForm] = useState({ channel: 'call', name: '', phone: '', email: '', address: '', zip: '', projectType: '', howDidYouHear: '', sourceDetail: '', refCode: '', intentId: '', message: '' });
   const { busy, error, run } = useAction();
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const save = (e) => {
@@ -24,12 +51,23 @@ function NewLead({ onClose }) {
     <Modal title="Add a lead" onClose={onClose}>
       <form onSubmit={save} className="space-y-3">
         <p className="text-sm text-slate-500">For a call, text or referral that didn&apos;t come through the website.</p>
+        <Field label="How did they reach you?">
+          <Select value={form.channel} onChange={(e) => setForm({ ...form, channel: e.target.value, intentId: '' })}>
+            <option value="call">Phone call</option>
+            <option value="text">Text</option>
+            <option value="manual">Other (in person, referral, email)</option>
+          </Select>
+        </Field>
+        {form.channel !== 'manual' && <RecentTaps kind={form.channel} value={form.intentId} onChange={(intentId) => setForm({ ...form, intentId })} />}
         <Field label="Name"><Input required value={form.name} onChange={set('name')} /></Field>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Phone"><Input type="tel" value={form.phone} onChange={set('phone')} /></Field>
           <Field label="Email"><Input type="email" value={form.email} onChange={set('email')} /></Field>
         </div>
-        <Field label="Address"><Input value={form.address} onChange={set('address')} /></Field>
+        <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
+          <Field label="Address"><Input value={form.address} onChange={set('address')} /></Field>
+          <Field label="ZIP"><Input inputMode="numeric" maxLength={10} value={form.zip} onChange={set('zip')} /></Field>
+        </div>
         <Field label="Project"><Input placeholder="e.g. Interior painting" value={form.projectType} onChange={set('projectType')} /></Field>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="How they heard about you">
@@ -40,6 +78,11 @@ function NewLead({ onClose }) {
           </Field>
           <Field label="Referred by, or where"><Input value={form.sourceDetail} onChange={set('sourceDetail')} /></Field>
         </div>
+        {form.channel === 'text' && !form.intentId && (
+          <Field label="Ref code" hint="Texts from the website's Text us button end with a code like “Ref K7F3”. Copy it here.">
+            <Input value={form.refCode} onChange={set('refCode')} maxLength={12} autoCapitalize="characters" />
+          </Field>
+        )}
         <Field label="Details"><Textarea rows={3} value={form.message} onChange={set('message')} /></Field>
         <ErrorNote error={error} />
         <Button type="submit" disabled={busy} className="w-full">{busy ? 'Saving…' : 'Save lead'}</Button>
@@ -48,11 +91,25 @@ function NewLead({ onClose }) {
   );
 }
 
+// Small tags under the source: found on Google, how it came in (when not
+// the quote form) and the service area when it's not home turf.
+function SourceTags({ lead }) {
+  const o = ORGANIC[lead.organic];
+  const zone = ZONES[lead.serviceZone];
+  const tags = [
+    o && o.short && <Badge key="o" tone={o.tone} title={lead.organicReason}>{o.short}</Badge>,
+    lead.channel && lead.channel !== 'form' && <Badge key="c">{channelLabel(lead.channel)}</Badge>,
+    zone && (lead.serviceZone === 'out' || lead.serviceZone === 'edge') && <Badge key="z" tone={zone.tone}>{zone.label}</Badge>,
+  ].filter(Boolean);
+  return tags.length ? <span className="mt-1 flex flex-wrap gap-1">{tags}</span> : null;
+}
+
 function Leads() {
   const params = useSearchParams();
   const router = useRouter();
   const status = params.get('status') ?? 'open';
   const source = params.get('source') || '';
+  const organic = params.get('organic') || '';
   const [q, setQ] = useState('');
   const [query, setQuery] = useState('');
   const [adding, setAdding] = useState(params.get('new') === '1');
@@ -63,8 +120,8 @@ function Leads() {
   }, [q]);
 
   const [data, error] = useLoad(
-    () => adminApi.get(`/leads?status=${encodeURIComponent(status)}&source=${encodeURIComponent(source)}&q=${encodeURIComponent(query)}`),
-    [status, source, query],
+    () => adminApi.get(`/leads?status=${encodeURIComponent(status)}&source=${encodeURIComponent(source)}&organic=${encodeURIComponent(organic)}&q=${encodeURIComponent(query)}`),
+    [status, source, organic, query],
   );
 
   return (
@@ -83,15 +140,31 @@ function Leads() {
           <FilterTabs
             tabs={TABS.map(([value, label]) => [value, label, value === 'spam' && data ? data.spamCount : 0])}
             value={status}
-            hrefFor={(value) => `/admin/leads/?status=${value}${source ? `&source=${encodeURIComponent(source)}` : ''}`}
+            hrefFor={(value) => `/admin/leads/?status=${value}${source ? `&source=${encodeURIComponent(source)}` : ''}${organic ? `&organic=${organic}` : ''}`}
             label="Show leads"
             className="sm:-mx-1"
           />
           <div className="contents sm:flex sm:gap-2">
-            <Select value={source} onChange={(e) => router.replace(`/admin/leads/?status=${status}${e.target.value ? `&source=${encodeURIComponent(e.target.value)}` : ''}`)} aria-label="Filter by source" className="sm:w-44">
+            <Select
+              value={organic ? `organic:${organic}` : source}
+              onChange={(e) => {
+                const v = e.target.value;
+                const filter = v.startsWith('organic:') ? `&organic=${v.slice(8)}` : v ? `&source=${encodeURIComponent(v)}` : '';
+                router.replace(`/admin/leads/?status=${status}${filter}`);
+              }}
+              aria-label="Filter by source"
+              className="sm:w-44"
+            >
               <option value="">Every source</option>
-              {LEAD_SOURCES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-              <option value="none">Not recorded</option>
+              <optgroup label="How they said they heard">
+                {LEAD_SOURCES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                <option value="none">Not recorded</option>
+              </optgroup>
+              <optgroup label="Tracked">
+                <option value="organic:google">Found on Google (search or Maps)</option>
+                <option value="organic:search">Google Search</option>
+                <option value="organic:gbp">Google Business Profile</option>
+              </optgroup>
             </Select>
             <Input type="search" placeholder="Search name, phone, address…" value={q} onChange={(e) => setQ(e.target.value)} className="col-span-2 sm:max-w-xs" aria-label="Search leads" />
           </div>
@@ -105,11 +178,13 @@ function Leads() {
                 <td className="px-4 py-3">
                   <Link href={`/admin/leads/view/?id=${l.id}`} className="font-medium text-slate-900 no-underline" onClick={(e) => e.stopPropagation()}>{l.name}</Link>
                   <span className="block text-xs text-slate-500">{status === 'spam' && l.spam ? (l.spam.by === 'auto' ? l.spam.reason : `Marked by ${l.spam.by}`) : l.phone}</span>
+                  <span className="md:hidden"><SourceTags lead={l} /></span>
                 </td>
                 <td className="hidden px-4 py-3 text-slate-700 sm:table-cell">{l.projectType}</td>
                 <td className="hidden px-4 py-3 text-slate-700 md:table-cell">
                   {sourceLabel(l.howDidYouHear)}
                   {l.sourceDetail && <span className="block text-xs text-slate-500">{l.sourceDetail}</span>}
+                  <SourceTags lead={l} />
                 </td>
                 <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{ago(l.createdAt)}</td>
                 <td className="px-4 py-3"><StatusBadge status={l.status} /></td>

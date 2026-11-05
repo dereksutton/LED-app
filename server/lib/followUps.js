@@ -3,14 +3,22 @@
 
 // The confirmation goes to whatever address the visitor typed, so it carries
 // none of their input: a bot can't use it to send its own text to strangers.
-const buildCustomerReply = ({ to, from, replyTo, phone }) => ({
-    from,
-    to,
-    reply_to: replyTo,
-    subject: 'We got your quote request',
-    text: `Thanks for reaching out to LED Custom Painting & More.\n\nWe received your quote request and will be in touch within one business day. If it's urgent, call or text us at ${phone}.\n\nLED Custom Painting & More`,
-    html: `<p>Thanks for reaching out to LED Custom Painting &amp; More.</p><p>We received your quote request and will be in touch within one business day. If it's urgent, call or text us at <a href="tel:${phone.replace(/[^\d+]/g, '')}">${phone}</a>.</p><p>LED Custom Painting &amp; More</p>`,
-});
+const buildCustomerReply = ({ to, from, replyTo, phone }) => {
+    const tel = phone.replace(/[^\d+]/g, '');
+    const steps = [
+        'Efrain or someone on our team will call or text you within one business day to ask a few questions about the project.',
+        'We set a time to come out and look. The estimate is free and there is no obligation.',
+        'You get a written quote you can accept online.',
+    ];
+    return {
+        from,
+        to,
+        reply_to: replyTo,
+        subject: 'Thanks, we got your request',
+        text: `Thanks for reaching out to LED Custom Painting & More. We got your request.\n\nWhat happens next:\n${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nIf you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at ${phone}.\n\nEfrain and the LED Custom Painting team\nServing Clay County, Mandarin and St. Johns`,
+        html: `<p>Thanks for reaching out to LED Custom Painting &amp; More. We got your request.</p><p><strong>What happens next:</strong></p><ol>${steps.map((s) => `<li>${s}</li>`).join('')}</ol><p>If you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at <a href="tel:${tel}">${phone}</a>.</p><p>Efrain and the LED Custom Painting team<br>Serving Clay County, Mandarin and St. Johns</p>`,
+    };
+};
 
 const buildOwnerSms = (lead) => {
     const parts = [lead.name, lead.phone, lead.projectType, lead.address].filter(Boolean);

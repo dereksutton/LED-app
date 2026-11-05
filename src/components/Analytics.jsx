@@ -1,19 +1,25 @@
 "use client";
 import { useEffect } from 'react';
 import Script from 'next/script';
-import { GA_ID, ADS_ID, META_PIXEL_ID, trackCall, trackEmail } from '../lib/analytics';
+import { GA_ID, ADS_ID, META_PIXEL_ID, recordContactIntent, trackCall, trackEmail, trackText } from '../lib/analytics';
+import { getRefCode, readAttribution } from '../lib/attribution';
 
 // Loads GA4 (plus Google Ads and Meta Pixel when their IDs are set) and
-// reports every tel:/mailto: click site-wide, so individual links don't need
-// their own handlers.
+// reports every tel:/sms:/mailto: click site-wide, so individual links don't
+// need their own handlers. Call and text taps are also recorded for the
+// owner's dashboard.
 export default function Analytics() {
   useEffect(() => {
     const onClick = (e) => {
-      const link = e.target.closest && e.target.closest('a[href^="tel:"], a[href^="mailto:"]');
+      const link = e.target.closest && e.target.closest('a[href^="tel:"], a[href^="sms:"], a[href^="mailto:"]');
       if (!link) return;
       const location = window.location.pathname;
-      if (link.getAttribute('href').startsWith('tel:')) {
-        trackCall({ location });
+      const href = link.getAttribute('href');
+      if (href.startsWith('tel:') || href.startsWith('sms:')) {
+        const kind = href.startsWith('tel:') ? 'call' : 'text';
+        if (kind === 'call') trackCall({ location });
+        else trackText({ location });
+        recordContactIntent({ kind, refCode: getRefCode(), attribution: readAttribution() });
       } else {
         trackEmail({ location });
       }

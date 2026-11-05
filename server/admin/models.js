@@ -44,6 +44,9 @@ const customerSchema = new Schema({
     address: { type: String, trim: true, maxlength: 300 },
     notes: { type: String, trim: true, maxlength: 5000 },
     leadId: { type: ObjectId, ref: 'QuoteRequest' },
+    // Set when a customer added by hand was linked to an earlier lead by its
+    // phone or email.
+    leadMatch: { by: { type: String, enum: ['phone', 'email'] }, at: Date },
     createdAt: { type: Date, default: Date.now },
     updatedAt: Date,
 });
@@ -68,9 +71,14 @@ const sharedDocFields = {
     history: [{ _id: false, at: { type: Date, default: Date.now }, event: String }],
 };
 
+// Why a quote has no lead.
+const NO_LEAD_REASONS = ['referral', 'repeat', 'walk-in', 'other'];
+
 const quoteSchema = new Schema({
     ...sharedDocFields,
     leadId: { type: ObjectId, ref: 'QuoteRequest' },
+    noLeadReason: { type: String, enum: NO_LEAD_REASONS },
+    noLeadNote: { type: String, trim: true, maxlength: 300 },
     title: { type: String, trim: true, maxlength: 200 },
     items: [itemSchema],
     taxRate: { type: Number, default: 0, min: 0, max: 100 },
@@ -164,4 +172,6 @@ module.exports = {
     Contract: model('Contract', contractSchema),
     Settings: model('Settings', settingsSchema),
     Counter: model('Counter', counterSchema),
+    ContactIntent: require('../models/ContactIntent'),
+    NO_LEAD_REASONS,
 };

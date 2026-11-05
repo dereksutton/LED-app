@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { Resend } = require('resend');
 const connectDB = require('./config/db');
 const QuoteRequest = require('./models/QuoteRequest');
+const ContactIntent = require('./models/ContactIntent');
 const { createApp } = require('./app');
 const { createTwilioSms, createTwilioSender } = require('./lib/followUps');
 const { createStripe } = require('./admin/stripe');
@@ -39,6 +40,13 @@ const saveLead = async (lead) => {
     return doc._id;
 };
 
+// Call and Text button taps, so the owner can tie a call or text to the
+// visit it came from. Skipped quietly when the database is down.
+const saveContactIntent = async (intent) => {
+    if (mongoose.connection.readyState !== 1) return;
+    await ContactIntent.create(intent);
+};
+
 const corsOrigins = process.env.NODE_ENV === 'production' ? [] : ['http://localhost:3000'];
 if (process.env.CORS_ORIGIN) {
     corsOrigins.push(...process.env.CORS_ORIGIN.split(',').map((o) => o.trim()));
@@ -68,6 +76,7 @@ const stripe = createStripe({
 const app = createApp({
     sendEmail,
     saveLead,
+    saveContactIntent,
     sendSms,
     customerReply: process.env.CUSTOMER_AUTOREPLY === 'true' ? { phone: '(904) 385-0426' } : null,
     notifyTo: process.env.LEAD_NOTIFY_EMAIL || 'ledcustompainting@gmail.com',

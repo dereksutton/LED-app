@@ -468,7 +468,7 @@ const Hero = () => {
                         <h1
                             className="hero-title-stroke text-[--luxury-midnight] font-serif-luxury font-bold text-4xl lg:text-7xl leading-[1.15] lg:leading-tight tracking-tighter mb-8 lg:mb-10"
                         >
-                            Precision Painting Contractors in Jacksonville &amp; North Florida
+                            Precision Painting Contractors in Orange Park, Fleming Island &amp; Clay County
                         </h1>
                         <p className="text-[--luxury-champagne] text-2xl lg:text-4xl font-sans-luxury font-medium mb-8 lg:mb-12 leading-relaxed max-w-4xl" style={{textShadow: '2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 2px 2px 0px #1e293b, 1px 2px 0px #1e293b, 0px 1px 0px #1e293b, 0px -1px 0px #1e293b, 1px 0px 0px #1e293b, -1px 0px 0px #1e293b'}}>
                             Quality You Can See, Service You Can Trust.

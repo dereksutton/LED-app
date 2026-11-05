@@ -84,7 +84,7 @@ export default function ServicesIndex() {
             Professional Painting &amp; Property Services
           </h1>
           <p className="mt-6 font-sans-luxury text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Throughout Jacksonville and North Florida. Licensed, insured, and backed by a 3-year warranty — from single-room refreshes to full commercial buildouts.
+            Throughout Clay County, Mandarin and St. Johns. Licensed, insured, and backed by a 3-year warranty — from single-room refreshes to full commercial buildouts.
           </p>
         </div>
       </header>
@@ -104,14 +104,14 @@ export default function ServicesIndex() {
           <div className="max-w-3xl mx-auto text-center mb-16">
             <p className="font-sans-luxury text-lg text-slate-600 leading-relaxed">
               LED Custom Painting &amp; More brings {claims.experience} of professional painting
-              experience to homeowners and businesses across Jacksonville,{' '}
+              experience to homeowners and businesses across Orange Park,{' '}
               <Link
                 href="/painters-fleming-island-fl/"
                 className="font-semibold text-slate-800 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-800 transition-colors"
               >
                 Fleming Island
               </Link>
-              , and North Florida. Every service below is handled by licensed, insured
+              {' '}and all of Clay County, plus Mandarin and St. Johns. Every service below is handled by licensed, insured
               crews, finished with premium Sherwin-Williams and Benjamin Moore coatings,
               and backed by our written 3-year warranty. Choose a service to see our
               process, what is included, and answers to common questions — then request a

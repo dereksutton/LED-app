@@ -1,3 +1,5 @@
+const { ZONE_LABELS } = require('./serviceArea');
+
 // Builds the owner notification email for a quote request.
 // Every value comes from a public form, so all of it is escaped before it
 // touches HTML.
@@ -32,11 +34,17 @@ const describeAttribution = (a) => {
     ].filter(Boolean).join(' · ');
 };
 
+const OUT_NOTE = 'This ZIP is outside Clay County, Mandarin and St. Johns. The visitor was told you mainly serve those areas and will let them know within a day if you can take the project.';
+
 const buildLeadEmail = (lead, { to, from }) => {
     const {
         name, email, phone, address, projectType, propertyType, timeline,
-        budgetRange, paintingArea, message, howDidYouHear, sourceDetail, attribution,
+        budgetRange, paintingArea, message, howDidYouHear, sourceDetail, attribution, bestTime,
     } = lead;
+    const callback = lead.channel === 'callback';
+    const outOfArea = lead.serviceZone === 'out';
+    const area = lead.serviceZone ? ZONE_LABELS[lead.serviceZone] : '';
+    const title = callback ? 'Callback Request' : 'New Quote Request';
     const heard = [howDidYouHear, sourceDetail].filter(Boolean).join(': ');
     const tracked = describeAttribution(attribution);
     const spamNote = lead.isSpam
@@ -59,27 +67,31 @@ const buildLeadEmail = (lead, { to, from }) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>New Quote Request</title>
+        <title>${title}</title>
       </head>
       <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
         <div style="background: linear-gradient(135deg, #1a1a1a 0%, #0F172A 100%); padding: 30px; border-radius: 10px 10px 0 0;">
-          <h1 style="color: #F7E7CE; margin: 0; text-align: center;">New Quote Request</h1>
+          <h1 style="color: #F7E7CE; margin: 0; text-align: center;">${title}</h1>
         </div>
 
         <div style="background: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none;">
           ${spamNote ? `<p style="background: #FEF3C7; color: #92400E; padding: 12px 15px; border-radius: 5px; margin: 0 0 20px 0;">${spamNote}</p>` : ''}
+          ${outOfArea && !spamNote ? `<p style="background: #FEF3C7; color: #92400E; padding: 12px 15px; border-radius: 5px; margin: 0 0 20px 0;">${OUT_NOTE}</p>` : ''}
           <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Contact Information</h2>
           <table style="width: 100%; margin-bottom: 20px;">
             ${row('Name', name)}
-            <tr>
+            ${email ? `<tr>
               <td style="padding: 8px 0;"><strong>Email:</strong></td>
               <td style="padding: 8px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #1a1a1a;">${escapeHtml(email)}</a></td>
-            </tr>
+            </tr>` : ''}
             <tr>
               <td style="padding: 8px 0;"><strong>Phone:</strong></td>
               <td style="padding: 8px 0;"><a href="${telHref(phone)}" style="color: #1a1a1a;">${escapeHtml(phone)}</a></td>
             </tr>
             ${row('Property Address', address)}
+            ${row('ZIP', !address ? lead.zip : '')}
+            ${row('Service Area', area)}
+            ${row('Best Time to Call', bestTime)}
           </table>
 
           <h2 style="color: #1a1a1a; border-bottom: 2px solid #E8B4B8; padding-bottom: 10px;">Project Details</h2>
@@ -98,12 +110,12 @@ const buildLeadEmail = (lead, { to, from }) => {
           <div style="margin-top: 30px; padding: 20px; background: #FEFCF8; border-radius: 5px; text-align: center;">
             <p style="margin: 0 0 15px 0;"><strong>Submitted:</strong> ${submittedDate}</p>
             <a href="${telHref(phone)}" style="display: inline-block; padding: 12px 30px; background: #1a1a1a; color: #F7E7CE; text-decoration: none; border-radius: 5px; margin: 5px;">Call Customer</a>
-            <a href="mailto:${escapeHtml(email)}" style="display: inline-block; padding: 12px 30px; background: #0F172A; color: #F7E7CE; text-decoration: none; border-radius: 5px; margin: 5px;">Email Customer</a>
+            ${email ? `<a href="mailto:${escapeHtml(email)}" style="display: inline-block; padding: 12px 30px; background: #0F172A; color: #F7E7CE; text-decoration: none; border-radius: 5px; margin: 5px;">Email Customer</a>` : ''}
           </div>
         </div>
 
         <div style="text-align: center; padding: 20px; color: #666; font-size: 12px;">
-          <p>This is an automated notification from your website's quote request form.</p>
+          <p>This is an automated notification from your website's ${callback ? 'callback' : 'quote request'} form.</p>
         </div>
       </body>
       </html>
@@ -121,14 +133,19 @@ const buildLeadEmail = (lead, { to, from }) => {
         .map(([label, value]) => `${label}: ${value}\n`)
         .join('');
 
-    const text = `${spamNote ? `${spamNote}\n\n` : ''}New Quote Request\n\nCONTACT INFORMATION\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nProperty Address: ${address}\n\nPROJECT DETAILS\nProject Type: ${projectType}\n${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
+    const contact = [
+        ['Name', name], ['Email', email], ['Phone', phone], ['Property Address', address],
+        ['ZIP', !address ? lead.zip : ''], ['Service Area', area], ['Best Time to Call', bestTime],
+    ].filter(([, value]) => value).map(([label, value]) => `${label}: ${value}\n`).join('');
+    const notes = [spamNote, outOfArea && !spamNote ? OUT_NOTE : ''].filter(Boolean).map((n) => `${n}\n\n`).join('');
+    const text = `${notes}${title}\n\nCONTACT INFORMATION\n${contact}\nPROJECT DETAILS\n${projectType ? `Project Type: ${projectType}\n` : ''}${optional}${message ? `\nProject Details & Special Requirements:\n${message}\n` : ''}\nSubmitted: ${submittedDate}`;
 
     return {
         from,
         to,
-        reply_to: email,
+        ...(email ? { reply_to: email } : {}),
         // Strip line breaks so a name can't smuggle extra headers into the subject.
-        subject: `${spamNote ? 'Likely spam: ' : ''}Quote Request from ${name.replace(/[\r\n]+/g, ' ')}`,
+        subject: `${spamNote ? 'Likely spam: ' : outOfArea ? 'Out of area: ' : ''}${callback ? 'Callback Request' : 'Quote Request'} from ${name.replace(/[\r\n]+/g, ' ')}`,
         html,
         text,
     };

@@ -6,6 +6,7 @@ const { computeTotals, invoiceState } = require('./money');
 const defaults = require('./defaults');
 const { randomToken } = require('./crypto');
 const { describeAttribution } = require('../lib/leadEmail');
+const { leadOrganic } = require('../lib/leadSources');
 
 class InputError extends Error {
     constructor(message, status = 400) {
@@ -105,6 +106,11 @@ const serializeLead = (lead) => {
     if (o.status === 'completed') o.status = 'won';
     if (o.status === 'declined') o.status = 'lost';
     o.trackedSource = describeAttribution(lead.attribution);
+    const { organic, reason } = leadOrganic(plain(lead));
+    o.organic = organic;
+    o.organicReason = reason;
+    o.channel = o.channel || (o.source === 'manual' ? 'manual' : 'form');
+    o.history = o.history || [];
     return o;
 };
 

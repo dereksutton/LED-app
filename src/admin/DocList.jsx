@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from './api';
 import CustomerPicker from './CustomerPicker';
+import LeadPicker from './LeadPicker';
 import { money, shortDate } from './format';
 import { Button, Card, Empty, ErrorNote, FilterTabs, PageHeader, Spinner, StatusBadge, Table, useLoad } from './ui';
 
@@ -16,15 +17,27 @@ export default function DocList({ kind, title, subtitle, tabs, newLabel, dateCol
   const [data, error] = useLoad(() => adminApi.get(`/${kind}s?status=${encodeURIComponent(status)}`), [status]);
   const list = data ? data[`${kind}s`] : null;
 
-  const create = async (customer) => {
-    const res = await adminApi.post(`/${kind}s`, { customerId: customer.id });
-    router.push(`/admin/${kind}s/edit/?id=${res[kind].id}`);
+  // A quote for a customer with no lead on file asks which lead it's for.
+  const [needsLead, setNeedsLead] = useState(null);
+  const create = async (customer, link = {}) => {
+    try {
+      const res = await adminApi.post(`/${kind}s`, { customerId: customer.id, ...link });
+      router.push(`/admin/${kind}s/edit/?id=${res[kind].id}`);
+    } catch (err) {
+      if (kind === 'quote' && err.status === 400 && /lead/.test(err.message) && !link.leadId && !link.noLeadReason) {
+        setPicking(false);
+        setNeedsLead(customer);
+        return;
+      }
+      throw err;
+    }
   };
 
   return (
     <>
       <PageHeader title={title} subtitle={subtitle} actions={<Button onClick={() => setPicking(true)}>{newLabel}</Button>} />
-      {picking && <CustomerPicker title={`${newLabel}: choose the customer`} onPick={create} onClose={() => setPicking(false)} />}
+      {picking && <CustomerPicker title={`${newLabel}: choose the customer`} onPick={(c) => create(c)} onClose={() => setPicking(false)} />}
+      {needsLead && <LeadPicker customer={needsLead} onPick={(link) => create(needsLead, link)} onClose={() => setNeedsLead(null)} />}
       <Card>
         <FilterTabs tabs={tabs} value={status} hrefFor={(v) => `/admin/${kind}s/${v ? `?status=${v}` : ''}`} className="mb-3" />
         <ErrorNote error={error} />

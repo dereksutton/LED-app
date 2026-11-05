@@ -1,4 +1,5 @@
 import { claims } from './site';
+import { SERVICE_AREAS } from './serviceArea';
 
 export const services = [
   {
@@ -63,18 +64,7 @@ Whether you're updating a single room or refreshing your entire home, we work ar
       'Furniture moving and full floor protection',
       'Detailed cleanup — better than we found it',
     ],
-    serviceAreas: [
-      'Riverside',
-      'Avondale',
-      'San Marco',
-      'Mandarin',
-      'Ponte Vedra Beach',
-      'Jacksonville Beach',
-      'Atlantic Beach',
-      'Nocatee',
-      'Southside',
-      'Ortega',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'How long does interior painting take?',
@@ -164,18 +154,7 @@ From stucco homes and wood siding to trim, fascia, soffits, and shutters, we han
       'Paint splatter and overspray cleanup',
       '3-year written warranty',
     ],
-    serviceAreas: [
-      'Jacksonville',
-      'Ponte Vedra',
-      'St. Augustine',
-      'Fernandina Beach',
-      'Orange Park',
-      'Fleming Island',
-      'Middleburg',
-      'Nocatee',
-      'Jacksonville Beach',
-      'Atlantic Beach',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'How often should I repaint my home\'s exterior?',
@@ -265,18 +244,7 @@ Pressure washing isn't just cosmetic. Regular cleaning prevents permanent staini
       'Biodegradable, pet-safe detergents',
       'Plant and property protection',
     ],
-    serviceAreas: [
-      'Jacksonville',
-      'Atlantic Beach',
-      'Neptune Beach',
-      'Jacksonville Beach',
-      'Ponte Vedra Beach',
-      'Mandarin',
-      'Arlington',
-      'Westside',
-      'Nocatee',
-      'Fruit Cove',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'What\'s the difference between pressure washing and soft washing?',
@@ -366,18 +334,7 @@ We refinish kitchen cabinets, bathroom vanities, laundry room cabinets, and buil
       'Dust-controlled on-site containment',
       'Appliance and countertop protection',
     ],
-    serviceAreas: [
-      'Jacksonville',
-      'Ponte Vedra',
-      'St. Johns County',
-      'Clay County',
-      'Nassau County',
-      'Nocatee',
-      'Julington Creek',
-      'Orange Park',
-      'Mandarin',
-      'San Marco',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'How much does cabinet refinishing cost compared to new cabinets?',
@@ -467,18 +424,7 @@ We also handle ceiling painting, water stain repair, and accent ceiling treatmen
       'Furniture covering and limited moving',
       'Vacuum-grade post-project cleanup',
     ],
-    serviceAreas: [
-      'Jacksonville',
-      'San Marco',
-      'Avondale',
-      'Riverside',
-      'Mandarin',
-      'Arlington',
-      'Southside',
-      'Julington Creek',
-      'Fleming Island',
-      'Orange Park',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'Is popcorn ceiling removal messy?',
@@ -568,18 +514,7 @@ From interior office repaints and retail refreshes to exterior building painting
       'HOA common-area and breezeway painting',
       'Scheduled off-hours and overnight work',
     ],
-    serviceAreas: [
-      'Jacksonville',
-      'Southside',
-      'Westside',
-      'Arlington',
-      'Orange Park',
-      'Jacksonville Beach',
-      'Nocatee / St. Johns',
-      'Ponte Vedra',
-      'Fleming Island',
-      'Fernandina Beach',
-    ],
+    serviceAreas: SERVICE_AREAS,
     faqs: [
       {
         q: 'Can you work after hours to avoid business disruption?',

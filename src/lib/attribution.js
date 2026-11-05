@@ -52,3 +52,28 @@ export function captureAttribution() {
     // storage blocked: the lead just goes without tracking
   }
 }
+
+// A short code for this browser, e.g. "K7F3". It rides along in the Text
+// us message and with Call taps, so a text or call can be matched to how the
+// visitor found the site. Random, and tied to nothing personal.
+const REF_KEY = 'led_ref';
+const REF_CHARS = 'ACDEFGHJKMNPQRTUVWXY34679';
+
+export function getRefCode() {
+  if (typeof window === 'undefined') return '';
+  try {
+    const stored = window.localStorage.getItem(REF_KEY);
+    if (stored && /^[A-Z0-9]{4,8}$/.test(stored)) return stored;
+  } catch {
+    // storage blocked: make one for this page view
+  }
+  const bytes = new Uint8Array(4);
+  window.crypto.getRandomValues(bytes);
+  const code = Array.from(bytes, (b) => REF_CHARS[b % REF_CHARS.length]).join('');
+  try {
+    window.localStorage.setItem(REF_KEY, code);
+  } catch {
+    // fine: the code still works for this visit
+  }
+  return code;
+}

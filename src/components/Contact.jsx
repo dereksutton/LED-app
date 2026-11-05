@@ -1,9 +1,12 @@
 "use client";
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { trackLead } from '../lib/analytics';
-import { readAttribution } from '../lib/attribution';
+import { trackFormStart, trackLead } from '../lib/analytics';
+import { getRefCode, readAttribution } from '../lib/attribution';
 import { claims } from '../data/site';
+import CallbackForm from './CallbackForm';
+import TextUsLink from './TextUsLink';
 
 const IconComponent = ({ iconType }) => {
     const iconProps = {
@@ -80,6 +83,13 @@ const Contact = () => {
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
+    const started = useRef(false);
+    const onFormStart = () => {
+        if (started.current) return;
+        started.current = true;
+        trackFormStart({ form: 'quote' });
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -102,6 +112,7 @@ const Contact = () => {
                     ...formData,
                     address: `${formData.street.trim()}, ${formData.city.trim()}, FL ${formData.zip.trim()}`,
                     attribution: readAttribution() || undefined,
+                    refCode: getRefCode(),
                 })
             });
 
@@ -109,6 +120,7 @@ const Contact = () => {
 
             if (response.ok) {
                 trackLead({ service: formData.projectType });
+                router.push(`/thank-you/?type=quote${data.serviceArea === 'out' ? '&area=out' : ''}`);
                 setStatus({
                     type: 'success',
                     message: 'Thank you for your request! We\'ll contact you within 24 hours with a detailed quote.'
@@ -333,7 +345,7 @@ const Contact = () => {
                             )}
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                            <form onSubmit={handleSubmit} onFocus={onFormStart} className="space-y-6 text-left">
                                 {/* Honeypot: hidden from people, filled by bots, dropped by the API */}
                                 <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}>
                                     <label htmlFor="website">Website</label>
@@ -372,7 +384,7 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="city" className={labelClass}>City *</label>
-                                        <input type="text" id="city" name="city" autoComplete="address-level2" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="Jacksonville" disabled={isSubmitting} />
+                                        <input type="text" id="city" name="city" autoComplete="address-level2" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="Orange Park" disabled={isSubmitting} />
                                     </div>
                                     <div>
                                         <label htmlFor="zip" className={labelClass}>ZIP *</label>
@@ -500,7 +512,21 @@ const Contact = () => {
                                     Available Mon-Fri: 8AM-6PM<br />
                                     Saturday: 9AM-4PM
                                 </p>
+                                <TextUsLink className="mt-5 inline-flex items-center justify-center rounded-full border-2 border-[#2C3E50] px-6 py-2.5 font-sans-luxury font-semibold text-[#2C3E50] hover:bg-[#2C3E50] hover:text-[#F5E6D3] transition-colors no-underline">
+                                    Or text us
+                                </TextUsLink>
                             </div>
+                        </div>
+
+                        {/* Callback request */}
+                        <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-md">
+                            <h3 className="font-serif-luxury text-2xl text-[#2C3E50] mb-2 text-center">
+                                Prefer a Call Back?
+                            </h3>
+                            <p className="font-sans-luxury text-slate-600 mb-5 text-center text-sm">
+                                Leave your name and number and we&apos;ll call you.
+                            </p>
+                            <CallbackForm />
                         </div>
 
                         {/* Why Choose Us */}
@@ -515,7 +541,7 @@ const Contact = () => {
                                     'Licensed & fully insured',
                                     'A+ Better Business Bureau rating',
                                     `${claims.experience} of experience`,
-                                    'Local North Florida company'
+                                    'Local Clay County company'
                                 ].map((benefit, index) => (
                                     <motion.div
                                         key={index}

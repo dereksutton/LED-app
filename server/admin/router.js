@@ -2,10 +2,16 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const {
-    AdminUser, AdminSession, QuoteRequest, Customer, Quote, Invoice, Contract, Settings,
+    AdminUser, AdminSession, QuoteRequest, Customer, Quote, Invoice, Contract, Settings, ContactIntent, NO_LEAD_REASONS,
 } = require('./models');
 const { LEAD_STATUSES } = require('../models/QuoteRequest');
-const { normalizeSource } = require('../lib/leadSources');
+const {
+    normalizeSource, classifyOrganic, normalizeRefCode, ORGANIC_SOURCES, CHANNEL_LABELS,
+} = require('../lib/leadSources');
+const { zoneForZip } = require('../lib/serviceArea');
+const {
+    logChange, markLeadWon, isWon, findLeadMatch,
+} = require('./leadTracking');
 const { hashPassword, verifyPassword, checkPasswordStrength, sha256 } = require('./crypto');
 const { computeTotals, invoiceState, paidCents, formatMoney, DAY } = require('./money');
 const { fillTemplate } = require('./defaults');
@@ -194,10 +200,13 @@ const createAdminRouter = ({
         const source = typeof req.query.source === 'string' ? req.query.source : '';
         if (source === 'none') filter.howDidYouHear = { $in: [null, ''] };
         else if (source) filter.howDidYouHear = new RegExp(`^${escapeRegex(source)}$`, 'i');
+        const organic = typeof req.query.organic === 'string' ? req.query.organic : '';
+        if (organic === 'google') filter.organic = { $in: ['search', 'gbp'] };
+        else if (ORGANIC_SOURCES.includes(organic)) filter.organic = organic;
         const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
         if (q) {
             const re = new RegExp(escapeRegex(q), 'i');
-            filter.$or = [{ name: re }, { email: re }, { phone: re }, { address: re }, { projectType: re }, { sourceDetail: re }];
+            filter.$or = [{ name: re }, { email: re }, { phone: re }, { address: re }, { projectType: re }, { sourceDetail: re }, { refCode: re }];
         }
         const [leads, spamCount] = await Promise.all([
             QuoteRequest.find(filter, { notes: 0 }).sort({ createdAt: -1 }).limit(500),
@@ -206,12 +215,66 @@ const createAdminRouter = ({
         res.json({ leads: leads.map(serializeLead), spamCount });
     }));
 
+    // A call, text or referral that didn't come through the website. A call
+    // or text can be tied to a Call or Text tap on the site (intentId), or to
+    // the ref code in a prefilled text, and takes that visit's Google credit.
     router.post('/leads', wrap(async (req, res) => {
         const fields = parseLeadFields(req.body);
         if (!fields.name) throw new InputError('Add a name.');
         if (!fields.phone && !fields.email) throw new InputError('Add a phone number or email.');
-        const lead = await QuoteRequest.create({ ...fields, source: 'manual', status: 'new' });
+        const channel = ['call', 'text', 'manual'].includes(req.body.channel) ? req.body.channel : 'manual';
+        const zip = str(req.body.zip, 10);
+        if (zip && !/^\d{5}(-\d{4})?$/.test(zip)) throw new InputError('Enter a 5-digit ZIP code.');
+        const refCode = req.body.refCode ? normalizeRefCode(req.body.refCode) : null;
+        if (req.body.refCode && !refCode) throw new InputError('That ref code doesn\'t look right. It\'s 4 letters and numbers, like K7F3.');
+        let intent = null;
+        if (req.body.intentId) {
+            intent = await ContactIntent.findById(id(req.body.intentId, 'tap'));
+            if (!intent) throw new InputError('That call or text tap doesn\'t exist.', 404);
+        } else if (refCode) {
+            intent = await ContactIntent.findOne({ refCode, createdAt: { $gte: new Date(Date.now() - 90 * DAY) } }).sort({ createdAt: -1 });
+        }
+        const attribution = intent && intent.attribution ? intent.toObject().attribution : undefined;
+        const credit = classifyOrganic({ attribution, howDidYouHear: fields.howDidYouHear });
+        const tapped = intent ? ` (matched a ${intent.kind === 'call' ? 'Call' : 'Text'} tap on the site)` : '';
+        const lead = await QuoteRequest.create({
+            ...fields,
+            ...(zip ? { zip, serviceZone: zoneForZip(zip) } : {}),
+            source: 'manual',
+            channel,
+            organic: credit.organic,
+            ...(credit.reason ? { organicReason: `${credit.reason}${attribution ? tapped : ''}` } : {}),
+            ...(refCode || (intent && intent.refCode) ? { refCode: refCode || intent.refCode } : {}),
+            ...(attribution ? { attribution } : {}),
+            status: 'new',
+            history: [{ at: new Date(), by: req.admin.name, field: 'Added', from: '', to: CHANNEL_LABELS[channel] }],
+        });
+        if (intent && !intent.leadId) {
+            intent.leadId = lead._id;
+            await intent.save();
+        }
         res.status(201).json({ lead: serializeLead(lead) });
+    }));
+
+    // Call and Text taps on the site not yet tied to a lead, newest first:
+    // the last `minutes` (15 by default), or every tap with a ref code.
+    router.get('/contact-intents', wrap(async (req, res) => {
+        const filter = { leadId: { $exists: false } };
+        const refCode = typeof req.query.refCode === 'string' && req.query.refCode ? normalizeRefCode(req.query.refCode) : null;
+        if (refCode) {
+            filter.refCode = refCode;
+        } else {
+            const minutes = Math.min(Math.max(Number(req.query.minutes) || 15, 1), 24 * 60);
+            filter.createdAt = { $gte: new Date(Date.now() - minutes * 60 * 1000) };
+        }
+        if (req.query.kind === 'call' || req.query.kind === 'text') filter.kind = req.query.kind;
+        const intents = await ContactIntent.find(filter).sort({ createdAt: -1 }).limit(20);
+        res.json({
+            intents: intents.map((i) => ({
+                id: String(i._id), kind: i.kind, refCode: i.refCode, page: i.page,
+                organic: i.organic, organicReason: i.organicReason, createdAt: i.createdAt,
+            })),
+        });
     }));
 
     router.get('/leads/:id', wrap(async (req, res) => {
@@ -220,11 +283,60 @@ const createAdminRouter = ({
         res.json({ lead: serializeLead(lead), quotes: quotes.map(serializeQuote) });
     }));
 
+    // Every change to the source, status or job amount goes in the lead's
+    // history with who made it.
     router.patch('/leads/:id', wrap(async (req, res) => {
         const lead = await findOr404(QuoteRequest, req.params.id, 'lead');
-        Object.assign(lead, parseLeadFields(req.body));
+        const by = req.admin.name;
+        const fields = parseLeadFields(req.body);
+        for (const f of ['howDidYouHear', 'sourceDetail']) {
+            if (fields[f] !== undefined) logChange(lead, by, f, lead[f], fields[f]);
+        }
+        Object.assign(lead, fields);
+
         const status = dashboardStatus(req.body.status);
-        if (status) lead.status = status;
+        if (status) {
+            const before = isWon(lead.status) ? 'won' : lead.status === 'declined' ? 'lost' : lead.status;
+            logChange(lead, by, 'status', before, status);
+            if (status !== 'won') lead.wonAt = undefined;
+            else if (!lead.wonAt) lead.wonAt = new Date();
+            lead.status = status;
+        }
+
+        if (req.body.jobAmountCents !== undefined) {
+            const amount = req.body.jobAmountCents === null || req.body.jobAmountCents === ''
+                ? undefined
+                : Math.round(num(req.body.jobAmountCents, { min: 0, max: 1e10, label: 'Job amount' }));
+            logChange(lead, by, 'jobAmountCents', lead.jobAmountCents, amount);
+            lead.jobAmountCents = amount;
+        }
+
+        const plainLead = () => ({ attribution: lead.toObject().attribution, howDidYouHear: lead.howDidYouHear });
+        const current = lead.organic || classifyOrganic(plainLead()).organic;
+        if (req.body.organic !== undefined) {
+            // 'auto' hands it back to the tracking and the form answer.
+            if (req.body.organic === 'auto') {
+                const next = classifyOrganic(plainLead());
+                logChange(lead, by, 'organic', current, next.organic);
+                lead.organic = next.organic;
+                lead.organicReason = next.reason || undefined;
+                lead.organicManual = undefined;
+            } else if (ORGANIC_SOURCES.includes(req.body.organic)) {
+                if (logChange(lead, by, 'organic', current, req.body.organic)) {
+                    lead.organic = req.body.organic;
+                    lead.organicReason = `Set by ${by}`;
+                    lead.organicManual = true;
+                }
+            } else {
+                throw new InputError('Unknown Google credit.');
+            }
+        } else if (fields.howDidYouHear !== undefined && !lead.organicManual) {
+            const next = classifyOrganic(plainLead());
+            logChange(lead, by, 'organic', current, next.organic);
+            lead.organic = next.organic;
+            lead.organicReason = next.reason || undefined;
+        }
+
         lead.updatedAt = new Date();
         await lead.save();
         res.json({ lead: serializeLead(lead) });
@@ -234,6 +346,7 @@ const createAdminRouter = ({
     router.post('/leads/:id/spam', wrap(async (req, res) => {
         const lead = await findOr404(QuoteRequest, req.params.id, 'lead');
         if (typeof req.body.spam !== 'boolean') throw new InputError('Say whether this is spam.');
+        logChange(lead, req.admin.name, 'isSpam', Boolean(lead.isSpam), req.body.spam);
         if (req.body.spam) {
             lead.isSpam = true;
             lead.spam = { markedAt: new Date(), by: req.admin.name, reason: str(req.body.reason, 300) || 'Marked as spam' };
@@ -319,11 +432,33 @@ const createAdminRouter = ({
         res.json({ customers: customers.map(serializeCustomer) });
     }));
 
+    // A customer added by hand is checked against leads from the last 12
+    // months by phone and email, and linked to the one it came from.
+    const matchCustomerToLead = async (customer, by) => {
+        if (customer.leadId) return null;
+        const found = await findLeadMatch({ phone: customer.phone, email: customer.email });
+        if (!found) return null;
+        customer.leadId = found.lead._id;
+        customer.leadMatch = { by: found.by, at: new Date() };
+        await customer.save();
+        if (!found.lead.customerId) {
+            logChange(found.lead, by, 'customer', '', `${customer.name} (matched by ${found.by})`);
+            found.lead.customerId = customer._id;
+            await found.lead.save();
+        }
+        return briefMatch(found.lead, found.by);
+    };
+    const briefMatch = (lead, by) => {
+        const l = serializeLead(lead);
+        return { leadId: l.id, name: l.name, createdAt: l.createdAt, organic: l.organic, channel: l.channel, by };
+    };
+
     router.post('/customers', wrap(async (req, res) => {
         const fields = parseCustomer(req.body);
         if (!fields.name) throw new InputError('Add a name.');
         const customer = await Customer.create(fields);
-        res.status(201).json({ customer: serializeCustomer(customer) });
+        const match = await matchCustomerToLead(customer, req.admin.name);
+        res.status(201).json({ customer: serializeCustomer(customer), match });
     }));
 
     router.get('/customers/:id', wrap(async (req, res) => {
@@ -332,7 +467,9 @@ const createAdminRouter = ({
             Quote.find({ customerId: customer._id }).sort({ createdAt: -1 }),
             Invoice.find({ customerId: customer._id }).sort({ createdAt: -1 }),
             Contract.find({ customerId: customer._id }, { 'signature.imageDataUrl': 0 }).sort({ createdAt: -1 }),
-            QuoteRequest.find({ customerId: customer._id }, { notes: 0 }).sort({ createdAt: -1 }),
+            QuoteRequest.find(customer.leadId
+                ? { $or: [{ customerId: customer._id }, { _id: customer.leadId }] }
+                : { customerId: customer._id }, { notes: 0 }).sort({ createdAt: -1 }),
         ]);
         res.json({
             customer: serializeCustomer(customer),
@@ -349,7 +486,8 @@ const createAdminRouter = ({
         if (fields.name === '') throw new InputError('Add a name.');
         Object.assign(customer, fields, { updatedAt: new Date() });
         await customer.save();
-        res.json({ customer: serializeCustomer(customer) });
+        const match = await matchCustomerToLead(customer, req.admin.name);
+        res.json({ customer: serializeCustomer(customer), match });
     }));
 
     router.delete('/customers/:id', wrap(async (req, res) => {
@@ -503,22 +641,65 @@ const createAdminRouter = ({
 
     docRoutes('quote');
 
+    // Every quote names its lead, or why it has none. With no lead picked it
+    // takes the customer's lead, or one matched by phone or email.
+    const quoteLeadLink = async (body, customer, by, { auto = true } = {}) => {
+        if (body.leadId) {
+            const lead = await findOr404(QuoteRequest, body.leadId, 'lead');
+            return { leadId: lead._id };
+        }
+        if (auto && customer.leadId) return { leadId: customer.leadId };
+        if (auto && await matchCustomerToLead(customer, by)) return { leadId: customer.leadId };
+        const reason = str(body.noLeadReason, 20);
+        if (!reason) throw new InputError('Pick the lead this quote is for, or say why there isn\'t one.');
+        if (!NO_LEAD_REASONS.includes(reason)) throw new InputError('Unknown reason.');
+        return { noLeadReason: reason, noLeadNote: str(body.noLeadNote, 300) };
+    };
+
     router.post('/quotes', wrap(async (req, res) => {
         const customer = await loadCustomer(id(req.body.customerId, 'customer'));
-        const leadId = req.body.leadId ? id(req.body.leadId, 'lead') : undefined;
-        const quote = await createQuote({ ...quoteFields(req.body), customerId: customer._id, leadId });
+        const link = await quoteLeadLink(req.body, customer, req.admin.name);
+        const quote = await createQuote({ ...quoteFields(req.body), customerId: customer._id, ...link });
         res.status(201).json({ quote: serializeQuote(quote) });
     }));
 
+    // Changes the lead a quote is for, even after it was answered. An
+    // accepted quote marks its new lead won.
+    router.post('/quotes/:id/lead', wrap(async (req, res) => {
+        const quote = await findOr404(Quote, req.params.id, 'quote');
+        const customer = await loadCustomer(quote.customerId);
+        const link = await quoteLeadLink(req.body, customer, req.admin.name, { auto: false });
+        quote.leadId = link.leadId;
+        quote.noLeadReason = link.noLeadReason;
+        quote.noLeadNote = link.noLeadNote;
+        quote.history.push({ event: link.leadId ? `Linked to a lead by ${req.admin.name}` : `Marked as having no lead (${link.noLeadReason}) by ${req.admin.name}` });
+        quote.updatedAt = new Date();
+        await quote.save();
+        if (quote.status === 'accepted' && quote.leadId) {
+            await markLeadWon(quote.leadId, { by: req.admin.name, amountCents: computeTotals(quote).totalCents });
+        }
+        res.json({ quote: serializeQuote(quote), lead: await quoteLead(quote) });
+    }));
+
+    const quoteLead = async (quote) => {
+        if (!quote.leadId) return null;
+        const lead = await QuoteRequest.findById(quote.leadId, { notes: 0 });
+        if (!lead) return null;
+        const l = serializeLead(lead);
+        return { id: l.id, name: l.name, createdAt: l.createdAt, organic: l.organic, channel: l.channel, status: l.status };
+    };
+
     router.get('/quotes/:id', wrap(async (req, res) => {
         const quote = await findOr404(Quote, req.params.id, 'quote');
-        const [customer, invoices, contracts] = await Promise.all([
+        const [customer, invoices, contracts, lead] = await Promise.all([
             Customer.findById(quote.customerId),
             Invoice.find({ quoteId: quote._id }).sort({ createdAt: 1 }),
             Contract.find({ quoteId: quote._id }, { body: 0, 'signature.imageDataUrl': 0 }).sort({ createdAt: 1 }),
+            quoteLead(quote),
         ]);
         res.json({
             quote: serializeQuote(quote),
+            lead,
             customer: customer && serializeCustomer(customer),
             invoices: invoices.map(serializeInvoice),
             contracts: contracts.map(serializeContract),
@@ -554,14 +735,14 @@ const createAdminRouter = ({
         quote.updatedAt = new Date();
         await quote.save();
         if (status === 'accepted' && quote.leadId) {
-            await QuoteRequest.updateOne({ _id: quote.leadId }, { status: 'won', updatedAt: new Date() });
+            await markLeadWon(quote.leadId, { by: req.admin.name, amountCents: computeTotals(quote).totalCents });
         }
         res.json({ quote: serializeQuote(quote) });
     }));
 
     router.post('/quotes/:id/duplicate', wrap(async (req, res) => {
         const quote = await findOr404(Quote, req.params.id, 'quote');
-        const copy = await createQuote(pick(quote.toObject(), ['customerId', 'leadId', 'title', 'items', 'taxRate', 'discountCents', 'depositPercent', 'notes', 'terms']));
+        const copy = await createQuote(pick(quote.toObject(), ['customerId', 'leadId', 'noLeadReason', 'noLeadNote', 'title', 'items', 'taxRate', 'discountCents', 'depositPercent', 'notes', 'terms']));
         res.status(201).json({ quote: serializeQuote(copy) });
     }));
 
