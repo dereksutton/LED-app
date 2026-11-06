@@ -1,7 +1,6 @@
 // Where LED works: every Clay County community except Keystone Heights, plus
 // Mandarin and the St. Johns area. The site's schema, service pages and
-// footer all read this list. The API tags leads by ZIP in
-// server/lib/serviceArea.js; keep the two in step.
+// footer all read this list.
 export const CLAY_COUNTY = [
   'Orange Park',
   'Fleming Island',

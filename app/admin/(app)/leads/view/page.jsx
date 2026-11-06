@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../../src/admin/api';
-import { LEAD_SOURCES, ORGANIC, STATUS, ZONES, centsToInput, channelLabel, dateTime, money, shortDate, toCents } from '../../../../../src/admin/format';
+import { LEAD_SOURCES, ORGANIC, STATUS, centsToInput, channelLabel, dateTime, money, shortDate, toCents } from '../../../../../src/admin/format';
 import { Badge, Button, Card, ErrorNote, Field, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
 
 const DETAILS = [
@@ -19,8 +19,8 @@ const show = (h, v) => (h.field === 'Status' && STATUS[v] ? STATUS[v].label : v 
 // A text from the owner's own phone, ready to send.
 const textHref = (lead) => {
   const first = (lead.name || '').trim().split(/\s+/)[0];
-  const project = lead.projectType && lead.projectType !== 'Callback request' ? ` about ${lead.projectType.toLowerCase()}` : '';
-  const body = `Hi${first ? ` ${first}` : ''}, this is Efrain with LED Custom Painting. Thanks for reaching out${project}! When's a good time to talk, or to come take a look?`;
+  const project = lead.projectType ? ` about ${lead.projectType.toLowerCase()}` : '';
+  const body = `Hi${first ? ` ${first}` : ''}, this is LED Custom Painting. Thanks for reaching out${project}! When's a good time to talk, or to come take a look?`;
   // "?&body=" works on both iPhone and Android.
   return `sms:${digits(lead.phone)}?&body=${encodeURIComponent(body)}`;
 };
@@ -64,7 +64,6 @@ function SourceCard({ lead, onSaved }) {
     run(async () => onSaved((await adminApi.patch(`/leads/${lead.id}`, { howDidYouHear: source, sourceDetail: detail })).lead));
   };
   const setOrganic = (organic) => run(async () => onSaved((await adminApi.patch(`/leads/${lead.id}`, { organic })).lead));
-  const zone = ZONES[lead.serviceZone];
   return (
     <Card title="Lead source">
       <form onSubmit={save} className="space-y-3">
@@ -89,10 +88,9 @@ function SourceCard({ lead, onSaved }) {
             <option value="none">Not from Google</option>
           </Select>
         </Field>
-        {(lead.refCode || zone) && (
+        {lead.refCode && (
           <div className="flex flex-wrap gap-1.5">
-            {lead.refCode && <Badge>Ref {lead.refCode}</Badge>}
-            {zone && <Badge tone={zone.tone}>{zone.label}</Badge>}
+            <Badge>Ref {lead.refCode}</Badge>
           </div>
         )}
         <ErrorNote error={error} />
@@ -121,6 +119,10 @@ function Lead() {
       setData({ ...data, lead: res.lead });
     });
   };
+  const setOutOfArea = (outOfArea) => run(async () => {
+    const res = await adminApi.patch(`/leads/${id}`, { outOfArea });
+    setData({ ...data, lead: res.lead });
+  });
   const addNote = (e) => {
     e.preventDefault();
     run(async () => {
@@ -173,9 +175,9 @@ function Lead() {
           onSaved={(saved) => { setMarkingWon(false); setData({ ...data, lead: saved }); }}
         />
       )}
-      {lead.serviceZone === 'out' && !lead.isSpam && (
+      {lead.outOfArea && !lead.isSpam && (
         <div className="mt-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Outside Clay County, Mandarin and St. Johns. They were told you&apos;d let them know within a day if you can take the project.
+          Marked out of your service area. Nothing was sent to the customer.
         </div>
       )}
       {lead.isSpam && (
@@ -248,6 +250,19 @@ function Lead() {
                 <button type="button" className="text-sm font-medium underline" onClick={() => setMarkingWon(true)}>{typeof lead.jobAmountCents === 'number' ? 'Edit' : 'Add'}</button>
               </div>
             )}
+            <label className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300"
+                checked={Boolean(lead.outOfArea)}
+                disabled={busy}
+                onChange={(e) => setOutOfArea(e.target.checked)}
+              />
+              <span>
+                Out of service area
+                <span className="block text-xs text-slate-500">Only marks the lead. Nothing is sent to the customer.</span>
+              </span>
+            </label>
             <div className="mt-3 flex flex-wrap gap-2">
               {lead.phone && <Button variant="secondary" href={`tel:${lead.phone.replace(/[^\d+]/g, '')}`}>Call</Button>}
               {lead.phone && <Button variant="secondary" href={textHref(lead)}>Text</Button>}

@@ -94,7 +94,7 @@ const quoteRequestSchema = new mongoose.Schema({
     default: 'website'
   },
   // How the lead reached LED (see lib/leadSources.js).
-  channel: { type: String, enum: ['form', 'callback', 'call', 'text', 'manual'] },
+  channel: { type: String, enum: ['form', 'call', 'text', 'manual'] },
   // Organic Google credit, worked out when the lead is made: 'search', 'gbp'
   // or 'none', and why. organicManual: set by hand, so edits to
   // howDidYouHear no longer change it.
@@ -103,10 +103,9 @@ const quoteRequestSchema = new mongoose.Schema({
   organicManual: { type: Boolean },
   // The site's ref code from a prefilled text or a tapped call button.
   refCode: { type: String, trim: true },
-  // core / nearby / edge / out, from the ZIP (lib/serviceArea.js).
-  serviceZone: { type: String, enum: ['core', 'nearby', 'edge', 'out'] },
-  // Best time to call back, from the callback form.
-  bestTime: { type: String, trim: true },
+  // Set by the owner in the dashboard when the job is outside the area LED
+  // works. Never set automatically, and nothing is sent to the customer.
+  outOfArea: { type: Boolean },
   // The job: what it was won for and when.
   jobAmountCents: { type: Number, min: 0 },
   wonAt: Date,

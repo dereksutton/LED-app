@@ -635,7 +635,7 @@ describe('organic credit and job tracking', () => {
         },
     });
 
-    dbTest('website leads carry their Google credit, channel and area', async () => {
+    dbTest('website leads carry their Google credit and channel', async () => {
         await quoteForm({ attribution: { referrer: 'www.google.com' } });
         const list = await call('GET', '/api/admin/leads?status=&organic=google', { cookie });
         const lead = list.data.leads.find((l) => l.email === 'grace@example.com');
@@ -643,7 +643,6 @@ describe('organic credit and job tracking', () => {
         assert.equal(lead.organic, 'search');
         assert.equal(lead.organicReason, 'Came from a Google search');
         assert.equal(lead.channel, 'form');
-        assert.equal(lead.serviceZone, 'core');
         const none = await call('GET', '/api/admin/leads?status=&organic=none', { cookie });
         assert.ok(!none.data.leads.some((l) => l.id === lead.id));
         // Leads from before tagging are credited from what they have.
@@ -682,6 +681,20 @@ describe('organic credit and job tracking', () => {
         assert.equal(reopened.data.lead.wonAt, undefined);
     });
 
+    dbTest('the owner marks a lead out of the service area, and nothing is sent', async () => {
+        const list = await call('GET', '/api/admin/leads?q=grace', { cookie });
+        const id = list.data.leads[0].id;
+        const emailsBefore = sent.length;
+        const out = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: true } });
+        assert.equal(out.status, 200);
+        assert.equal(out.data.lead.outOfArea, true);
+        assert.ok(out.data.lead.history.some((h) => h.field === 'Service area' && h.to === 'Out of service area'));
+        const back = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: false } });
+        assert.equal(back.data.lead.outOfArea, undefined);
+        assert.equal(sent.length, emailsBefore);
+        assert.equal((await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: 'yes' } })).status, 400);
+    });
+
     dbTest('a phone lead picks up the Google credit of the Call tap before it', async () => {
         const tap = await call('POST', '/api/contact-intent', {
             body: { kind: 'call', refCode: 'Q7RT', page: '/', attribution: { utmSource: 'google', utmMedium: 'organic', utmCampaign: 'gbp' } },
@@ -700,7 +713,7 @@ describe('organic credit and job tracking', () => {
         assert.equal(added.data.lead.organic, 'gbp');
         assert.match(added.data.lead.organicReason, /Call tap/);
         assert.equal(added.data.lead.refCode, 'Q7RT');
-        assert.equal(added.data.lead.serviceZone, 'nearby');
+        assert.equal(added.data.lead.zip, '32259');
         assert.equal(added.data.lead.history[0].field, 'Added');
         // A tap is offered once.
         const after = await call('GET', '/api/admin/contact-intents?kind=call', { cookie });

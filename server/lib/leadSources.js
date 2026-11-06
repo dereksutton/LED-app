@@ -39,9 +39,9 @@ const parseAttribution = (input) => {
     return Object.keys(out).length ? out : undefined;
 };
 
-// How a lead reached LED: the quote form, the callback form, a phone call,
+// How a lead reached LED: the quote form, a phone call,
 // a text, or one the owner typed in some other way.
-const LEAD_CHANNELS = ['form', 'callback', 'call', 'text', 'manual'];
+const LEAD_CHANNELS = ['form', 'call', 'text', 'manual'];
 
 // Organic Google credit: 'search' (Google Search), 'gbp' (the Google
 // Business Profile) or 'none'.
@@ -91,7 +91,7 @@ const leadOrganic = (lead) => {
 };
 
 const ORGANIC_LABELS = { search: 'Google Search', gbp: 'Google Business Profile', none: 'Not organic Google' };
-const CHANNEL_LABELS = { form: 'Quote form', callback: 'Callback request', call: 'Phone call', text: 'Text', manual: 'Added by hand' };
+const CHANNEL_LABELS = { form: 'Quote form', call: 'Phone call', text: 'Text', manual: 'Added by hand' };
 
 module.exports = {
     LEAD_SOURCES, normalizeSource, parseAttribution,

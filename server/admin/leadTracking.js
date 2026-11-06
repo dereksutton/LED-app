@@ -14,10 +14,11 @@ const SHOW = {
     jobAmountCents: (v) => (typeof v === 'number' ? formatMoney(v) : ''),
     isSpam: (v) => (v ? 'Spam' : 'Not spam'),
     customer: (v) => v || '',
+    outOfArea: (v) => (v ? 'Out of service area' : 'In service area'),
 };
 const LABELS = {
     status: 'Status', howDidYouHear: 'How they heard', sourceDetail: 'Referred by', organic: 'Google credit',
-    channel: 'Came in by', jobAmountCents: 'Job amount', isSpam: 'Spam', customer: 'Customer',
+    channel: 'Came in by', jobAmountCents: 'Job amount', isSpam: 'Spam', customer: 'Customer', outOfArea: 'Service area',
 };
 
 // Adds one history line when a tracked field really changes.

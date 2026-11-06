@@ -83,8 +83,8 @@ export const sourceLabel = (value) => {
   return found ? found[1] : value || 'Not recorded';
 };
 
-// Organic Google credit, how a lead came in, and its service area. Values
-// match the API (server/lib/leadSources.js, server/lib/serviceArea.js).
+// Organic Google credit and how a lead came in. Values match the API
+// (server/lib/leadSources.js).
 export const ORGANIC = {
   search: { label: 'Google Search', short: 'Google', tone: 'green' },
   gbp: { label: 'Google Business Profile', short: 'Google Maps', tone: 'green' },
@@ -92,18 +92,11 @@ export const ORGANIC = {
 };
 export const CHANNELS = [
   ['form', 'Quote form'],
-  ['callback', 'Callback request'],
   ['call', 'Phone call'],
   ['text', 'Text'],
   ['manual', 'Added by hand'],
 ];
 export const channelLabel = (value) => (CHANNELS.find(([v]) => v === value) || [null, ''])[1];
-export const ZONES = {
-  core: { label: 'Clay County', tone: 'gray' },
-  nearby: { label: 'Mandarin / St. Johns', tone: 'gray' },
-  edge: { label: 'Edge of area', tone: 'amber' },
-  out: { label: 'Out of area', tone: 'red' },
-};
 export const NO_LEAD_REASONS = [
   ['referral', 'Referral'],
   ['repeat', 'Repeat customer'],

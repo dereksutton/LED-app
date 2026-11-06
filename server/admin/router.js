@@ -8,7 +8,6 @@ const { LEAD_STATUSES } = require('../models/QuoteRequest');
 const {
     normalizeSource, classifyOrganic, normalizeRefCode, ORGANIC_SOURCES, CHANNEL_LABELS,
 } = require('../lib/leadSources');
-const { zoneForZip } = require('../lib/serviceArea');
 const {
     logChange, markLeadWon, isWon, findLeadMatch,
 } = require('./leadTracking');
@@ -239,7 +238,7 @@ const createAdminRouter = ({
         const tapped = intent ? ` (matched a ${intent.kind === 'call' ? 'Call' : 'Text'} tap on the site)` : '';
         const lead = await QuoteRequest.create({
             ...fields,
-            ...(zip ? { zip, serviceZone: zoneForZip(zip) } : {}),
+            ...(zip ? { zip } : {}),
             source: 'manual',
             channel,
             organic: credit.organic,
@@ -309,6 +308,14 @@ const createAdminRouter = ({
                 : Math.round(num(req.body.jobAmountCents, { min: 0, max: 1e10, label: 'Job amount' }));
             logChange(lead, by, 'jobAmountCents', lead.jobAmountCents, amount);
             lead.jobAmountCents = amount;
+        }
+
+        // Out of service area: the owner's call, made here. It only marks the
+        // lead; nothing is sent to the customer.
+        if (req.body.outOfArea !== undefined) {
+            if (typeof req.body.outOfArea !== 'boolean') throw new InputError('Say whether this lead is out of the service area.');
+            logChange(lead, by, 'outOfArea', Boolean(lead.outOfArea), req.body.outOfArea);
+            lead.outOfArea = req.body.outOfArea || undefined;
         }
 
         const plainLead = () => ({ attribution: lead.toObject().attribution, howDidYouHear: lead.howDidYouHear });

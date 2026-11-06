@@ -8,7 +8,6 @@ const { mountAdmin } = require('./admin');
 const {
     normalizeSource, parseAttribution, classifyOrganic, normalizeRefCode,
 } = require('./lib/leadSources');
-const { zoneForZip, OUT_OF_AREA_MESSAGE } = require('./lib/serviceArea');
 const { checkForSpam } = require('./lib/spamCheck');
 
 const REQUIRED_FIELDS = ['name', 'email', 'phone', 'street', 'city', 'zip', 'projectType', 'howDidYouHear'];
@@ -63,34 +62,7 @@ const tagLead = (lead, body, channel) => {
     if (reason) lead.organicReason = reason;
     const refCode = normalizeRefCode(body.refCode);
     if (refCode) lead.refCode = refCode;
-    const zone = zoneForZip(lead.zip);
-    if (zone) lead.serviceZone = zone;
     return lead;
-};
-
-// "Prefer a call back?": just a name and a phone number, with an optional
-// ZIP, best time and how they heard.
-const CALLBACK_FIELDS = { name: 100, phone: 40, zip: 10, bestTime: 100, howDidYouHear: 50, sourceDetail: 300 };
-const parseCallbackRequest = (body = {}) => {
-    const lead = {};
-    for (const [field, max] of Object.entries(CALLBACK_FIELDS)) {
-        const value = typeof body[field] === 'string' ? body[field].trim() : '';
-        if (value.length > max) return { error: `${field} is too long` };
-        if (value) lead[field] = value;
-    }
-    if (!lead.name || !lead.phone) return { error: 'Please add your name and phone number.' };
-    const digits = lead.phone.replace(/\D/g, '');
-    if (!(digits.length === 10 || (digits.length === 11 && digits.startsWith('1')))) {
-        return { error: 'Please enter a 10-digit phone number.' };
-    }
-    if (lead.zip && !ZIP_RE.test(lead.zip)) return { error: 'Please enter a 5-digit ZIP code.' };
-    if (lead.howDidYouHear) {
-        lead.howDidYouHear = normalizeSource(lead.howDidYouHear);
-        if (!lead.howDidYouHear) return { error: 'Please tell us how you heard about us.' };
-    }
-    if (lead.zip) lead.state = 'FL';
-    lead.projectType = 'Callback request';
-    return { lead: tagLead(lead, body, 'callback') };
 };
 
 // A tap on the site's Call or Text button: no personal details, just the
@@ -203,16 +175,10 @@ const createApp = ({
             }
         });
 
-        const outOfArea = lead.serviceZone === 'out' && !spamReason;
-        res.status(200).json({
-            success: true,
-            message: outOfArea ? OUT_OF_AREA_MESSAGE : 'Quote request received.',
-            ...(lead.serviceZone && !spamReason ? { serviceArea: lead.serviceZone } : {}),
-        });
+        res.status(200).json({ success: true, message: 'Quote request received.' });
     };
 
     app.post('/send-quote', limiter, handleLead(parseQuoteRequest));
-    app.post('/api/callback', limiter, handleLead(parseCallbackRequest));
 
     // Call and Text button taps. Never fails the visitor: the tap has
     // already opened their dialer or messages app.
@@ -242,4 +208,4 @@ const createApp = ({
     return app;
 };
 
-module.exports = { createApp, parseQuoteRequest, parseCallbackRequest, parseContactIntent };
+module.exports = { createApp, parseQuoteRequest, parseContactIntent };

@@ -2,7 +2,6 @@ const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { createApp } = require('./app');
 const { classifyOrganic, normalizeRefCode } = require('./lib/leadSources');
-const { zoneForZip } = require('./lib/serviceArea');
 
 const validLead = {
     name: 'Jane Doe',
@@ -207,56 +206,35 @@ test('organic Google credit comes from tracking first, then the form answer', ()
     assert.equal(classifyOrganic({ attribution: { referrer: 'notgoogle.com.evil.io' } }).organic, 'none');
 });
 
-test('ref codes and ZIP zones', () => {
+test('ref codes', () => {
     assert.equal(normalizeRefCode(' ref k7f3 '), 'K7F3');
     assert.equal(normalizeRefCode('<script>'), null);
-    assert.equal(zoneForZip('32073'), 'core');
-    assert.equal(zoneForZip('32259-1234'), 'nearby');
-    assert.equal(zoneForZip('32092'), 'edge');
-    assert.equal(zoneForZip('32656'), 'out');
-    assert.equal(zoneForZip(''), undefined);
 });
 
-test('form leads are tagged with channel, organic credit, ref code and area', async () => {
+test('form leads are tagged with channel, organic credit and ref code', async () => {
     reset();
     const res = await post({ ...validLead, refCode: 'k7f3', attribution: { referrer: 'www.google.com' } });
     assert.equal(res.status, 200);
-    const body = await res.json();
-    assert.equal(body.serviceArea, 'core');
     assert.equal(saved[0].channel, 'form');
     assert.equal(saved[0].organic, 'search');
     assert.equal(saved[0].organicReason, 'Came from a Google search');
     assert.equal(saved[0].refCode, 'K7F3');
-    assert.equal(saved[0].serviceZone, 'core');
-    assert.doesNotMatch(sent[0].subject, /Out of area/);
 });
 
-test('out-of-area leads are kept, flagged and told what happens next', async () => {
+test('a ZIP outside the usual area gets the same reply and email as any other', async () => {
     reset();
     const res = await post({ ...validLead, city: 'Ponte Vedra Beach', zip: '32082' });
     assert.equal(res.status, 200);
     const body = await res.json();
-    assert.equal(body.serviceArea, 'out');
-    assert.match(body.message, /Clay County, Mandarin and St\. Johns/);
-    assert.equal(saved[0].serviceZone, 'out');
-    assert.match(sent[0].subject, /^Out of area: Quote Request from Jane Doe/);
+    assert.deepEqual(body, { success: true, message: 'Quote request received.' });
+    assert.equal(saved[0].outOfArea, undefined);
+    assert.match(sent[0].subject, /^Quote Request from Jane Doe/);
+    assert.doesNotMatch(`${sent[0].text}${sent[0].html}`, /out of area|service area/i);
 });
 
-test('a callback request needs only a name and phone', async () => {
-    reset();
-    const res = await post({ name: 'Sam Lee', phone: '904-555-0199', zip: '32065', bestTime: 'After 5' }, '/api/callback');
-    assert.equal(res.status, 200);
-    assert.equal(saved[0].channel, 'callback');
-    assert.equal(saved[0].projectType, 'Callback request');
-    assert.equal(saved[0].serviceZone, 'core');
-    assert.match(sent[0].subject, /^Callback Request from Sam Lee/);
-    assert.match(sent[0].text, /Best Time to Call: After 5/);
-    assert.equal(sent[0].reply_to, undefined);
-
-    const bad = await post({ name: 'Sam', phone: '12' }, '/api/callback');
-    assert.equal(bad.status, 400);
-    const noName = await post({ phone: '9045550199' }, '/api/callback');
-    assert.equal(noName.status, 400);
+test('the old callback route is gone', async () => {
+    const res = await post({ name: 'Sam Lee', phone: '904-555-0199' }, '/api/callback');
+    assert.equal(res.status, 404);
 });
 
 test('call and text taps are recorded without personal details', async () => {

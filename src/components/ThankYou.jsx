@@ -1,15 +1,11 @@
 "use client";
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { site } from '../data/site';
 import TextUsLink from './TextUsLink';
 
-// The message after a quote or callback request. ?type=callback and
-// ?area=out change the wording; nothing personal is in the address.
+// The message after a quote request. The same for everyone: whether a job
+// is in the service area is the owner's call, made later.
 export default function ThankYou() {
-  const params = useSearchParams();
-  const callback = params.get('type') === 'callback';
-  const outOfArea = params.get('area') === 'out';
   return (
     <section className="mx-auto max-w-2xl px-6 py-20 text-center lg:py-28">
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
@@ -18,19 +14,11 @@ export default function ThankYou() {
         </svg>
       </div>
       <h1 className="font-serif-luxury text-4xl text-[#2C3E50] lg:text-5xl">
-        {callback ? 'We’ll call you soon' : 'Thanks, we got your request'}
+        Thanks, we got your request
       </h1>
-      {outOfArea ? (
-        <p className="mt-6 font-sans-luxury text-lg text-slate-600">
-          We mainly serve Clay County, Mandarin and St. Johns, and we&apos;ll let you know within a day if we can take your project.
-        </p>
-      ) : (
-        <p className="mt-6 font-sans-luxury text-lg text-slate-600">
-          {callback
-            ? 'Someone from our team will call you within one business day.'
-            : 'We’ll call or text within one business day to set up your free estimate.'}
-        </p>
-      )}
+      <p className="mt-6 font-sans-luxury text-lg text-slate-600">
+        We’ll call or text within one business day to set up your free estimate.
+      </p>
       <div className="mt-10 rounded-2xl bg-slate-50 p-6 text-left font-sans-luxury text-slate-700">
         <p className="font-semibold text-[#2C3E50]">What happens next</p>
         <ol className="mt-3 list-decimal space-y-2 pl-5">

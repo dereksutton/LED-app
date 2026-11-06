@@ -19,7 +19,7 @@ const fbq = (...args) => {
   }
 };
 
-// Quote or callback form submitted successfully. form: 'quote' | 'callback'.
+// Quote form submitted successfully.
 export const trackLead = ({ service, form = 'quote' } = {}) => {
   gtag('event', 'generate_lead', { form, service });
   if (ADS_ID && ADS_LEAD_LABEL) {

@@ -6,7 +6,7 @@
 const buildCustomerReply = ({ to, from, replyTo, phone }) => {
     const tel = phone.replace(/[^\d+]/g, '');
     const steps = [
-        'Efrain or someone on our team will call or text you within one business day to ask a few questions about the project.',
+        'Someone on our team will call or text you within one business day to ask a few questions about the project.',
         'We set a time to come out and look. The estimate is free and there is no obligation.',
         'You get a written quote you can accept online.',
     ];
@@ -15,8 +15,8 @@ const buildCustomerReply = ({ to, from, replyTo, phone }) => {
         to,
         reply_to: replyTo,
         subject: 'Thanks, we got your request',
-        text: `Thanks for reaching out to LED Custom Painting & More. We got your request.\n\nWhat happens next:\n${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nIf you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at ${phone}.\n\nEfrain and the LED Custom Painting team\nServing Clay County, Mandarin and St. Johns`,
-        html: `<p>Thanks for reaching out to LED Custom Painting &amp; More. We got your request.</p><p><strong>What happens next:</strong></p><ol>${steps.map((s) => `<li>${s}</li>`).join('')}</ol><p>If you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at <a href="tel:${tel}">${phone}</a>.</p><p>Efrain and the LED Custom Painting team<br>Serving Clay County, Mandarin and St. Johns</p>`,
+        text: `Thanks for reaching out to LED Custom Painting & More. We got your request.\n\nWhat happens next:\n${steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nIf you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at ${phone}.\n\nThe LED Custom Painting team\nServing Clay County, Mandarin and St. Johns`,
+        html: `<p>Thanks for reaching out to LED Custom Painting &amp; More. We got your request.</p><p><strong>What happens next:</strong></p><ol>${steps.map((s) => `<li>${s}</li>`).join('')}</ol><p>If you have photos of the area you want painted, just reply to this email with them. If it's urgent, call or text us at <a href="tel:${tel}">${phone}</a>.</p><p>The LED Custom Painting team<br>Serving Clay County, Mandarin and St. Johns</p>`,
     };
 };
 

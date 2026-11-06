@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi } from '../../../../src/admin/api';
-import { LEAD_SOURCES, ORGANIC, ZONES, ago, channelLabel, sourceLabel } from '../../../../src/admin/format';
+import { LEAD_SOURCES, ORGANIC, ago, channelLabel, sourceLabel } from '../../../../src/admin/format';
 import { Badge, Button, Card, Empty, ErrorNote, Field, FilterTabs, Input, Modal, PageHeader, Select, Spinner, StatusBadge, Table, Textarea, useAction, useLoad } from '../../../../src/admin/ui';
 
 const TABS = [['open', 'Open'], ['new', 'New'], ['contacted', 'Contacted'], ['quoted', 'Quoted'], ['won', 'Won'], ['lost', 'Lost'], ['', 'All'], ['spam', 'Spam']];
@@ -92,14 +92,13 @@ function NewLead({ onClose }) {
 }
 
 // Small tags under the source: found on Google, how it came in (when not
-// the quote form) and the service area when it's not home turf.
+// the quote form) and whether the owner marked it out of the service area.
 function SourceTags({ lead }) {
   const o = ORGANIC[lead.organic];
-  const zone = ZONES[lead.serviceZone];
   const tags = [
     o && o.short && <Badge key="o" tone={o.tone} title={lead.organicReason}>{o.short}</Badge>,
     lead.channel && lead.channel !== 'form' && <Badge key="c">{channelLabel(lead.channel)}</Badge>,
-    zone && (lead.serviceZone === 'out' || lead.serviceZone === 'edge') && <Badge key="z" tone={zone.tone}>{zone.label}</Badge>,
+    lead.outOfArea && <Badge key="z" tone="amber">Out of area</Badge>,
   ].filter(Boolean);
   return tags.length ? <span className="mt-1 flex flex-wrap gap-1">{tags}</span> : null;
 }

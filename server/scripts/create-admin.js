@@ -1,6 +1,6 @@
 // Creates a dashboard login, or resets one.
 //
-//   npm run create-admin -- --email owner@example.com --name "Efrain" [--phone "(904) 555-0123"]
+//   npm run create-admin -- --email owner@example.com --name "Jane Smith" [--phone "(904) 555-0123"]
 //   npm run create-admin -- --email owner@example.com --reset
 //
 // Asks for the password without showing it. Each sign-in then emails a
