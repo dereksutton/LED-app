@@ -37,7 +37,7 @@ const contactInfo = [
     {
         icon: 'location',
         label: 'Service Area',
-        value: 'Jacksonville & Fleming Island, FL',
+        value: 'Clay County, Mandarin & St. Johns',
         href: null,
     },
 ];
@@ -142,7 +142,7 @@ const Footer = () => {
                             LED Custom Painting
                         </h3>
                         <p className="font-sans-luxury text-slate-300 mb-6 leading-relaxed">
-                            North Florida&apos;s premier painting professionals, delivering exceptional results with {claims.experience} of experience and unwavering commitment to quality.
+                            Clay County&apos;s premier painting professionals, delivering exceptional results with {claims.experience} of experience and unwavering commitment to quality.
                         </p>
                         <div className="space-y-3 inline-block lg:block">
                             {businessInfo.map((info) => (
@@ -283,9 +283,9 @@ const Footer = () => {
                         >
                             painting contractors in Fleming Island, FL
                         </Link>
-                        , plus Jacksonville, Orange Park, Middleburg, Green Cove Springs,
-                        Doctors Inlet, Oakleaf, and Ponte Vedra — serving communities
-                        throughout Clay and Duval counties.
+                        , plus Orange Park, Green Cove Springs, Middleburg, Oakleaf,
+                        Doctors Inlet and the rest of Clay County, along with Mandarin
+                        and St. Johns.
                     </p>
                 </div>
 
@@ -316,9 +316,9 @@ const Footer = () => {
                         <div className="flex items-center space-x-2">
                             <span className="font-sans-luxury text-slate-400 text-sm">
                                 Proudly serving
-                            </span>
+                            </span>{' '}
                             <span className="font-serif-luxury text-[#E8B4A0] font-semibold">
-                                North Florida
+                                Clay County, Mandarin &amp; St. Johns
                             </span>
                         </div>
                     </div>

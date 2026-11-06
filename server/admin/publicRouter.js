@@ -2,11 +2,12 @@
 // carries a long random token; there is no other way in.
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const { Customer, Quote, Invoice, Contract, QuoteRequest } = require('./models');
+const { Customer, Quote, Invoice, Contract } = require('./models');
 const { computeTotals, invoiceState, formatMoney } = require('./money');
 const { quotePdf, invoicePdf, contractPdf } = require('./pdf');
 const { buildOwnerAlert } = require('./emails');
 const { InputError, str, getSettings } = require('./docs');
+const { markLeadWon } = require('./leadTracking');
 
 const TOKEN_RE = /^[A-Za-z0-9_-]{30,64}$/;
 const SIGNATURE_RE = /^data:image\/png;base64,[A-Za-z0-9+/=]+$/;
@@ -142,7 +143,7 @@ const createPublicRouter = ({ sendEmail, emailFrom, ownerEmail, siteUrl, stripe,
         doc.acceptedIp = req.ip;
         doc.history.push({ event: `Accepted online by ${name}` });
         await doc.save();
-        if (doc.leadId) await QuoteRequest.updateOne({ _id: doc.leadId }, { status: 'won', updatedAt: new Date() });
+        if (doc.leadId) await markLeadWon(doc.leadId, { by: `${name} (accepted online)`, amountCents: computeTotals(doc).totalCents });
         await alertOwner(`Estimate ${doc.number} accepted`, [
             `${name} accepted estimate ${doc.number} (${formatMoney(computeTotals(doc).totalCents)}).`,
             'Next step: send the contract or the deposit invoice from the dashboard.',

@@ -1,5 +1,6 @@
 import { services, getServiceBySlug, getAllServiceSlugs } from '../../../src/data/services';
 import ServicePageLayout from '../../../src/components/ServicePageLayout';
+import { areaServedSchema } from '../../../src/data/serviceArea';
 
 export function generateStaticParams() {
   return getAllServiceSlugs().map((slug) => ({ slug }));
@@ -72,13 +73,7 @@ export default async function ServicePage({ params }) {
     name: `${service.name} in Jacksonville, FL`,
     description: service.description.split('\n\n')[0],
     provider: { '@id': 'https://ledcustompainting.com/#business' },
-    areaServed: [
-      { '@type': 'City', name: 'Jacksonville', addressRegion: 'FL' },
-      { '@type': 'City', name: 'Fleming Island', addressRegion: 'FL' },
-      { '@type': 'City', name: 'Orange Park', addressRegion: 'FL' },
-      { '@type': 'City', name: 'Middleburg', addressRegion: 'FL' },
-      { '@type': 'City', name: 'Green Cove Springs', addressRegion: 'FL' },
-    ],
+    areaServed: areaServedSchema,
     serviceType: service.name,
     url: `https://ledcustompainting.com/services/${service.slug}/`,
   };

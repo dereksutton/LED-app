@@ -1,9 +1,11 @@
 "use client";
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { trackLead } from '../lib/analytics';
-import { readAttribution } from '../lib/attribution';
-import { claims } from '../data/site';
+import { trackFormStart, trackLead } from '../lib/analytics';
+import { getRefCode, readAttribution } from '../lib/attribution';
+import { claims, site } from '../data/site';
+import TextUsLink from './TextUsLink';
 
 const IconComponent = ({ iconType }) => {
     const iconProps = {
@@ -80,6 +82,13 @@ const Contact = () => {
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
+    const started = useRef(false);
+    const onFormStart = () => {
+        if (started.current) return;
+        started.current = true;
+        trackFormStart({ form: 'quote' });
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -102,6 +111,7 @@ const Contact = () => {
                     ...formData,
                     address: `${formData.street.trim()}, ${formData.city.trim()}, FL ${formData.zip.trim()}`,
                     attribution: readAttribution() || undefined,
+                    refCode: getRefCode(),
                 })
             });
 
@@ -109,6 +119,7 @@ const Contact = () => {
 
             if (response.ok) {
                 trackLead({ service: formData.projectType });
+                router.push('/thank-you/');
                 setStatus({
                     type: 'success',
                     message: 'Thank you for your request! We\'ll contact you within 24 hours with a detailed quote.'
@@ -295,12 +306,11 @@ const Contact = () => {
                     />
                 </motion.div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="max-w-4xl mx-auto space-y-8">
                     {/* Quote Form */}
                     <motion.div
-                        className="lg:col-span-2"
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                     >
@@ -333,7 +343,7 @@ const Contact = () => {
                             )}
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                            <form onSubmit={handleSubmit} onFocus={onFormStart} className="space-y-6 text-left">
                                 {/* Honeypot: hidden from people, filled by bots, dropped by the API */}
                                 <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}>
                                     <label htmlFor="website">Website</label>
@@ -372,7 +382,7 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="city" className={labelClass}>City *</label>
-                                        <input type="text" id="city" name="city" autoComplete="address-level2" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="Jacksonville" disabled={isSubmitting} />
+                                        <input type="text" id="city" name="city" autoComplete="address-level2" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="Orange Park" disabled={isSubmitting} />
                                     </div>
                                     <div>
                                         <label htmlFor="zip" className={labelClass}>ZIP *</label>
@@ -468,85 +478,57 @@ const Contact = () => {
                         </div>
                     </motion.div>
 
-                    {/* Contact Information Sidebar */}
+                    {/* Under the form: other ways to reach us, and why people pick us */}
                     <motion.div
-                        className="space-y-8"
-                        initial={{ opacity: 0, x: 50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
+                        className="grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg"
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
+                        transition={{ duration: 0.8, delay: 0.5 }}
                     >
-                        {/* Phone Contact */}
-                        <div className="bg-gradient-to-br from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] backdrop-blur-sm rounded-2xl p-8 border border-slate-700/30">
-                            <div className="text-center">
-                                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#2C3E50]/20 rounded-full mb-4">
-                                    <IconComponent iconType="phone" />
-                                </div>
-                                <h3 className="font-serif-luxury text-2xl text-[#2C3E50] mb-4">
-                                    Prefer to Call?
-                                </h3>
-                                <p className="font-sans-luxury text-slate-700 mb-6">
-                                    Speak directly with our team for immediate assistance and answers to your questions.
-                                </p>
-                                <motion.a
-                                    href="tel:+19043850426"
-                                    className="inline-flex items-center justify-center font-serif-luxury font-bold text-2xl text-[#2C3E50] hover:text-slate-600 transition-colors duration-300 no-underline"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    📞 (904) 385-0426
-                                </motion.a>
-                                <p className="font-sans-luxury text-sm text-slate-600 mt-4">
-                                    Available Mon-Fri: 8AM-6PM<br />
-                                    Saturday: 9AM-4PM
-                                </p>
-                            </div>
+                        <div className="bg-gradient-to-br from-[#F5E6D3] via-[#E8B4A0] to-[#F5E6D3] p-8 lg:p-10 text-center md:text-left">
+                            <h3 className="font-serif-luxury text-2xl text-[#2C3E50]">
+                                Rather talk it through?
+                            </h3>
+                            <p className="mt-2 font-sans-luxury text-slate-700">
+                                Call or text us and we&apos;ll answer your questions.
+                            </p>
+                            <a
+                                href={site.phoneHref}
+                                className="mt-5 inline-block font-serif-luxury font-bold text-3xl text-[#2C3E50] hover:text-slate-600 transition-colors duration-300 no-underline"
+                            >
+                                {site.phone}
+                            </a>
+                            <p className="mt-2 font-sans-luxury text-sm text-slate-600">
+                                Mon-Fri 8AM-6PM, Saturday 9AM-4PM
+                            </p>
+                            <TextUsLink className="mt-6 inline-flex items-center justify-center rounded-full border-2 border-[#2C3E50] px-6 py-2.5 font-sans-luxury font-semibold text-[#2C3E50] hover:bg-[#2C3E50] hover:text-[#F5E6D3] transition-colors no-underline">
+                                Text us instead
+                            </TextUsLink>
                         </div>
-
-                        {/* Why Choose Us */}
-                        <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] backdrop-blur-sm rounded-2xl p-8 border border-[#2C3E50]/30 shadow-lg">
-                            <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] mb-6 text-center">
+                        <div className="bg-gradient-to-br from-[#2C3E50] via-[#34495e] to-[#2C3E50] p-8 lg:p-10">
+                            <h3 className="font-serif-luxury text-2xl text-[#F5E6D3] text-center md:text-left">
                                 Why Choose LED Custom Painting?
                             </h3>
-                            <div className="space-y-4">
+                            <ul className="mt-5 space-y-3">
                                 {[
-                                    'Free detailed estimates',
+                                    'Free, no-obligation estimates',
                                     `${claims.warranty} on all work`,
                                     'Licensed & fully insured',
                                     'A+ Better Business Bureau rating',
                                     `${claims.experience} of experience`,
-                                    'Local North Florida company'
-                                ].map((benefit, index) => (
-                                    <motion.div
-                                        key={index}
-                                        className="flex items-center space-x-3"
-                                        initial={{ opacity: 0, x: -20 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ delay: index * 0.1 }}
-                                    >
-                                        <div className="w-6 h-6 rounded-full bg-[#F5E6D3]/20 flex items-center justify-center flex-shrink-0">
-                                            <svg className="w-4 h-4 text-[#F5E6D3]" fill="currentColor" viewBox="0 0 20 20">
+                                    'Local Clay County company',
+                                ].map((benefit) => (
+                                    <li key={benefit} className="flex items-center space-x-3">
+                                        <span className="w-6 h-6 rounded-full bg-[#F5E6D3]/20 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 text-[#F5E6D3]" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                             </svg>
-                                        </div>
+                                        </span>
                                         <span className="font-sans-luxury text-[#F5E6D3]">{benefit}</span>
-                                    </motion.div>
+                                    </li>
                                 ))}
-                            </div>
-                        </div>
-
-                        {/* Response Time */}
-                        <div className="bg-gradient-to-br from-[#F5E6D3] to-[#E8B4A0] backdrop-blur-sm rounded-2xl p-6 border border-[#2C3E50]/10 text-center shadow-md">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-white/80 rounded-full mb-4">
-                                <IconComponent iconType="clock" />
-                            </div>
-                            <h4 className="font-serif-luxury text-lg text-[#2C3E50] mb-2">
-                                Quick Response
-                            </h4>
-                            <p className="font-sans-luxury text-slate-700 text-sm">
-                                We&apos;ll contact you within 24 hours with your detailed quote
-                            </p>
+                            </ul>
                         </div>
                     </motion.div>
                 </div>

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { services } from '../data/services';
 import { site } from '../data/site';
+import TextUsLink from './TextUsLink';
 
 const navLinks = [
   { href: '/services/', label: 'Services' },
@@ -55,6 +56,11 @@ export default function SiteHeader({ quoteHref = '/contact/' }) {
             <span className="hidden md:inline">{site.phone}</span>
             <span className="sr-only md:hidden">Call {site.phone}</span>
           </a>
+          <TextUsLink
+            className="hidden md:inline-flex items-center rounded-full border border-[--luxury-champagne]/50 px-4 py-2 text-[--luxury-champagne] hover:text-white hover:border-white no-underline font-sans-luxury font-semibold"
+          >
+            Text us
+          </TextUsLink>
           <a
             href={quoteHref}
             className="hidden sm:inline-flex items-center rounded-full bg-[--luxury-champagne] px-5 py-2.5 font-sans-luxury font-semibold text-[--luxury-midnight] hover:bg-white no-underline"

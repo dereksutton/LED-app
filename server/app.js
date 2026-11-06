@@ -5,7 +5,9 @@ const { buildLeadEmail } = require('./lib/leadEmail');
 const { buildCustomerReply, buildOwnerSms } = require('./lib/followUps');
 const { mountAdmin } = require('./admin');
 
-const { normalizeSource, parseAttribution } = require('./lib/leadSources');
+const {
+    normalizeSource, parseAttribution, classifyOrganic, normalizeRefCode,
+} = require('./lib/leadSources');
 const { checkForSpam } = require('./lib/spamCheck');
 
 const REQUIRED_FIELDS = ['name', 'email', 'phone', 'street', 'city', 'zip', 'projectType', 'howDidYouHear'];
@@ -47,9 +49,37 @@ const parseQuoteRequest = (body = {}) => {
     }
     lead.state = 'FL';
     lead.address = `${lead.street}, ${lead.city}, FL ${lead.zip}`;
+    return { lead: tagLead(lead, body, 'form') };
+};
+
+// Tracking, organic credit, ref code and service area, shared by both forms.
+const tagLead = (lead, body, channel) => {
     const attribution = parseAttribution(body.attribution);
     if (attribution) lead.attribution = attribution;
-    return { lead };
+    lead.channel = channel;
+    const { organic, reason } = classifyOrganic(lead);
+    lead.organic = organic;
+    if (reason) lead.organicReason = reason;
+    const refCode = normalizeRefCode(body.refCode);
+    if (refCode) lead.refCode = refCode;
+    return lead;
+};
+
+// A tap on the site's Call or Text button: no personal details, just the
+// kind, the visitor's ref code, the page and the tracked visit.
+const parseContactIntent = (body = {}) => {
+    const kind = body.kind === 'call' || body.kind === 'text' ? body.kind : null;
+    if (!kind) return { error: 'Unknown kind' };
+    const intent = { kind };
+    const refCode = normalizeRefCode(body.refCode);
+    if (refCode) intent.refCode = refCode;
+    if (typeof body.page === 'string' && body.page.startsWith('/')) intent.page = body.page.trim().slice(0, 300);
+    const attribution = parseAttribution(body.attribution);
+    if (attribution) intent.attribution = attribution;
+    const { organic, reason } = classifyOrganic({ attribution });
+    intent.organic = organic;
+    if (reason) intent.organicReason = reason;
+    return { intent };
 };
 
 /**
@@ -63,7 +93,7 @@ const parseQuoteRequest = (body = {}) => {
  */
 const createApp = ({
     sendEmail, saveLead, notifyTo, notifyFrom, sendSms = null, customerReply = null,
-    corsOrigins = [], rateLimitMax = 5, admin = null,
+    saveContactIntent = null, corsOrigins = [], rateLimitMax = 5, intentRateLimitMax = 30, admin = null,
 }) => {
     const app = express();
 
@@ -86,13 +116,14 @@ const createApp = ({
         validate: { xForwardedForHeader: false },
     });
 
-    app.post('/send-quote', limiter, async (req, res) => {
+    // Saves, emails and follows up on a lead from either form.
+    const handleLead = (parse) => async (req, res) => {
         // Honeypot: real visitors never see or fill this field.
         if (req.body && req.body.website) {
             return res.status(200).json({ success: true, message: 'Quote request received.' });
         }
 
-        const { lead, error } = parseQuoteRequest(req.body);
+        const { lead, error } = parse(req.body);
         if (error) {
             return res.status(400).json({ success: false, message: error });
         }
@@ -132,7 +163,7 @@ const createApp = ({
         if (sendSms && !spamReason) {
             followUps.push(['SMS', sendSms(buildOwnerSms(lead))]);
         }
-        if (customerReply && !spamReason) {
+        if (customerReply && !spamReason && lead.email) {
             followUps.push(['AUTOREPLY', sendEmail(buildCustomerReply({
                 to: lead.email, from: notifyFrom, replyTo: notifyTo, phone: customerReply.phone,
             }))]);
@@ -145,6 +176,29 @@ const createApp = ({
         });
 
         res.status(200).json({ success: true, message: 'Quote request received.' });
+    };
+
+    app.post('/send-quote', limiter, handleLead(parseQuoteRequest));
+
+    // Call and Text button taps. Never fails the visitor: the tap has
+    // already opened their dialer or messages app.
+    const intentLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: intentRateLimitMax,
+        validate: { xForwardedForHeader: false },
+        handler: (req, res) => res.status(204).end(),
+    });
+    app.post('/api/contact-intent', intentLimiter, async (req, res) => {
+        const { intent, error } = parseContactIntent(req.body);
+        if (error) return res.status(400).json({ success: false, message: error });
+        if (saveContactIntent) {
+            try {
+                await saveContactIntent(intent);
+            } catch (err) {
+                console.error('[CONTACT_INTENT_SAVE_FAILED]', err && err.message);
+            }
+        }
+        res.status(204).end();
     });
 
     app.get('/health', (req, res) => {
@@ -154,4 +208,4 @@ const createApp = ({
     return app;
 };
 
-module.exports = { createApp, parseQuoteRequest };
+module.exports = { createApp, parseQuoteRequest, parseContactIntent };

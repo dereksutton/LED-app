@@ -4,10 +4,11 @@ import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { adminApi, pdfUrl } from '../../../../../src/admin/api';
 import DocHistory from '../../../../../src/admin/DocHistory';
-import { centsToInput, dateInput, dateTime, fromDateInput, money, toCents, totals } from '../../../../../src/admin/format';
+import LeadPicker from '../../../../../src/admin/LeadPicker';
+import { NO_LEAD_REASONS, ORGANIC, centsToInput, dateInput, dateTime, fromDateInput, money, toCents, totals } from '../../../../../src/admin/format';
 import LineItems, { cleanItems } from '../../../../../src/admin/LineItems';
 import SendDialog from '../../../../../src/admin/SendDialog';
-import { Button, Card, ErrorNote, Field, Input, Notice, PageHeader, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
+import { Badge, Button, Card, ErrorNote, Field, Input, Notice, PageHeader, Spinner, StatusBadge, Textarea, useAction, useLoad } from '../../../../../src/admin/ui';
 
 const toForm = (q) => ({
   title: q.title || '',
@@ -34,8 +35,9 @@ function QuoteEditor({ id, data, reload, notice, setNotice }) {
   const [form, setForm] = useState(() => toForm(data.quote));
   const [dirty, setDirty] = useState(false);
   const [sending, setSending] = useState(false);
+  const [pickingLead, setPickingLead] = useState(false);
   const { busy, error: actionError, run } = useAction();
-  const { quote, customer, invoices, contracts, link } = data;
+  const { quote, customer, invoices, contracts, link, lead } = data;
   const locked = ['accepted', 'declined'].includes(quote.status);
   const payload = () => ({
     title: form.title,
@@ -155,6 +157,32 @@ function QuoteEditor({ id, data, reload, notice, setNotice }) {
                 {invoices.map((i) => <li key={i.id} className="flex justify-between"><Link href={`/admin/invoices/edit/?id=${i.id}`}>Invoice {i.number} · {money(i.totalCents)}</Link><StatusBadge status={i.displayStatus} /></li>)}
               </ul>
             </Card>
+          )}
+          <Card title="Lead" actions={<button type="button" className="text-sm font-medium text-slate-700 underline" onClick={() => setPickingLead(true)}>Change</button>}>
+            {lead ? (
+              <Link href={`/admin/leads/view/?id=${lead.id}`} className="block no-underline">
+                <span className="flex items-center gap-2 font-medium text-slate-900">
+                  {lead.name}
+                  {ORGANIC[lead.organic] && ORGANIC[lead.organic].short && <Badge tone="green">{ORGANIC[lead.organic].short}</Badge>}
+                </span>
+                <span className="block text-xs text-slate-500">Lead from {dateTime(lead.createdAt)}</span>
+              </Link>
+            ) : quote.noLeadReason ? (
+              <p className="text-sm text-slate-700">
+                No lead: {(NO_LEAD_REASONS.find(([v]) => v === quote.noLeadReason) || [null, quote.noLeadReason])[1]}
+                {quote.noLeadNote && <span className="block text-xs text-slate-500">{quote.noLeadNote}</span>}
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500">Not linked to a lead yet.</p>
+            )}
+          </Card>
+          {pickingLead && (
+            <LeadPicker
+              title="Link this quote to a lead"
+              customer={customer}
+              onPick={async (choice) => { await adminApi.post(`/quotes/${id}/lead`, choice); setPickingLead(false); setNotice('Lead updated.'); reload(); }}
+              onClose={() => setPickingLead(false)}
+            />
           )}
           <Card title="History"><DocHistory history={quote.history} /></Card>
         </div>

@@ -344,7 +344,7 @@ const Guarantee = () => {
                                 <div className="font-serif-luxury text-3xl font-bold text-[#F5E6D3] mb-2">{claims.years}</div>
                                 <div className="font-sans-luxury text-sm font-semibold text-[#E8B4A0] mb-2">Years of Excellence</div>
                                 <div className="font-sans-luxury text-xs text-slate-400 leading-relaxed">
-                                    Over a decade of trusted service in North Florida, delivering consistently exceptional results for residential and commercial clients.
+                                    Over a decade of trusted service in Clay County, delivering consistently exceptional results for residential and commercial clients.
                                 </div>
                             </motion.div>
 

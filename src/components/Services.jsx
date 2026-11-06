@@ -112,14 +112,14 @@ const Services = () => {
                         transition={{ duration: 0.8, delay: 0.4 }}
                     >
                         LED Custom Painting &amp; More is a licensed and insured team of painting
-                        contractors serving Jacksonville,{' '}
+                        contractors serving Orange Park,{' '}
                         <Link
                             href="/painters-fleming-island-fl/"
                             className="font-semibold text-slate-800 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-800 transition-colors"
                         >
                             Fleming Island
                         </Link>
-                        , and communities across North Florida. From interior and exterior painting
+                        {' '}and all of Clay County, plus Mandarin and St. Johns. From interior and exterior painting
                         to cabinet refinishing, pressure washing, ceiling services, and commercial
                         painting, we deliver durable, beautiful results backed by a {claims.warranty}{' '}
                         and {claims.experience} of local experience.

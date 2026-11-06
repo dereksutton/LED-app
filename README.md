@@ -38,7 +38,7 @@ The owner signs in at `/admin` with email and password, then a 6-digit code that
 Create a login (on Render: the led-app-api Shell tab; locally: in `server/`):
 
 ```
-npm run create-admin -- --email owner@example.com --name "Efrain" --phone "(904) 555-0123"
+npm run create-admin -- --email owner@example.com --name "Jane Smith" --phone "(904) 555-0123"
 ```
 
 It asks for a password (12+ characters). `--phone` is optional. Codes last 10 minutes, five wrong codes throw one away, and five wrong tries lock the login for 15 minutes. To reset a forgotten password or unlock a login, run the same command with `--reset`.
@@ -55,6 +55,30 @@ What's in it:
 - Contracts filled from a template in Settings and signed online (typed name, drawn signature, time, IP and a SHA-256 fingerprint of the text)
 - Email to the owner when a customer accepts, signs or pays
 - Built for phones too: a bottom menu (Home, Leads, Quotes, Invoices, More) and dropdown filters, so nothing scrolls sideways
+
+### Lead tracking
+
+Every lead is tagged with how it came in (form, call, text or added by hand) and whether it counts as organic Google: Google Search, the Google Business Profile, or neither. The tag comes from what the site saw (ad click IDs, UTM tags, the referring site) and, failing that, the visitor's "How did you hear" answer. Paid clicks never count as organic. The owner can override the tag on a lead, and every change to a lead's status, source, credit or job amount lands in its change history.
+
+- **Text us and call taps:** the site's Text us link prefills a message with a short ref code, and taps on Call or Text are recorded (`POST /api/contact-intent`). When the owner adds a lead by hand from a call or text, the dashboard shows recent taps to match, so the lead keeps its Google credit.
+- **Service area:** the owner decides. A lead can be marked out of the service area from its page in the dashboard; that only marks the lead and never sends the customer anything. The site's list of towns (for search engines and the service pages) is in `src/data/serviceArea.js`.
+- **Mark won:** records the job amount and the date won. Accepting a quote online marks its lead won with the quote total. Every new quote is tied to a lead, or says why there isn't one (referral, repeat customer, walk-in, other).
+
+### Monthly commission report
+
+A read-only script builds the month's statement of jobs won from organic Google leads, a CSV of the same jobs and a draft invoice. It only reads the database, writes three files on the computer it runs on and sends nothing.
+
+```
+cd server
+npm run commission-report -- --month 2026-11
+```
+
+Options: `--base job` (default, job amounts of jobs won that month) or `--base collected` (money received that month on credited jobs), `--rate 10`, `--window 365` (days from first lead to win that still count), `--out <folder>`, and `--from`, `--to`, `--number` for the invoice draft. With no `--month` it does last month. Files land in `commission-reports/<month>/`, which git ignores. Leads won before won dates were recorded are listed, not counted, until someone uses Mark won on them.
+
+### Google Analytics and Business Profile
+
+- Link the Google Business Profile website button to `https://ledcustompainting.com/?utm_source=google&utm_medium=organic&utm_campaign=gbp` so those visits are credited to the profile.
+- In GA4, mark `generate_lead`, `click_to_call` and `click_to_text` as key events. Both forms land on `/thank-you/`, which search engines are told not to index.
 
 Card payments are off until `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are set. The webhook goes to `https://led-app-api.onrender.com/api/stripe/webhook` and listens for `checkout.session.completed`.
 
@@ -75,6 +99,8 @@ The dashboard tests need a MongoDB at `TEST_MONGO_URI` (default `mongodb://127.0
 ## Deploying
 
 Both Render services have auto-deploy off. After merging into `master`, open each service in Render and choose Manual Deploy: `led-app-frontend` first, then `led-app-api`. The new quote form still sends the one-line `address` the older API needs, but the newer API needs the split address and lead source that only the new form sends, so the site goes first.
+
+The lead-tracking release is the other way round: deploy `led-app-api` first, since the site's call and text tap tracking calls a route only the new API has, and the quote form it accepts is unchanged. To send visitors the "we got your request" email, set `CUSTOMER_AUTOREPLY=true` on the API.
 
 ## Settings
 

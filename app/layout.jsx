@@ -3,13 +3,14 @@ import { Inter, Playfair_Display } from 'next/font/google';
 import MotionProvider from '../src/components/MotionProvider';
 import SiteChrome from '../src/components/SiteChrome';
 import { claims, site } from '../src/data/site';
+import { areaServedSchema } from '../src/data/serviceArea';
 
 export const metadata = {
-  title: 'Jacksonville Painting Contractors | LED Custom Painting',
+  title: 'Painters in Orange Park & Clay County, FL | LED Custom Painting',
   description:
-    'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior, cabinet refinishing & pressure washing. Free quote today.',
+    'Licensed & insured painters serving Orange Park, Fleming Island and all of Clay County, plus Mandarin & St. Johns. Interior, exterior & cabinets. Free quote.',
   keywords:
-    'painting contractors, painting services, interior painting, exterior painting, commercial painting, cabinet refinishing, pressure washing, Jacksonville, Fleming Island, Orange Park, Clay County, North Florida, professional painters, licensed painters, free quotes, LED Custom Painting',
+    'painters, painting contractors, interior painting, exterior painting, cabinet refinishing, pressure washing, Orange Park, Fleming Island, Green Cove Springs, Middleburg, Oakleaf, Clay County, Mandarin, St. Johns, licensed painters, free quotes, LED Custom Painting',
   authors: [{ name: 'LED Custom Painting & More' }],
   metadataBase: new URL('https://ledcustompainting.com'),
   alternates: {
@@ -18,15 +19,15 @@ export const metadata = {
   openGraph: {
     type: 'website',
     url: 'https://ledcustompainting.com/',
-    title: 'Jacksonville Painting Contractors | LED Custom Painting',
+    title: 'Painters in Orange Park & Clay County, FL | LED Custom Painting',
     description:
-      'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior, cabinet refinishing & pressure washing. Free quote today.',
+      'Licensed & insured painters serving Orange Park, Fleming Island and all of Clay County, plus Mandarin & St. Johns. Interior, exterior & cabinets. Free quote.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'LED Custom Painting — painting contractors serving Jacksonville & North Florida',
+        alt: 'LED Custom Painting, painters serving Clay County, Mandarin and St. Johns',
       },
     ],
     locale: 'en_US',
@@ -34,13 +35,13 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jacksonville Painting Contractors | LED Custom Painting',
+    title: 'Painters in Orange Park & Clay County, FL | LED Custom Painting',
     description:
-      'Licensed & insured painting contractors serving Jacksonville & North Florida. Interior, exterior & commercial painting. Free quotes.',
+      'Licensed & insured painters serving Orange Park, Fleming Island and Clay County, plus Mandarin & St. Johns. Free quotes.',
     images: [
       {
         url: '/og-image.jpg',
-        alt: 'LED Custom Painting — painting contractors serving Jacksonville & North Florida',
+        alt: 'LED Custom Painting, painters serving Clay County, Mandarin and St. Johns',
       },
     ],
   },
@@ -90,7 +91,7 @@ export default function RootLayout({ children }) {
               "@id": "https://ledcustompainting.com/#business",
               "name": "LED Custom Painting & More",
               "description":
-                "Licensed and insured painting contractors serving Jacksonville, Fleming Island, and North Florida with interior, exterior, cabinet, ceiling, and commercial painting plus pressure washing.",
+                "Licensed and insured painting contractors serving Orange Park, Fleming Island and all of Clay County, plus Mandarin and St. Johns, with interior, exterior, cabinet, ceiling, and commercial painting plus pressure washing.",
               "url": "https://ledcustompainting.com/",
               "image": "https://ledcustompainting.com/og-image.jpg",
               "logo": "https://ledcustompainting.com/images/LED-logo.webp",
@@ -107,16 +108,7 @@ export default function RootLayout({ children }) {
                 "latitude": 30.3322,
                 "longitude": -81.6557,
               },
-              "areaServed": [
-                { "@type": "City", "name": "Jacksonville", "addressRegion": "FL" },
-                { "@type": "City", "name": "Fleming Island", "addressRegion": "FL" },
-                { "@type": "City", "name": "Orange Park", "addressRegion": "FL" },
-                { "@type": "City", "name": "Middleburg", "addressRegion": "FL" },
-                { "@type": "City", "name": "Green Cove Springs", "addressRegion": "FL" },
-                { "@type": "City", "name": "Ponte Vedra", "addressRegion": "FL" },
-                { "@type": "AdministrativeArea", "name": "Clay County, FL" },
-                { "@type": "AdministrativeArea", "name": "Duval County, FL" },
-              ],
+              "areaServed": areaServedSchema,
               "priceRange": "$$",
               "openingHoursSpecification": [
                 {
@@ -148,7 +140,7 @@ export default function RootLayout({ children }) {
                 "@type": "OfferCatalog",
                 "name": "Painting Services",
                 "itemListElement": [
-                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Interior Painting", "description": "Professional interior painting services for homes and businesses in North Florida." } },
+                  { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Interior Painting", "description": "Professional interior painting services for homes and businesses in Clay County, Mandarin and St. Johns." } },
                   { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Exterior Painting", "description": "Expert exterior painting to protect and beautify your property." } },
                   { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Pressure Washing", "description": "Thorough pressure washing services for driveways, decks, and exteriors." } },
                   { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Cabinet Refinishing", "description": "Transform your kitchen with professional cabinet refinishing." } },

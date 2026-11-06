@@ -86,6 +86,12 @@ test('confirmation email carries none of the visitor input', () => {
     assert.doesNotMatch(msg.text + msg.html + msg.subject, /spam|Jane/);
 });
 
+test('confirmation email is signed by the team, not a person', () => {
+    const msg = buildCustomerReply({ to: 'a@b.co', from: 'q@x.co', replyTo: 'o@x.co', phone: '(904) 385-0426' });
+    assert.doesNotMatch(msg.text + msg.html, /Efrain/);
+    assert.match(msg.text, /The LED Custom Painting team/);
+});
+
 test('a failed text or confirmation never fails the request', async () => {
     await withApp({
         sendEmail: async (m) => { if (m.to === 'jane@example.com') throw new Error('nope'); },

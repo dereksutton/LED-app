@@ -61,7 +61,7 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
           <motion.p
             className="mt-5 font-sans-luxury text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed"
           >
-            Professional {service.name.toLowerCase()} in Jacksonville &amp; North Florida — licensed, insured, and backed by a 3-year warranty.
+            Professional {service.name.toLowerCase()} in Clay County, Mandarin &amp; St. Johns — licensed, insured, and backed by a 3-year warranty.
           </motion.p>
           <motion.a
             href="#quote"
@@ -329,8 +329,8 @@ const ServicePageLayout = ({ service, relatedServices = [] }) => {
             <div className="max-w-5xl mx-auto px-6 lg:px-8">
               <SectionHeader
                 eyebrow="Service Areas"
-                title={`${service.name} Across North Florida`}
-                subtitle="Based in Jacksonville, proudly serving communities throughout Duval, St. Johns, Clay, and Nassau counties."
+                title={`${service.name} in Clay County, Mandarin & St. Johns`}
+                subtitle="Serving every Clay County community except Keystone Heights, plus Mandarin and the St. Johns area."
                 variant="light"
                 align="center"
                 className="mb-12"

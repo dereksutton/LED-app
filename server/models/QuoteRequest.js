@@ -6,6 +6,16 @@ const mongoose = require('mongoose');
 // saved before the dashboard may still carry them.
 const LEAD_STATUSES = ['new', 'contacted', 'quoted', 'won', 'lost', 'completed', 'declined'];
 
+// One line per change to a lead's source, status or job amount, so every
+// credited job can be traced back.
+const historySchema = new mongoose.Schema({
+  at: { type: Date, default: Date.now },
+  by: { type: String, trim: true },
+  field: { type: String, trim: true },
+  from: { type: String, trim: true },
+  to: { type: String, trim: true }
+}, { _id: false });
+
 const noteSchema = new mongoose.Schema({
   text: { type: String, required: true, trim: true, maxlength: 5000 },
   by: { type: String, trim: true },
@@ -83,6 +93,23 @@ const quoteRequestSchema = new mongoose.Schema({
     enum: ['website', 'manual'],
     default: 'website'
   },
+  // How the lead reached LED (see lib/leadSources.js).
+  channel: { type: String, enum: ['form', 'call', 'text', 'manual'] },
+  // Organic Google credit, worked out when the lead is made: 'search', 'gbp'
+  // or 'none', and why. organicManual: set by hand, so edits to
+  // howDidYouHear no longer change it.
+  organic: { type: String, enum: ['search', 'gbp', 'none'] },
+  organicReason: { type: String, trim: true },
+  organicManual: { type: Boolean },
+  // The site's ref code from a prefilled text or a tapped call button.
+  refCode: { type: String, trim: true },
+  // Set by the owner in the dashboard when the job is outside the area LED
+  // works. Never set automatically, and nothing is sent to the customer.
+  outOfArea: { type: Boolean },
+  // The job: what it was won for and when.
+  jobAmountCents: { type: Number, min: 0 },
+  wonAt: Date,
+  history: [historySchema],
   createdAt: {
     type: Date,
     default: Date.now
@@ -107,6 +134,7 @@ const quoteRequestSchema = new mongoose.Schema({
 
 quoteRequestSchema.index({ createdAt: -1 });
 quoteRequestSchema.index({ isSpam: 1, createdAt: -1 });
+quoteRequestSchema.index({ wonAt: 1 });
 
 module.exports = mongoose.model('QuoteRequest', quoteRequestSchema);
 module.exports.LEAD_STATUSES = LEAD_STATUSES;

@@ -92,7 +92,7 @@ const Portfolio = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <span className="block">Our Recent</span>
+              <span className="block">Our Recent</span>{' '}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[--luxury-champagne] via-[--luxury-rose-gold] to-[--luxury-champagne]">
                 Transformations
               </span>

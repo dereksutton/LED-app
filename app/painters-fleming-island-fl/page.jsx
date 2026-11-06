@@ -84,7 +84,8 @@ const nearbyAreas = [
   'Green Cove Springs',
   'Doctors Inlet',
   'Oakleaf',
-  'Jacksonville',
+  'Mandarin',
+  'St. Johns',
 ];
 
 const faqs = [
@@ -102,7 +103,7 @@ const faqs = [
   },
   {
     q: 'What areas around Fleming Island do you serve?',
-    a: 'We are based in the Jacksonville area and cover all of Fleming Island plus the surrounding Clay County communities, including Orange Park, Middleburg, Green Cove Springs, Doctors Inlet, and Oakleaf. If you are nearby and not sure whether we reach you, just call — we will let you know right away.',
+    a: 'We cover all of Fleming Island plus the surrounding Clay County communities, including Orange Park, Middleburg, Green Cove Springs, Doctors Inlet, and Oakleaf. If you are nearby and not sure whether we reach you, just call — we will let you know right away.',
   },
 ];
 
@@ -209,8 +210,8 @@ export default function FlemingIslandPage() {
             <div className="space-y-6 font-sans-luxury text-lg text-slate-600 leading-relaxed text-left">
               <p>
                 When Fleming Island homeowners search for painting contractors they
-                can trust, LED Custom Painting &amp; More is the name they find. For more
-                than 13 years we have painted homes and businesses throughout Clay
+                can trust, LED Custom Painting &amp; More is the name they find. For
+                {claims.experience} we have painted homes and businesses throughout Clay
                 County — from the established streets of Eagle Harbor and Pace Island to
                 newer construction across Fleming Island and Orange Park. Every project
                 is handled by a licensed, insured crew and backed by our written 3-year
@@ -357,7 +358,7 @@ export default function FlemingIslandPage() {
             <SectionHeader
               eyebrow="Service Area"
               title="Beyond Fleming Island"
-              subtitle="We also serve the surrounding Clay County and Jacksonville-area communities:"
+              subtitle="We also serve the rest of Clay County, plus Mandarin and St. Johns:"
               variant="light"
               align="center"
               className="mb-10"

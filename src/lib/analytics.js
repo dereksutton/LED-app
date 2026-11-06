@@ -20,8 +20,8 @@ const fbq = (...args) => {
 };
 
 // Quote form submitted successfully.
-export const trackLead = ({ service } = {}) => {
-  gtag('event', 'generate_lead', { form: 'quote', service });
+export const trackLead = ({ service, form = 'quote' } = {}) => {
+  gtag('event', 'generate_lead', { form, service });
   if (ADS_ID && ADS_LEAD_LABEL) {
     gtag('event', 'conversion', { send_to: `${ADS_ID}/${ADS_LEAD_LABEL}` });
   }
@@ -41,4 +41,31 @@ export const trackCall = ({ location } = {}) => {
 export const trackEmail = ({ location } = {}) => {
   gtag('event', 'click_email', { location });
   fbq('track', 'Contact', { method: 'email' });
+};
+
+// "Text us" tapped.
+export const trackText = ({ location } = {}) => {
+  gtag('event', 'click_to_text', { location });
+  fbq('track', 'Contact', { method: 'text' });
+};
+
+// First field touched on a form, to compare form starts with leads.
+export const trackFormStart = ({ form }) => {
+  gtag('event', 'form_start', { form });
+};
+
+// Tells the API about a Call or Text tap (no personal details), so the owner
+// can tie the call or text he gets to the visit it came from. Fire and
+// forget: the tap has already opened the dialer or messages app.
+export const recordContactIntent = ({ kind, refCode, attribution }) => {
+  try {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/contact-intent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind, refCode, attribution: attribution || undefined, page: window.location.pathname }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // never block the tap
+  }
 };

@@ -1,6 +1,7 @@
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const { createApp } = require('./app');
+const { classifyOrganic, normalizeRefCode } = require('./lib/leadSources');
 
 const validLead = {
     name: 'Jane Doe',
@@ -20,6 +21,7 @@ let saveImpl;
 let emailImpl;
 const sent = [];
 const saved = [];
+const intents = [];
 
 let server;
 let baseUrl;
@@ -28,6 +30,7 @@ before(async () => {
     const app = createApp({
         sendEmail: (msg) => emailImpl(msg),
         saveLead: (lead) => saveImpl(lead),
+        saveContactIntent: async (intent) => { intents.push(intent); },
         notifyTo: 'owner@example.com',
         notifyFrom: 'quotes@example.com',
         rateLimitMax: 1000,
@@ -47,8 +50,8 @@ const reset = () => {
     emailImpl = async (msg) => { sent.push(msg); return { id: 'e1' }; };
 };
 
-const post = (body) =>
-    fetch(`${baseUrl}/send-quote`, {
+const post = (body, path = '/send-quote') =>
+    fetch(`${baseUrl}${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -187,4 +190,63 @@ test('short form without property type or timeline is accepted', async () => {
     assert.equal(res.status, 200);
     assert.equal(saved.length, 1);
     assert.doesNotMatch(sent[0].text, /undefined/);
+});
+
+test('organic Google credit comes from tracking first, then the form answer', () => {
+    assert.deepEqual(classifyOrganic({ attribution: { referrer: 'www.google.com' }, howDidYouHear: 'Facebook' }),
+        { organic: 'search', reason: 'Came from a Google search' });
+    assert.equal(classifyOrganic({ attribution: { utmSource: 'google', utmMedium: 'organic', utmCampaign: 'gbp' } }).organic, 'gbp');
+    assert.equal(classifyOrganic({ attribution: { referrer: 'maps.google.com' } }).organic, 'gbp');
+    assert.equal(classifyOrganic({ attribution: { referrer: 'www.google.com', clickId: 'google' }, howDidYouHear: 'Google Search' }).organic, 'none');
+    assert.equal(classifyOrganic({ attribution: { utmSource: 'google', utmMedium: 'cpc' }, howDidYouHear: 'Google Search' }).organic, 'none');
+    assert.equal(classifyOrganic({ attribution: { utmSource: 'nextdoor' }, howDidYouHear: 'Google Search' }).organic, 'none');
+    assert.equal(classifyOrganic({ howDidYouHear: 'Google Search' }).organic, 'search');
+    assert.equal(classifyOrganic({ howDidYouHear: 'google maps' }).organic, 'gbp');
+    assert.equal(classifyOrganic({ howDidYouHear: 'Referral' }).organic, 'none');
+    assert.equal(classifyOrganic({ attribution: { referrer: 'notgoogle.com.evil.io' } }).organic, 'none');
+});
+
+test('ref codes', () => {
+    assert.equal(normalizeRefCode(' ref k7f3 '), 'K7F3');
+    assert.equal(normalizeRefCode('<script>'), null);
+});
+
+test('form leads are tagged with channel, organic credit and ref code', async () => {
+    reset();
+    const res = await post({ ...validLead, refCode: 'k7f3', attribution: { referrer: 'www.google.com' } });
+    assert.equal(res.status, 200);
+    assert.equal(saved[0].channel, 'form');
+    assert.equal(saved[0].organic, 'search');
+    assert.equal(saved[0].organicReason, 'Came from a Google search');
+    assert.equal(saved[0].refCode, 'K7F3');
+});
+
+test('a ZIP outside the usual area gets the same reply and email as any other', async () => {
+    reset();
+    const res = await post({ ...validLead, city: 'Ponte Vedra Beach', zip: '32082' });
+    assert.equal(res.status, 200);
+    const body = await res.json();
+    assert.deepEqual(body, { success: true, message: 'Quote request received.' });
+    assert.equal(saved[0].outOfArea, undefined);
+    assert.match(sent[0].subject, /^Quote Request from Jane Doe/);
+    assert.doesNotMatch(`${sent[0].text}${sent[0].html}`, /out of area|service area/i);
+});
+
+test('the old callback route is gone', async () => {
+    const res = await post({ name: 'Sam Lee', phone: '904-555-0199' }, '/api/callback');
+    assert.equal(res.status, 404);
+});
+
+test('call and text taps are recorded without personal details', async () => {
+    intents.length = 0;
+    const res = await post({
+        kind: 'text', refCode: 'AB12', page: '/services/', name: 'Jane', phone: '9045550100',
+        attribution: { utmSource: 'google', utmMedium: 'organic', utmCampaign: 'gbp' },
+    }, '/api/contact-intent');
+    assert.equal(res.status, 204);
+    assert.equal(intents.length, 1);
+    assert.deepEqual(Object.keys(intents[0]).sort(), ['attribution', 'kind', 'organic', 'organicReason', 'page', 'refCode']);
+    assert.equal(intents[0].organic, 'gbp');
+    const bad = await post({ kind: 'email' }, '/api/contact-intent');
+    assert.equal(bad.status, 400);
 });

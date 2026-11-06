@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const { createApp } = require('./app');
-const { AdminUser, QuoteRequest, Invoice, Contract } = require('./admin/models');
+const { AdminUser, QuoteRequest, Invoice, Contract, ContactIntent } = require('./admin/models');
 const { hashPassword } = require('./admin/crypto');
 const { createStripe } = require('./admin/stripe');
 
@@ -50,6 +50,7 @@ before(async () => {
             return { id: 'e1' };
         },
         saveLead: async (lead) => (await QuoteRequest.create(lead))._id,
+        saveContactIntent: (intent) => ContactIntent.create(intent),
         notifyTo: 'owner@example.com',
         notifyFrom: 'quotes@example.com',
         rateLimitMax: 1000,
@@ -495,6 +496,10 @@ describe('leads to paid invoice', () => {
         assert.equal(twice.status, 409);
         const lead = await call('GET', `/api/admin/leads/${leadId}`, { cookie });
         assert.equal(lead.data.lead.status, 'won');
+        // Accepting stamps when it was won and the job amount from the quote.
+        assert.ok(lead.data.lead.wonAt);
+        assert.equal(lead.data.lead.jobAmountCents, quote.totalCents);
+        assert.ok(lead.data.lead.history.some((h) => h.field === 'Status' && h.to === 'won' && /accepted online/.test(h.by)));
         const edit = await call('PATCH', `/api/admin/quotes/${quote.id}`, { cookie, body: { title: 'changed' } });
         assert.equal(edit.status, 409);
         // Accepted work moves from open quotes to ready to invoice.
@@ -615,5 +620,146 @@ describe('leads to paid invoice', () => {
         assert.equal(q.data.quote.depositPercent, 50);
         assert.equal((await call('DELETE', `/api/admin/quotes/${q.data.quote.id}`, { cookie })).status, 200);
         assert.equal((await call('DELETE', `/api/admin/quotes/${quote.id}`, { cookie })).status, 409);
+    });
+});
+
+describe('organic credit and job tracking', () => {
+    let cookie;
+
+    before(async () => { if (connected) ({ cookie } = await signIn('tracking@example.com')); });
+
+    const quoteForm = (extra) => call('POST', '/send-quote', {
+        body: {
+            name: 'Grace Hopper', email: 'grace@example.com', phone: '(904) 555-0142', street: '9 Oak Ln', city: 'Orange Park', zip: '32073',
+            projectType: 'Interior Painting', howDidYouHear: 'Google Search', ...extra,
+        },
+    });
+
+    dbTest('website leads carry their Google credit and channel', async () => {
+        await quoteForm({ attribution: { referrer: 'www.google.com' } });
+        const list = await call('GET', '/api/admin/leads?status=&organic=google', { cookie });
+        const lead = list.data.leads.find((l) => l.email === 'grace@example.com');
+        assert.ok(lead);
+        assert.equal(lead.organic, 'search');
+        assert.equal(lead.organicReason, 'Came from a Google search');
+        assert.equal(lead.channel, 'form');
+        const none = await call('GET', '/api/admin/leads?status=&organic=none', { cookie });
+        assert.ok(!none.data.leads.some((l) => l.id === lead.id));
+        // Leads from before tagging are credited from what they have.
+        const old = await QuoteRequest.create({ name: 'Old Google', phone: '1', howDidYouHear: 'Google Maps', status: 'new' });
+        const oldRes = await call('GET', `/api/admin/leads/${old._id}`, { cookie });
+        assert.equal(oldRes.data.lead.organic, 'gbp');
+        assert.equal(oldRes.data.lead.channel, 'form');
+    });
+
+    dbTest('marking a lead won records the job amount and every change', async () => {
+        const list = await call('GET', '/api/admin/leads?q=grace', { cookie });
+        const id = list.data.leads[0].id;
+        const won = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { status: 'won', jobAmountCents: 485000 } });
+        assert.equal(won.status, 200);
+        assert.equal(won.data.lead.status, 'won');
+        assert.equal(won.data.lead.jobAmountCents, 485000);
+        assert.ok(won.data.lead.wonAt);
+        const fields = won.data.lead.history.map((h) => h.field);
+        assert.ok(fields.includes('Status') && fields.includes('Job amount'));
+        assert.equal(won.data.lead.history.find((h) => h.field === 'Job amount').to, '$4,850.00');
+        assert.equal(won.data.lead.history[0].by, 'Efrain');
+
+        const changed = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { howDidYouHear: 'Referral' } });
+        // The tracked Google visit still wins over the new answer.
+        assert.equal(changed.data.lead.organic, 'search');
+        const manual = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { organic: 'none' } });
+        assert.equal(manual.data.lead.organic, 'none');
+        assert.equal(manual.data.lead.organicReason, 'Set by Efrain');
+        assert.ok(manual.data.lead.history.some((h) => h.field === 'Google credit' && h.from === 'Google Search' && h.to === 'Not organic Google'));
+        const auto = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { organic: 'auto' } });
+        assert.equal(auto.data.lead.organic, 'search');
+        assert.equal((await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { organic: 'facebook' } })).status, 400);
+        assert.equal((await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { jobAmountCents: -5 } })).status, 400);
+
+        const reopened = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { status: 'quoted' } });
+        assert.equal(reopened.data.lead.wonAt, undefined);
+    });
+
+    dbTest('the owner marks a lead out of the service area, and nothing is sent', async () => {
+        const list = await call('GET', '/api/admin/leads?q=grace', { cookie });
+        const id = list.data.leads[0].id;
+        const emailsBefore = sent.length;
+        const out = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: true } });
+        assert.equal(out.status, 200);
+        assert.equal(out.data.lead.outOfArea, true);
+        assert.ok(out.data.lead.history.some((h) => h.field === 'Service area' && h.to === 'Out of service area'));
+        const back = await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: false } });
+        assert.equal(back.data.lead.outOfArea, undefined);
+        assert.equal(sent.length, emailsBefore);
+        assert.equal((await call('PATCH', `/api/admin/leads/${id}`, { cookie, body: { outOfArea: 'yes' } })).status, 400);
+    });
+
+    dbTest('a phone lead picks up the Google credit of the Call tap before it', async () => {
+        const tap = await call('POST', '/api/contact-intent', {
+            body: { kind: 'call', refCode: 'Q7RT', page: '/', attribution: { utmSource: 'google', utmMedium: 'organic', utmCampaign: 'gbp' } },
+        });
+        assert.equal(tap.status, 204);
+        const recent = await call('GET', '/api/admin/contact-intents?kind=call', { cookie });
+        const intent = recent.data.intents.find((i) => i.refCode === 'Q7RT');
+        assert.ok(intent);
+        assert.equal(intent.organic, 'gbp');
+
+        const added = await call('POST', '/api/admin/leads', {
+            cookie, body: { name: 'Caller', phone: '(904) 555-0177', channel: 'call', intentId: intent.id, zip: '32259' },
+        });
+        assert.equal(added.status, 201);
+        assert.equal(added.data.lead.channel, 'call');
+        assert.equal(added.data.lead.organic, 'gbp');
+        assert.match(added.data.lead.organicReason, /Call tap/);
+        assert.equal(added.data.lead.refCode, 'Q7RT');
+        assert.equal(added.data.lead.zip, '32259');
+        assert.equal(added.data.lead.history[0].field, 'Added');
+        // A tap is offered once.
+        const after = await call('GET', '/api/admin/contact-intents?kind=call', { cookie });
+        assert.ok(!after.data.intents.some((i) => i.id === intent.id));
+
+        // A text found by its ref code alone.
+        await call('POST', '/api/contact-intent', { body: { kind: 'text', refCode: 'ZX9P', attribution: { referrer: 'www.google.com' } } });
+        const text = await call('POST', '/api/admin/leads', { cookie, body: { name: 'Texter', phone: '9045550188', channel: 'text', refCode: 'ref zx9p' } });
+        assert.equal(text.data.lead.organic, 'search');
+        const noTap = await call('POST', '/api/admin/leads', { cookie, body: { name: 'Walk-in', phone: '9045550111', howDidYouHear: 'Google Maps' } });
+        assert.equal(noTap.data.lead.channel, 'manual');
+        assert.equal(noTap.data.lead.organic, 'gbp');
+        assert.equal((await call('POST', '/api/admin/leads', { cookie, body: { name: 'X', phone: '1', refCode: '<b>' } })).status, 400);
+    });
+
+    dbTest('customers added by hand are matched to their lead, and quotes need a lead or a reason', async () => {
+        const created = await call('POST', '/api/admin/customers', { cookie, body: { name: 'Grace H.', phone: '904.555.0142' } });
+        assert.equal(created.status, 201);
+        assert.ok(created.data.match);
+        assert.equal(created.data.match.by, 'phone');
+        assert.equal(created.data.match.name, 'Grace Hopper');
+        assert.equal(created.data.customer.leadId, created.data.match.leadId);
+        const quote = await call('POST', '/api/admin/quotes', { cookie, body: { customerId: created.data.customer.id } });
+        assert.equal(quote.status, 201);
+        assert.equal(quote.data.quote.leadId, created.data.match.leadId);
+        const view = await call('GET', `/api/admin/quotes/${quote.data.quote.id}`, { cookie });
+        assert.equal(view.data.lead.name, 'Grace Hopper');
+
+        const stranger = await call('POST', '/api/admin/customers', { cookie, body: { name: 'New Person', phone: '(386) 555-0100' } });
+        assert.equal(stranger.data.match, null);
+        const refused = await call('POST', '/api/admin/quotes', { cookie, body: { customerId: stranger.data.customer.id } });
+        assert.equal(refused.status, 400);
+        assert.match(refused.data.message, /lead/);
+        const ok = await call('POST', '/api/admin/quotes', { cookie, body: { customerId: stranger.data.customer.id, noLeadReason: 'repeat' } });
+        assert.equal(ok.status, 201);
+        assert.equal(ok.data.quote.noLeadReason, 'repeat');
+        assert.equal((await call('POST', '/api/admin/quotes', { cookie, body: { customerId: stranger.data.customer.id, noLeadReason: 'magic' } })).status, 400);
+
+        // Linking an accepted quote to a lead later marks that lead won.
+        const caller = (await call('GET', '/api/admin/leads?q=Caller', { cookie })).data.leads[0];
+        await call('PATCH', `/api/admin/quotes/${ok.data.quote.id}`, { cookie, body: { items: [{ description: 'Walls', quantity: 1, unitPriceCents: 120000 }] } });
+        await call('POST', `/api/admin/quotes/${ok.data.quote.id}/status`, { cookie, body: { status: 'accepted' } });
+        const linked = await call('POST', `/api/admin/quotes/${ok.data.quote.id}/lead`, { cookie, body: { leadId: caller.id } });
+        assert.equal(linked.status, 200);
+        assert.equal(linked.data.lead.status, 'won');
+        const callerLead = await call('GET', `/api/admin/leads/${caller.id}`, { cookie });
+        assert.equal(callerLead.data.lead.jobAmountCents, 120000);
     });
 });

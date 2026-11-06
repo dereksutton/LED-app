@@ -91,7 +91,7 @@ const WhyUs = () => {
         {
             icon: "location",
             title: "Local Expertise",
-            description: "As North Florida's premier painting specialists, we understand your community's unique architectural needs.",
+            description: "As Clay County's premier painting specialists, we understand your community's unique architectural needs.",
             highlight: `${claims.years} Years Local Experience`
         },
         {
@@ -212,7 +212,7 @@ const WhyUs = () => {
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.3 }}
                     >
-                        Discover the six pillars that make LED Custom Painting North Florida&apos;s most trusted painting professionals
+                        Discover the six pillars that make LED Custom Painting Clay County&apos;s most trusted painting professionals
                     </motion.p>
 
                     <motion.div

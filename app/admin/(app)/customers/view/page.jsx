@@ -100,6 +100,9 @@ function CustomerView({ id, data, reload, saved, setSaved }) {
           <Card title="Contracts"><DocLinks kind="contract" docs={data.contracts} /></Card>
           {data.leads.length > 0 && (
             <Card title="Leads">
+              {data.customer.leadMatch && (
+                <p className="mb-2 text-xs text-slate-500">Linked to their lead by matching {data.customer.leadMatch.by === 'phone' ? 'phone number' : 'email'}.</p>
+              )}
               <ul className="divide-y divide-slate-100">
                 {data.leads.map((l) => (
                   <li key={l.id}>

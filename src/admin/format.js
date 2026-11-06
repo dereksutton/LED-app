@@ -82,3 +82,24 @@ export const sourceLabel = (value) => {
   const found = LEAD_SOURCES.find(([v]) => v.toLowerCase() === String(value || '').toLowerCase());
   return found ? found[1] : value || 'Not recorded';
 };
+
+// Organic Google credit and how a lead came in. Values match the API
+// (server/lib/leadSources.js).
+export const ORGANIC = {
+  search: { label: 'Google Search', short: 'Google', tone: 'green' },
+  gbp: { label: 'Google Business Profile', short: 'Google Maps', tone: 'green' },
+  none: { label: 'Not organic Google', short: '', tone: 'gray' },
+};
+export const CHANNELS = [
+  ['form', 'Quote form'],
+  ['call', 'Phone call'],
+  ['text', 'Text'],
+  ['manual', 'Added by hand'],
+];
+export const channelLabel = (value) => (CHANNELS.find(([v]) => v === value) || [null, ''])[1];
+export const NO_LEAD_REASONS = [
+  ['referral', 'Referral'],
+  ['repeat', 'Repeat customer'],
+  ['walk-in', 'Walk-in or met in person'],
+  ['other', 'Other'],
+];
